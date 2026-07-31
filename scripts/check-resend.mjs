@@ -117,6 +117,37 @@ if (!failed) {
   }
 }
 
+// ── The database ────────────────────────────────────────────────────────
+// Postgres is the source of truth now: without it, nothing is stored at all,
+// and a WhatsApp-only signup has nowhere to go. Checked after Resend because
+// this is the one that actually loses data.
+console.log('\n' + '─'.repeat(60))
+console.log('Database\n')
+
+const dbUrl = process.env.DATABASE_URL
+if (!dbUrl) {
+  fail(
+    'DATABASE_URL is not set',
+    'Nothing is being stored. Every signup is logged to the server console and lost on restart.',
+    'Create a Postgres database (Vercel > Storage > Neon), copy its connection string into\n' +
+      '  .env.local as DATABASE_URL, and set the same value in the Vercel project settings.',
+  )
+} else {
+  try {
+    const { neon } = await import('@neondatabase/serverless')
+    const sql = neon(dbUrl)
+    const [{ n }] = await sql`SELECT count(*)::int AS n FROM signups`
+    console.log(`  ✓ Connected. ${n} signup${n === 1 ? '' : 's'} stored.`)
+  } catch (e) {
+    const msg = String(e?.message ?? e)
+    if (/relation "signups" does not exist/i.test(msg)) {
+      console.log('  ✓ Connected. The signups table does not exist yet; the first signup creates it.')
+    } else {
+      fail('Could not reach the database', msg, 'Check DATABASE_URL is the pooled connection string.')
+    }
+  }
+}
+
 console.log('\n' + '─'.repeat(60))
 if (failed) {
   console.log('✗ Signups will fail until the above is fixed.')

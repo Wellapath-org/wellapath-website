@@ -10,10 +10,12 @@
     "sync:kb": "node scripts/sync-kb.mjs",
     "check:copy": "node scripts/check-copy.mjs",
     "check:layout": "node scripts/check-layout.mjs",
-    "check": "npm run check:copy && npm run check:layout",
-    "check:resend": "node scripts/check-resend.mjs"
+    "check": "npm run check:phone && npm run check:copy && npm run check:layout",
+    "check:resend": "node scripts/check-resend.mjs",
+    "check:phone": "tsx scripts/check-phone.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@number-flow/react": "^0.6.2",
     "lucide-react": "^1.28.0",
     "motion": "^12.43.0",
@@ -32,6 +34,7 @@
     "@types/three": "^0.185.1",
     "puppeteer-core": "^24.0.0",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.1",
     "typescript": "^5.9.2"
   }
 }

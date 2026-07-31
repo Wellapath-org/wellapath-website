@@ -20,12 +20,19 @@
  *    server so it can be recovered, rather than disappearing into a success
  *    page that lied.
  *
- * 4. NDPR: the lawful basis is consent, given by submitting this form. Resend
- *    records the contact with a timestamp, which is the consent evidence.
- *    /privacy commits to deleting these within 30 days of launch.
+ * 4. NDPR: the lawful basis is consent, given by submitting this form. The
+ *    signups table records the timestamp, which is the consent evidence, and is
+ *    the single place to delete from when /privacy's 30-day promise falls due.
+ *
+ * 5. EITHER an email or a WhatsApp number is enough. Requiring email would
+ *    defeat the reason WhatsApp is offered at all: in this market it reaches
+ *    people email does not. Postgres is the source of truth; Resend is written
+ *    to as well when there is an email, so the launch broadcast stays one action.
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { Resend } from 'resend'
+import { parseNigerianMobile } from '@/content/phone'
+import { saveSignup, dbConfigured } from '@/content/db'
 
 export const runtime = 'nodejs'
 
@@ -41,11 +48,15 @@ function back(req: NextRequest, params: Record<string, string>) {
 
 export async function POST(req: NextRequest) {
   let email = ''
+  let whatsappRaw = ''
+  let source = ''
   let trap = ''
 
   try {
     const form = await req.formData()
     email = String(form.get('email') ?? '').trim().toLowerCase()
+    whatsappRaw = String(form.get('whatsapp') ?? '').trim()
+    source = String(form.get('source') ?? '').trim().slice(0, 120)
     trap = String(form.get('company') ?? '').trim()
   } catch {
     return back(req, { status: 'error' })
@@ -55,44 +66,80 @@ export async function POST(req: NextRequest) {
   // Answer as if it worked: telling a bot it failed only invites a retry.
   if (trap) return back(req, { status: 'ok' })
 
-  if (!email || email.length > 254 || !EMAIL.test(email)) {
-    return back(req, { status: 'invalid' })
+  // ── Validate whichever channels were given ────────────────────────────
+  const emailGiven = email.length > 0
+  const phoneGiven = whatsappRaw.length > 0
+
+  if (!emailGiven && !phoneGiven) return back(req, { status: 'nothing' })
+
+  if (emailGiven && (email.length > 254 || !EMAIL.test(email))) {
+    return back(req, { status: 'invalid-email' })
   }
 
-  const key = process.env.RESEND_API_KEY
-  const audienceId = process.env.RESEND_AUDIENCE_ID
-
-  if (!key || !audienceId) {
-    // Configuration failure, not the visitor's. Log it so the address survives.
-    console.error(
-      `[notify] RESEND_API_KEY or RESEND_AUDIENCE_ID missing. Unsaved signup: ${email}`,
-    )
-    return back(req, { status: 'error' })
+  let whatsapp: string | null = null
+  if (phoneGiven) {
+    const parsed = parseNigerianMobile(whatsappRaw)
+    if (!parsed.ok) return back(req, { status: 'invalid-phone' })
+    whatsapp = parsed.e164
   }
 
-  try {
-    const resend = new Resend(key)
-    const { error } = await resend.contacts.create({
-      email,
-      unsubscribed: false,
-      audienceId,
-    })
+  const who = [emailGiven ? email : null, whatsapp].filter(Boolean).join(' / ')
 
-    if (error) {
-      // Resend returns an error object rather than throwing for API-level
-      // problems. Already-subscribed is a success from the visitor's side.
-      const message = String(error.message ?? '').toLowerCase()
-      if (message.includes('already')) return back(req, { status: 'ok' })
+  // ── Postgres is the source of truth ────────────────────────────────────
+  // It is allowed to be absent. The database and the deployment that uses it
+  // do not go live in the same instant, and during that gap an email-only
+  // signup can still be stored in Resend, so failing it would throw away a
+  // real signup over an ordering detail. A WhatsApp number has nowhere else to
+  // go, so that case is still an honest error.
+  let stored = false
 
-      console.error(`[notify] Resend rejected ${email}: ${error.message}`)
-      return back(req, { status: 'error' })
+  if (dbConfigured()) {
+    try {
+      await saveSignup({ email: emailGiven ? email : null, whatsapp, source: source || null })
+      stored = true
+    } catch (e) {
+      console.error(`[notify] Could not save ${who} to Postgres:`, e)
     }
+  } else if (whatsapp) {
+    console.error(`[notify] DATABASE_URL missing. Unsaved WhatsApp signup: ${who}`)
+  }
 
-    return back(req, { status: 'ok' })
-  } catch (e) {
-    console.error(`[notify] Unhandled failure for ${email}:`, e)
+  // ── Resend, for the email broadcast ────────────────────────────────────
+  // Secondary when Postgres worked, and the only net when it did not.
+  let mailed = false
+
+  if (emailGiven) {
+    const key = process.env.RESEND_API_KEY
+    const audienceId = process.env.RESEND_AUDIENCE_ID
+    if (!key || !audienceId) {
+      console.error(`[notify] Resend is not configured, so ${email} is not on the launch list.`)
+    } else {
+      try {
+        const { error } = await new Resend(key).contacts.create({
+          email,
+          unsubscribed: false,
+          audienceId,
+        })
+        // Already-subscribed is a success from the visitor's side.
+        if (!error || String(error.message ?? '').toLowerCase().includes('already')) mailed = true
+        else console.error(`[notify] Resend rejected ${email}: ${error.message}`)
+      } catch (e) {
+        console.error(`[notify] Resend threw for ${email}:`, e)
+      }
+    }
+  }
+
+  // Success means at least one store kept it. A WhatsApp number that only
+  // Resend could not hold is not a success, whatever the email did.
+  const kept = stored || mailed
+  const numberLost = Boolean(whatsapp) && !stored
+
+  if (!kept || numberLost) {
+    console.error(`[notify] Unsaved signup: ${who}`)
     return back(req, { status: 'error' })
   }
+
+  return back(req, { status: 'ok' })
 }
 
 /** A GET here means someone followed the action URL directly. Send them on. */

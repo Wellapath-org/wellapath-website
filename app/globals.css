@@ -75,6 +75,17 @@
   --color-triage-warn-wash: #fdf4e3;
   --color-triage-crit-wash: #fdeeec;
 
+  /* ── Chart series — /admin only, never on a public page ───────────────
+     Two categorical slots for the signups chart, in fixed order. Validated
+     against the white card surface: chroma floor pass, CVD separation ΔE 30.9
+     deutan / 12.5 tritan, both over 3:1 on the surface. Slot 1 is the brand
+     violet, so the chart does not introduce a colour the site does not own;
+     slot 2 is a green that reads as the messaging channel without borrowing
+     WhatsApp's own brand green. These are NOT triage colours and carry no
+     clinical meaning, which is why they are named for the series instead. */
+  --color-series-email: #6f17ff;
+  --color-series-whatsapp: #0a8f4d;
+
   /* ── Type ─────────────────────────────────────────────────────────── */
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;

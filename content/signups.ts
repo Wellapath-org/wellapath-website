@@ -1,11 +1,25 @@
 /**
  * Signup data for the admin dashboard.
  *
- * Server-only. The Resend key is read here and never crosses to the client —
- * the page is a server component and only renders derived numbers and the list.
+ * Server-only. Neither the Resend key nor the database URL crosses to the
+ * client: the page is a server component and renders only derived numbers and
+ * the list itself.
+ *
+ * ── Two sources, deliberately ──────────────────────────────────────────────
+ *
+ * Postgres is the source of truth. It is the only store that can hold a
+ * WhatsApp-only signup, and it is the single place /privacy's deletion promise
+ * has to be honoured.
+ *
+ * Resend is still read, and merged in, because contacts collected before the
+ * database existed live only there. Dropping them silently would mean a
+ * dashboard that under-reports the real list, which is the one failure mode
+ * this file already learned the hard way. Anything present in both is matched
+ * on email and counted once, with the Postgres row winning.
  */
 import 'server-only'
 import { Resend } from 'resend'
+import { listSignups as listDbSignups, dbConfigured, type SignupRow } from './db'
 
 /**
  * Contacts are fetched over REST, not through `resend.contacts.list()`.
@@ -61,35 +75,62 @@ function parseResendDate(value: string): Date {
 
 export type Signup = {
   id: string
-  email: string
+  email: string | null
+  /** E.164, +234XXXXXXXXXX. Null when the person signed up by email only. */
+  whatsapp: string | null
+  /** 0803 123 4567. Null when there is no number. */
+  whatsappDisplay: string | null
   createdAt: Date
   unsubscribed: boolean
+  /** Where the row came from, so a stale Resend-only contact is visible as one. */
+  store: 'db' | 'resend'
+  source: string | null
 }
 
 export type SignupReport = {
   ok: boolean
   error?: string
+  /** Non-fatal problems: one store answered, the other did not. */
+  warnings: string[]
   audienceName?: string
   signups: Signup[]
   total: number
-  subscribed: number
+  withEmail: number
+  withWhatsapp: number
+  whatsappOnly: number
   unsubscribed: number
   last24h: number
   last7d: number
   last30d: number
   /** Oldest → newest, one entry per day, gaps filled with zero. */
-  daily: { date: Date; count: number }[]
+  daily: { date: Date; email: number; whatsapp: number; total: number }[]
   peakDay: number
 }
 
 const DAY = 24 * 60 * 60 * 1000
 
+function fromDb(r: SignupRow): Signup {
+  return {
+    id: `db-${r.id}`,
+    email: r.email,
+    whatsapp: r.whatsapp,
+    whatsappDisplay: r.whatsappDisplay,
+    createdAt: r.createdAt,
+    unsubscribed: false,
+    store: 'db',
+    source: r.source,
+  }
+}
+
 export async function getSignups(days = 30): Promise<SignupReport> {
   const empty: SignupReport = {
     ok: false,
+    warnings: [],
     signups: [],
     total: 0,
-    subscribed: 0,
+    withEmail: 0,
+    withWhatsapp: 0,
+    whatsappOnly: 0,
     unsubscribed: 0,
     last24h: 0,
     last7d: 0,
@@ -98,65 +139,125 @@ export async function getSignups(days = 30): Promise<SignupReport> {
     peakDay: 0,
   }
 
-  const key = process.env.RESEND_API_KEY
-  const audienceId = process.env.RESEND_AUDIENCE_ID
-  if (!key || !audienceId) {
-    return { ...empty, error: 'RESEND_API_KEY or RESEND_AUDIENCE_ID is not set on this deployment.' }
+  const warnings: string[] = []
+
+  // ── Postgres ────────────────────────────────────────────────────────────
+  let dbRows: SignupRow[] = []
+  let dbOk = false
+  if (dbConfigured()) {
+    try {
+      dbRows = await listDbSignups()
+      dbOk = true
+    } catch (e) {
+      warnings.push(
+        `The database could not be read: ${e instanceof Error ? e.message : 'unknown error'}`,
+      )
+    }
+  } else {
+    warnings.push('DATABASE_URL is not set, so no signups are being stored. Set it and redeploy.')
   }
 
-  try {
-    const resend = new Resend(key)
+  // ── Resend, for anything collected before the database existed ──────────
+  const key = process.env.RESEND_API_KEY
+  const audienceId = process.env.RESEND_AUDIENCE_ID
+  let resendRows: RawContact[] = []
+  let resendOk = false
+  let audienceName: string | undefined
 
-    const [raw, audiencesRes] = await Promise.all([
-      fetchContacts(key, audienceId),
-      resend.audiences.list(),
-    ])
-
-    const audienceName = audiencesRes.data?.data?.find((a) => a.id === audienceId)?.name
-
-    const signups: Signup[] = raw
-      .map((c) => ({
-        id: String(c.id),
-        email: String(c.email),
-        createdAt: parseResendDate(c.created_at),
-        unsubscribed: Boolean(c.unsubscribed),
-      }))
-      .filter((s) => !Number.isNaN(s.createdAt.getTime()))
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-
-    const now = Date.now()
-    const since = (ms: number) => signups.filter((s) => now - s.createdAt.getTime() <= ms).length
-
-    // One bucket per day so the axis is continuous. A bar chart that silently
-    // skips empty days overstates how steady the signups are.
-    const start = new Date(now - (days - 1) * DAY)
-    start.setHours(0, 0, 0, 0)
-    const buckets = new Map<number, number>()
-    for (let i = 0; i < days; i++) buckets.set(start.getTime() + i * DAY, 0)
-    for (const s of signups) {
-      const d = new Date(s.createdAt)
-      d.setHours(0, 0, 0, 0)
-      const k = d.getTime()
-      if (buckets.has(k)) buckets.set(k, (buckets.get(k) ?? 0) + 1)
+  if (key && audienceId) {
+    try {
+      const resend = new Resend(key)
+      const [raw, audiencesRes] = await Promise.all([
+        fetchContacts(key, audienceId),
+        resend.audiences.list(),
+      ])
+      resendRows = raw
+      audienceName = audiencesRes.data?.data?.find((a) => a.id === audienceId)?.name
+      resendOk = true
+    } catch (e) {
+      warnings.push(
+        `Resend could not be read: ${e instanceof Error ? e.message : 'unknown error'}`,
+      )
     }
-    const daily = [...buckets.entries()]
-      .sort((a, b) => a[0] - b[0])
-      .map(([t, count]) => ({ date: new Date(t), count }))
+  } else {
+    warnings.push('RESEND_API_KEY or RESEND_AUDIENCE_ID is not set, so the launch email has no list.')
+  }
 
+  if (!dbOk && !resendOk) {
     return {
-      ok: true,
-      audienceName,
-      signups,
-      total: signups.length,
-      subscribed: signups.filter((s) => !s.unsubscribed).length,
-      unsubscribed: signups.filter((s) => s.unsubscribed).length,
-      last24h: since(DAY),
-      last7d: since(7 * DAY),
-      last30d: since(30 * DAY),
-      daily,
-      peakDay: Math.max(0, ...daily.map((d) => d.count)),
+      ...empty,
+      warnings,
+      error: 'Neither the database nor Resend could be reached, so there is nothing to show.',
     }
-  } catch (e) {
-    return { ...empty, error: e instanceof Error ? e.message : 'Could not reach Resend.' }
+  }
+
+  // ── Merge, email-matched, Postgres winning ──────────────────────────────
+  const merged: Signup[] = dbRows.map(fromDb)
+  const known = new Set(merged.map((s) => s.email).filter(Boolean) as string[])
+  const unsubscribedIn = new Set(
+    resendRows.filter((c) => c.unsubscribed).map((c) => String(c.email).toLowerCase()),
+  )
+
+  for (const s of merged) {
+    if (s.email && unsubscribedIn.has(s.email)) s.unsubscribed = true
+  }
+
+  for (const c of resendRows) {
+    const email = String(c.email).toLowerCase()
+    if (known.has(email)) continue
+    const createdAt = parseResendDate(c.created_at)
+    if (Number.isNaN(createdAt.getTime())) continue
+    merged.push({
+      id: `resend-${c.id}`,
+      email,
+      whatsapp: null,
+      whatsappDisplay: null,
+      createdAt,
+      unsubscribed: Boolean(c.unsubscribed),
+      store: 'resend',
+      source: null,
+    })
+  }
+
+  merged.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+  const now = Date.now()
+  const since = (ms: number) => merged.filter((s) => now - s.createdAt.getTime() <= ms).length
+
+  // One bucket per day so the axis is continuous. A bar chart that silently
+  // skips empty days overstates how steady the signups are.
+  const start = new Date(now - (days - 1) * DAY)
+  start.setHours(0, 0, 0, 0)
+  const buckets = new Map<number, { email: number; whatsapp: number }>()
+  for (let i = 0; i < days; i++) buckets.set(start.getTime() + i * DAY, { email: 0, whatsapp: 0 })
+  for (const s of merged) {
+    const d = new Date(s.createdAt)
+    d.setHours(0, 0, 0, 0)
+    const b = buckets.get(d.getTime())
+    if (!b) continue
+    // Each signup lands in exactly one series, so the stack totals the day.
+    // WhatsApp wins the tie because that is the channel being measured.
+    if (s.whatsapp) b.whatsapp++
+    else b.email++
+  }
+  const daily = [...buckets.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([t, v]) => ({ date: new Date(t), ...v, total: v.email + v.whatsapp }))
+
+  return {
+    ok: true,
+    warnings,
+    audienceName,
+    signups: merged,
+    total: merged.length,
+    withEmail: merged.filter((s) => s.email).length,
+    withWhatsapp: merged.filter((s) => s.whatsapp).length,
+    whatsappOnly: merged.filter((s) => s.whatsapp && !s.email).length,
+    unsubscribed: merged.filter((s) => s.unsubscribed).length,
+    last24h: since(DAY),
+    last7d: since(7 * DAY),
+    last30d: since(30 * DAY),
+    daily,
+    peakDay: Math.max(0, ...daily.map((d) => d.total)),
   }
 }

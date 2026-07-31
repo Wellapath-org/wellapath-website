@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { MENU, NAV, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER } from '@/content/site'
 import { Button } from './ui'
 import { EmergencyCard } from './clinical'
-import { Mail, ChevronDown } from 'lucide-react'
+import { BellRing, ChevronDown } from 'lucide-react'
 
 /* ── Wordmark ─────────────────────────────────────────────────────────────
    From the app splash: lowercase "wellapath" with the tick. Drawn as SVG so
@@ -278,8 +278,8 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
           <span className="font-normal text-ink-soft"> It is free, and no account is needed.</span>
         </h2>
         <p className="text-body measure mt-4 text-ink-soft">
-          WellaPath is coming to Android and iPhone. Leave your email and we will tell you once, on the day it is live. Nothing else,
-          ever.
+          WellaPath is coming to Android and iPhone. Leave an email address or a WhatsApp number and
+          we will tell you once, on the day it is live. Nothing else, ever.
         </p>
 
         <form action="/api/notify" method="POST" className="relative mt-8 max-w-md">
@@ -290,7 +290,12 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
             <label htmlFor={`${id}-company`}>Company</label>
             <input id={`${id}-company`} name="company" type="text" tabIndex={-1} autoComplete="off" />
           </div>
+          <input type="hidden" name="source" value={id} />
 
+          {/* Neither field is `required`, and that is the point. Requiring the
+              email would undo the reason WhatsApp is here: it reaches people
+              email does not. The server insists on one of the two, so the rule
+              still holds with JavaScript off. */}
           <label htmlFor={`${id}-email`} className="text-body block font-semibold text-ink">
             Email address
           </label>
@@ -298,19 +303,45 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
             id={`${id}-email`}
             name="email"
             type="email"
-            required
             autoComplete="email"
             placeholder="you@example.com"
             className="mt-2 min-h-12 w-full rounded-md bg-card px-4 text-body text-ink ring ring-field-border placeholder:text-ink-mute focus:ring-2 focus:ring-accent-ink"
           />
-          <div className="mt-4">
-            <Button type="submit" full icon={Mail}>
+
+          <div
+            className="my-5 flex items-center gap-4 text-small text-ink-mute"
+            aria-hidden="true"
+          >
+            <span className="h-px flex-1 bg-rule" />
+            or
+            <span className="h-px flex-1 bg-rule" />
+          </div>
+
+          <label htmlFor={`${id}-whatsapp`} className="text-body block font-semibold text-ink">
+            WhatsApp number
+          </label>
+          <input
+            id={`${id}-whatsapp`}
+            name="whatsapp"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="0803 123 4567"
+            aria-describedby={`${id}-whatsapp-help`}
+            className="mt-2 min-h-12 w-full rounded-md bg-card px-4 text-body text-ink ring ring-field-border placeholder:text-ink-mute focus:ring-2 focus:ring-accent-ink"
+          />
+          <p id={`${id}-whatsapp-help`} className="text-small mt-2 text-ink-mute">
+            Nigerian mobile numbers. Any format is fine.
+          </p>
+
+          <div className="mt-6">
+            <Button type="submit" full icon={BellRing}>
               Notify me at launch
             </Button>
           </div>
           <p className="text-small mt-4 text-ink-mute">
-            One email, at launch. We do not sell or share your address, and we delete the list 30
-            days after. See our{' '}
+            One message, at launch. Either field on its own is enough. We do not sell or share your
+            details, and we delete the list 30 days after. See our{' '}
             <Link href="/privacy" className="text-accent-ink underline underline-offset-2">
               privacy page
             </Link>

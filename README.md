@@ -45,27 +45,41 @@ To build a preview anyway:
 ALLOW_UNREVIEWED_RED_FLAGS=true npm run build
 ```
 
-## Launch signup (Resend)
+## Launch signup
 
-The "Notify me at launch" form posts to `/api/notify`, which adds the address to
-a Resend audience. It needs two environment variables:
+The "Notify me at launch" form posts to `/api/notify`. It takes **an email
+address or a WhatsApp number, and either one on its own is enough**. Requiring
+the email would undo the reason the number is offered: it reaches people email
+does not.
+
+Postgres is the source of truth, because it is the only store that can hold a
+WhatsApp-only signup and it is the single place `/privacy`'s deletion promise
+has to be honoured. Resend is written to as well whenever there is an email, so
+the launch broadcast stays one action there.
 
 ```bash
-cp .env.example .env.local     # then fill in the two Resend values
+cp .env.example .env.local     # then fill in the values below
 npm run check:resend           # tells you exactly what is missing or wrong
 ```
 
 | Variable | Where from |
 |---|---|
+| `DATABASE_URL` | **Vercel → Storage → Create → Neon Postgres.** Copy the pooled connection string. The `signups` table is created on first use; there is no migration step |
 | `RESEND_API_KEY` | [resend.com/api-keys](https://resend.com/api-keys) — "Sending access" is enough; this code only creates contacts, it never sends |
 | `RESEND_AUDIENCE_ID` | [resend.com/audiences](https://resend.com/audiences) — create an audience, copy its **ID**, not its name |
+| `ADMIN_USER`, `ADMIN_PASSWORD` | Chosen by you. They gate `/admin/signups`, which lists real names and numbers |
 
-Set the same two in **Vercel → Settings → Environment Variables**. Vercel only
+Set the same values in **Vercel → Settings → Environment Variables**. Vercel only
 applies environment variables to deployments created *after* they are added, so
 redeploy once you have set them.
 
-Until they are set every signup returns an honest error and the address is
-written to the server log, so nothing is lost — but nothing is stored either.
+Until `DATABASE_URL` is set every signup returns an honest error and the details
+are written to the server log, so nothing is lost — but nothing is stored either.
+`/admin/signups` says so on the page rather than quietly reporting zero.
+
+Numbers are normalised to E.164 (`+234XXXXXXXXXX`) on the way in, so the same
+number typed as `08031234567`, `+234 803 123 4567` or `(0803) 123-4567` is one
+contact, not three. See `content/phone.ts`.
 
 ## Where the facts come from
 

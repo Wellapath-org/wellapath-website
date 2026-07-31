@@ -18,23 +18,40 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 }
 
-type Status = 'ok' | 'invalid' | 'error'
+type Status = 'ok' | 'nothing' | 'invalid-email' | 'invalid-phone' | 'error'
 
-const COPY: Record<Status, { eyebrow: string; lead: string; rest: string }> = {
+const STATUSES: Status[] = ['ok', 'nothing', 'invalid-email', 'invalid-phone', 'error']
+
+const COPY: Record<Status, { eyebrow: string; lead: string; rest: string; fix: string }> = {
   ok: {
     eyebrow: 'You are on the list',
-    lead: 'We will email you once.',
+    lead: 'We will reach you once.',
     rest: 'On the day the app is live, and not before.',
+    fix: '',
   },
-  invalid: {
+  nothing: {
+    eyebrow: 'The form was empty',
+    lead: 'We need one way to reach you.',
+    rest: 'An email address or a WhatsApp number. Either on its own is enough.',
+    fix: 'Nothing was saved. Go back and fill in whichever of the two suits you.',
+  },
+  'invalid-email': {
     eyebrow: 'Check the address',
     lead: 'That email address did not look right.',
     rest: 'Go back and try again.',
+    fix: 'Nothing was saved. Head back and check the address for a typo.',
+  },
+  'invalid-phone': {
+    eyebrow: 'Check the number',
+    lead: 'That did not look like a Nigerian mobile number.',
+    rest: 'We accept 0803 123 4567, +234 803 123 4567, and anything close.',
+    fix: 'Nothing was saved. Head back and check the digits. Spaces and brackets are fine.',
   },
   error: {
     eyebrow: 'Something went wrong',
-    lead: 'We could not save your address.',
+    lead: 'We could not save your details.',
     rest: 'This one is on us, not on you.',
+    fix: 'Nothing was saved, and the fault is at our end. Please try again in a moment.',
   },
 }
 
@@ -44,7 +61,7 @@ export default async function ThanksPage({
   searchParams: Promise<{ status?: string }>
 }) {
   const { status } = await searchParams
-  const s: Status = status === 'ok' || status === 'invalid' ? status : 'error'
+  const s: Status = STATUSES.includes(status as Status) ? (status as Status) : 'error'
   const c = COPY[s]
   const good = s === 'ok'
 
@@ -87,27 +104,23 @@ export default async function ThanksPage({
             <>
               <p>
                 <strong>What happens now: nothing, until launch.</strong> We will send exactly one
-                email, on the day the app is live. No newsletter, no product updates, no
-                &ldquo;we miss you&rdquo;.
+                message, on the day the app is live, to whichever route you gave us. No newsletter,
+                no product updates, no &ldquo;we miss you&rdquo;.
               </p>
               <p>
-                Your address is stored on its own. It is not linked to any symptom data, because
+                What you gave us is stored on its own. It is not linked to any symptom data, because
                 there is none to link it to. The assessment runs on your phone and never reaches
                 us.
               </p>
               <p>
                 Under the NDPR our lawful basis is your consent, given when you submitted the form.
-                You can withdraw it at any time and we will delete the address. We delete the whole
+                You can withdraw it at any time and we will delete your details. We delete the whole
                 list within 30 days of launch either way. See <a href="/privacy">privacy</a>.
               </p>
             </>
           ) : (
             <>
-              <p>
-                {s === 'invalid'
-                  ? 'Nothing was saved. Head back and check the address for a typo.'
-                  : 'Nothing was saved, and the fault is at our end. Please try again in a moment.'}
-              </p>
+              <p>{c.fix}</p>
               <p>
                 If you need care now, do not wait on us. Call{' '}
                 <a href={`tel:${EMERGENCY.national}`}>{EMERGENCY.national}</a> in an emergency, or

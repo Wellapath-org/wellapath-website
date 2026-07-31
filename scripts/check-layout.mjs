@@ -80,6 +80,10 @@ for (const route of ROUTES) {
       if (r.width === 0 || r.height === 0) continue
       const s = getComputedStyle(el)
       if (el.closest('[role="img"]')) continue // recreated UI, not operable
+      // Hidden from assistive tech AND off-screen: not a target anyone can hit.
+      // The signup honeypot lives here. A genuinely interactive control should
+      // never be aria-hidden, so this cannot mask a real violation.
+      if (el.closest('[aria-hidden="true"]')) continue
       if (s.display === 'inline' && el.closest('p, li')) continue // inline text links exempt
       // A control wrapped in a large label has the label's hit area.
       const lbl = el.closest('label')

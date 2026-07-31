@@ -4,7 +4,6 @@
  * operable and screen-reader announced with zero JavaScript.
  */
 import Link from 'next/link'
-import Image from 'next/image'
 import { MENU, NAV, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER } from '@/content/site'
 import { Button } from './ui'
 import { EmergencyCard } from './clinical'
@@ -25,13 +24,22 @@ export function Wordmark({
   // The supplied artwork, not a redraw. The letterforms are a custom typeface
   // and cannot be reproduced faithfully in markup; the earlier hand-drawn
   // version was an approximation and is gone.
+  // A plain <img>, not next/image.
+  //
+  // The logo is a fixed-size static asset above the fold: there is no
+  // responsive srcset to pick, nothing to lazy-load, and no runtime resizing to
+  // do. next/image bought none of that and cost ~5 KB of client JS, pushing
+  // First Load to the edge of the 120 KB budget. It also pulls `sharp` into the
+  // server bundle, which is where the outstanding libvips advisory lives.
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src="/brand/wordmark.webp"
       alt={SITE.name}
       width={Math.round((618 / 120) * height)}
       height={height}
-      priority
+      fetchPriority="high"
+      decoding="async"
       className={className}
     />
   )
@@ -40,7 +48,8 @@ export function Wordmark({
 /** The symbol alone, for tight spaces. Same artwork as the favicon. */
 export function TickMark({ className = 'h-5 w-5' }: { className?: string }) {
   return (
-    <Image src="/brand/symbol.png" alt="" width={40} height={40} className={className} aria-hidden />
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/brand/symbol.png" alt="" width={40} height={40} className={className} aria-hidden />
   )
 }
 

@@ -68,25 +68,45 @@ if (audienceId && !/^[0-9a-f-]{36}$/i.test(audienceId)) {
 if (!failed) {
   try {
     const resend = new Resend(key)
-    // Read-only: proves the key works AND the audience exists, without writing.
-    const { data, error } = await resend.contacts.list({ audienceId })
+
+    // List the audiences and check membership explicitly.
+    //
+    // An earlier version used `contacts.list({ audienceId })` and reported a
+    // PASS for an audience that did not exist — that call resolves against a
+    // /segments/ path and returns success for an unknown id. A preflight that
+    // says "correctly wired" when it is not is worse than no preflight, so this
+    // now compares against the real list and prints it.
+    const { data, error } = await resend.audiences.list()
 
     if (error) {
       const msg = String(error.message ?? '')
       if (/api key/i.test(msg)) {
         fail('Resend rejected the API key', msg, 'Regenerate it at resend.com/api-keys.')
-      } else if (/not found/i.test(msg)) {
-        fail(
-          'That audience does not exist on this account',
-          msg,
-          'Check the ID, and that the key belongs to the same Resend account.',
-        )
       } else {
         fail('Resend returned an error', msg, 'See https://resend.com/docs.')
       }
     } else {
-      const n = data?.data?.length ?? 0
-      console.log(`\n  ✓ Key valid, audience reachable. ${n} contact${n === 1 ? '' : 's'} on it.`)
+      const list = data?.data ?? []
+      const match = list.find((a) => a.id === audienceId)
+
+      if (!match) {
+        console.log('\n  Audiences on this account:')
+        if (list.length === 0) console.log('    (none — create one at resend.com/audiences)')
+        for (const a of list) console.log(`    ${a.id}  ${a.name}`)
+        fail(
+          'RESEND_AUDIENCE_ID does not match any audience on this account',
+          `Configured ${audienceId}, which is not in the list above.`,
+          list.length === 1
+            ? `Use ${list[0].id} (${list[0].name}), or create a dedicated launch audience.`
+            : 'Copy an ID from the list above, or check the key belongs to the right account.',
+        )
+      } else {
+        const { data: contacts } = await resend.contacts.list({ audienceId })
+        const n = contacts?.data?.length ?? 0
+        console.log(
+          `\n  ✓ Key valid. Audience "${match.name}" found, ${n} contact${n === 1 ? '' : 's'} on it.`,
+        )
+      }
     }
   } catch (e) {
     fail('Could not reach Resend', String(e?.message ?? e), 'Check network access.')

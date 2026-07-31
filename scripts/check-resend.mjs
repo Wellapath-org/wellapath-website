@@ -101,8 +101,12 @@ if (!failed) {
             : 'Copy an ID from the list above, or check the key belongs to the right account.',
         )
       } else {
-        const { data: contacts } = await resend.contacts.list({ audienceId })
-        const n = contacts?.data?.length ?? 0
+        // REST, not resend.contacts.list(): that method hits a /segments/ path
+        // and returned 0 for an audience that held 3 contacts.
+        const res = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+          headers: { Authorization: `Bearer ${key}` },
+        })
+        const n = res.ok ? ((await res.json()).data ?? []).length : 0
         console.log(
           `\n  ✓ Key valid. Audience "${match.name}" found, ${n} contact${n === 1 ? '' : 's'} on it.`,
         )

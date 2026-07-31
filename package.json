@@ -16,7 +16,7 @@
     "@number-flow/react": "^0.6.2",
     "lucide-react": "^1.28.0",
     "motion": "^12.43.0",
-    "next": "15.5.4",
+    "next": "^15.5.22",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "three": "^0.185.1"

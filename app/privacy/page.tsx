@@ -64,7 +64,7 @@ export default function PrivacyPage() {
             <h3 className="text-h3 font-bold text-ink">What we do handle</h3>
             <ul className="mt-4 space-y-2">
               {[
-                'Your email address, only if you give it to us for launch notification',
+                'Your email address or WhatsApp number, only if you give it to us for launch notification',
                 'Anonymous, aggregate counts of app downloads',
                 'Crash reports, if your device is set to send them. These contain no symptom data',
               ].map((x) => (
@@ -91,18 +91,21 @@ export default function PrivacyPage() {
         <Prose>
           <p>
             <strong>Lawful basis.</strong> Where we process personal data at all, it is on the basis
-            of your consent, given when you enter your email address and withdrawable at any time.
+            of your consent, given when you enter your email address or WhatsApp number, and withdrawable at
+            any time.
             The symptom assessment itself processes no personal data on our side, because it never
             reaches our side.
           </p>
           <p>
             <strong>Your rights.</strong> You may ask what we hold about you, ask us to correct it,
-            or ask us to delete it. Because the only thing we are likely to hold is an email address,
-            these requests are usually resolved in one step.
+            or ask us to delete it. Because the only thing we are likely to hold is an email address
+            or a phone number, these requests are usually resolved in one step.
           </p>
           <p>
-            <strong>Retention.</strong> Email addresses collected for launch notification are deleted
-            within 30 days of launch, or immediately on request.
+            <strong>Retention.</strong> Email addresses and WhatsApp numbers collected for launch
+            notification are deleted within 30 days of launch, or immediately on request. A WhatsApp
+            number is used to send the launch message and nothing else. We do not add you to any
+            group, and we do not pass the number to anyone.
           </p>
           <p>
             <strong>Analytics restraint.</strong> If we ever add analytics, it will be a cookieless,

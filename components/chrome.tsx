@@ -282,7 +282,15 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
           ever.
         </p>
 
-        <form action="/api/notify" method="POST" className="mt-8 max-w-md">
+        <form action="/api/notify" method="POST" className="relative mt-8 max-w-md">
+          {/* Honeypot. Hidden from people and from screen readers, so anything
+              that fills it is a bot. `hidden` alone would be skipped by some
+              bots, hence the off-screen positioning as well. */}
+          <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+            <label htmlFor={`${id}-company`}>Company</label>
+            <input id={`${id}-company`} name="company" type="text" tabIndex={-1} autoComplete="off" />
+          </div>
+
           <label htmlFor={`${id}-email`} className="text-body block font-semibold text-ink">
             Email address
           </label>
@@ -301,7 +309,8 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
             </Button>
           </div>
           <p className="text-small mt-4 text-ink-mute">
-            One email, at launch. We do not sell or share your address. See our{' '}
+            One email, at launch. We do not sell or share your address, and we delete the list 30
+            days after. See our{' '}
             <Link href="/privacy" className="text-accent-ink underline underline-offset-2">
               privacy page
             </Link>

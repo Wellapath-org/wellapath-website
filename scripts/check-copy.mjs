@@ -27,6 +27,8 @@ const ROUTES = [
   '/clinical-safety',
   '/partners',
   '/about',
+  '/notify/thanks?status=ok',
+  '/notify/thanks?status=error',
 ]
 
 /**

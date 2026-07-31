@@ -1,0 +1,44 @@
+{
+  "syncedFrom": "/Users/iamjohnseyi/Documents/project/wellapath-knowledge-base",
+  "artifacts": {
+    "rules.json": {
+      "source": "rules.ng.v2.2.json",
+      "version": "2.2",
+      "release_date": "2026-07-26"
+    },
+    "facilities.json": {
+      "source": "facilities.ng.v1.1.json",
+      "version": "1.1",
+      "release_date": "2026-07-26"
+    },
+    "tokens.json": {
+      "source": "token_dictionary.ng.v1.1.json",
+      "version": "1.1",
+      "release_date": "2026-04-05"
+    },
+    "red-flag-display.json": {
+      "source": "mobile_handoff/red_flag_display_map.json",
+      "version": null,
+      "release_date": null
+    },
+    "conditions/": {
+      "source": "conditions/*.ng.v2.0.json",
+      "count": 50
+    }
+  },
+  "receipts": {
+    "conditions": 50,
+    "rules": 75,
+    "rulesGlobal": 13,
+    "rulesConditionSpecific": 62,
+    "facilities": 5344,
+    "emergencyCapable": 924,
+    "withPhone": 45,
+    "byState": {
+      "Lagos": 2690,
+      "FCT": 614,
+      "Kano": 2040
+    },
+    "urgencyLevelsShown": 3
+  }
+}

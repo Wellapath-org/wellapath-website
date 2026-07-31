@@ -1,0 +1,576 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WellaPath — design tokens
+   Tailwind v4.3 · light only · see docs/DESIGN.md
+
+   Structure and craft from Stripe; hue is ours (#6B4EFF from the Flutter app).
+
+   Two structural decisions worth knowing before you edit anything:
+
+   1. `--color-*: initial` below DELETES Tailwind's default palette. There is
+      no `indigo-500`, no `slate-700`, no `gray-200` in this project. Default
+      Tailwind indigo is the single most-cited tell of generated design, and
+      the only reliable prevention is making it impossible to type.
+
+   2. Shadows are two-layer and violet-tinted, never black. Black shadows
+      desaturate whatever they fall on; a tinted shadow reads as light in a
+      room. Both layers carry negative spread so the shadow is narrower than
+      the box — Stripe's own construction.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/inter-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@theme {
+  /* Delete the default palette. Everything below is deliberate. */
+  --color-*: initial;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* ── Surfaces ─────────────────────────────────────────────────────────
+     Neutrals carry a violet cast. Premium systems never use pure neutrals —
+     every surface holds a trace of the brand hue.
+     ─────────────────────────────────────────────────────────────────── */
+  --color-ground: #ffffff;
+  --color-sunk: #f7f6fb;
+  --color-card: #ffffff;
+  --color-navy: #0e0b26;
+  --color-navy-card: #191338;
+
+  /* ── Ink (measured on white / on --color-sunk) ────────────────────── */
+  /* Sampled from the supplied logo files, not derived from the app. Both are
+     better for contrast than the values they replace. */
+  --color-ink: #100032; /* 19.33 / 17.97 — the wordmark ink */
+  --color-ink-soft: #565175; /*  7.42 /  6.85 — muted half of two-tone headings */
+  --color-ink-mute: #6f6a8a; /*  5.12 /  4.72 — captions, eyebrows */
+  --color-ink-on-navy: #c3baf0; /* 10.60 on navy */
+
+  /* ── Brand ────────────────────────────────────────────────────────── */
+  --color-accent: #6f17ff; /*  6.48 — the official brand violet */
+  --color-accent-hover: #5a0fd6; /*  8.49 */
+  --color-accent-ink: #5a0fd6; /*  8.49 — links, focus, violet text */
+  --color-accent-wash: #f3eeff;
+
+  /* ── Lines ────────────────────────────────────────────────────────── */
+  --color-rule: #e7e4f0;
+  --color-rail: #efedf7;
+  --color-field-border: #8e86a8; /*  3.43 — WCAG 1.4.11 needs 3:1 */
+
+  /* ── Triage — SEMANTIC ONLY, never decorative ─────────────────────── */
+  --color-triage-safe: #14764a; /*  5.21 on sunk */
+  --color-triage-warn: #8a5a00; /*  5.47 */
+  --color-triage-crit: #c0281f; /*  5.43 */
+  --color-triage-safe-wash: #eaf6f0;
+  --color-triage-warn-wash: #fdf4e3;
+  --color-triage-crit-wash: #fdeeec;
+
+  /* ── Type ─────────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text-hero: clamp(2.75rem, 5.2vw, 4.25rem);
+  --text-hero--line-height: 1.06;
+  --text-hero--letter-spacing: -0.034em;
+  --text-display: clamp(2.125rem, 3.8vw, 3rem);
+  --text-display--line-height: 1.12;
+  --text-display--letter-spacing: -0.028em;
+  --text-h1: clamp(1.875rem, 3vw, 2.5rem);
+  --text-h1--line-height: 1.15;
+  --text-h1--letter-spacing: -0.024em;
+  --text-h2: clamp(1.5rem, 2.2vw, 1.875rem);
+  --text-h2--line-height: 1.22;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.35;
+  --text-h3--letter-spacing: -0.012em;
+  --text-body-lg: 1.1875rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.62;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.5;
+  --text-eyebrow: 0.8125rem;
+  --text-eyebrow--line-height: 1.5;
+  --text-eyebrow--letter-spacing: 0.08em;
+  --text-figure: clamp(2.5rem, 4.2vw, 3.5rem);
+  --text-figure--line-height: 1;
+  --text-figure--letter-spacing: -0.03em;
+
+  /* ── Shape ────────────────────────────────────────────────────────────
+     Cards cap at 16px. Past that everything rounds into the same soft blob.
+     ─────────────────────────────────────────────────────────────────── */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-DEFAULT: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+
+  /* ── Depth: violet-tinted, two layers, negative spread ────────────── */
+  --shadow-lift: 0 2px 5px 0 rgb(23 20 54 / 0.09), 0 1px 1px 0 rgb(23 20 54 / 0.06);
+  --shadow-raise:
+    0 13.5px 27px -12.4px rgb(23 20 54 / 0.14), 0 8.1px 16.2px -8.1px rgb(23 20 54 / 0.06);
+  --shadow-float:
+    0 30px 60px -12px rgb(43 34 100 / 0.2), 0 18px 36px -18px rgb(23 20 54 / 0.22);
+  --inset-shadow-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
+}
+
+@layer base {
+  html {
+    /* Light only, like Stripe. Sunlight legibility (§8.1) is the governing
+       case, and one surface means the triage colours are measured once. */
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    font-synthesis-weight: none;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  /* The offset gap shows page ground, so the ring holds 7.87:1 even on a
+     violet fill. Use `outline-hidden`, never `outline-none`, if suppressing. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-ink);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  ::selection {
+    background: var(--color-accent-wash);
+    color: var(--color-ink);
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+  .measure {
+    max-width: 60ch;
+  }
+  .measure-wide {
+    max-width: 72ch;
+  }
+}
+
+@layer components {
+  /* ── The ruled container ────────────────────────────────────────────── */
+  .rails::before,
+  .rails::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-rail);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .rails::before {
+    left: 0;
+  }
+  .rails::after {
+    right: 0;
+  }
+
+  /* ── The aurora ───────────────────────────────────────────────────────
+     Violet mesh behind the hero. Pure CSS, no image, no bytes.
+     The mask keeps the left of the hero near-white so headline text sits on
+     clean ground. That is what stops the gradient costing contrast, and it
+     is not optional — re-measure if you touch it.
+     ─────────────────────────────────────────────────────────────────── */
+  .aurora {
+    position: absolute;
+    inset: -40% -22% auto 26%;
+    height: 180%;
+    background:
+      radial-gradient(28% 34% at 30% 22%, #efe3ff 0%, transparent 68%),
+      radial-gradient(30% 38% at 46% 34%, #c9b0ff 0%, transparent 66%),
+      radial-gradient(28% 40% at 60% 26%, #7c5cff 0%, transparent 64%),
+      radial-gradient(24% 34% at 72% 48%, #6f17ff 0%, transparent 62%),
+      radial-gradient(30% 36% at 84% 30%, #b79bff 0%, transparent 66%),
+      radial-gradient(26% 40% at 92% 62%, #8f6dff 0%, transparent 64%),
+      radial-gradient(24% 30% at 66% 74%, #f2c6ff 0%, transparent 68%),
+      radial-gradient(30% 32% at 52% 88%, #ddd0ff 0%, transparent 70%);
+    filter: blur(56px) saturate(1.3);
+    opacity: 0.72;
+    transform: skewX(-14deg) rotate(-3deg);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(102deg, transparent 0%, rgb(0 0 0 / 0.22) 22%, #000 52%);
+    mask-image: linear-gradient(102deg, transparent 0%, rgb(0 0 0 / 0.22) 22%, #000 52%);
+  }
+  .aurora-soft {
+    position: absolute;
+    inset: auto -20% -55% auto;
+    width: 62%;
+    height: 110%;
+    background:
+      radial-gradient(46% 48% at 60% 40%, #d5c6ff 0%, transparent 64%),
+      radial-gradient(40% 46% at 84% 66%, #9a7bff 0%, transparent 64%);
+    filter: blur(64px);
+    opacity: 0.34;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aurora {
+      animation: drift 26s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes drift {
+    from {
+      transform: skewX(-14deg) rotate(-3deg) translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: skewX(-17deg) rotate(-6deg) translate3d(-3%, 2%, 0) scale(1.07);
+    }
+  }
+
+  .figure-gradient {
+    background: linear-gradient(96deg, #c3b2ff 6%, #9d80ff 44%, #e5b8ff 96%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ── Reveal on scroll ─────────────────────────────────────────────────
+     Native scroll-driven animation — no JavaScript, no observer, no bytes.
+     Content ships visible; the animation only enhances its entrance.
+     ─────────────────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .reveal {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 78%;
+      }
+    }
+  }
+  @media print {
+    .reveal {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+  /* Deliberately restrained. The earlier 16px rise over a long range made the
+     whole page feel like it was assembling itself as you scrolled, which reads
+     as busy rather than considered. 7px, resolving early, is enough to feel
+     alive without competing with reading. */
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     Scroll-driven effects — native CSS, zero JavaScript.
+
+     Stripe's own marketing site drives its scroll motion with
+     `animation-timeline` / `scroll-timeline` rather than a JS library, and on
+     this project that matters twice over: our JS budget has ~13 KB of headroom,
+     and these run off the main thread, so they stay smooth on the low-end
+     Android the audience actually holds.
+
+     Every block is wrapped in BOTH `prefers-reduced-motion: no-preference` and
+     `@supports (animation-timeline: view())`. A browser without support simply
+     shows the finished state. Nothing here is load-bearing.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      /* ── Staggered entrance ────────────────────────────────────────────
+         Each child gets its OWN view timeline, so the stagger comes from
+         their positions rather than from a delay we have to hand-tune. */
+      .stagger > * {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 8% entry 74%;
+      }
+
+      /* ── SVG draw-on ───────────────────────────────────────────────────
+         The privacy diagram draws itself as it enters. The arrow appearing
+         after the boxes is the argument: rules come down, nothing goes up. */
+      .draw [data-draw] {
+        stroke-dasharray: var(--len, 400);
+        stroke-dashoffset: var(--len, 400);
+        animation: draw linear both;
+        animation-timeline: view();
+        animation-range: entry 20% cover 40%;
+      }
+      .draw [data-fade] {
+        animation: fade-in linear both;
+        animation-timeline: view();
+        animation-range: entry 25% cover 45%;
+      }
+
+      /* ── Scroll-linked progress rail ───────────────────────────────────
+         A hairline that fills as you move through the section. It marks
+         reading position, which is functional rather than decorative. */
+      .rail-track {
+        scroll-timeline: --rail block;
+      }
+      .rail-fill {
+        transform-origin: top;
+        scale: 1 0;
+        animation: fill linear both;
+        animation-timeline: --rail;
+        animation-range: entry 90% exit 10%;
+      }
+
+      /* ── Hero product card settle ──────────────────────────────────────
+         Lifts very slightly as the hero scrolls away. Not parallax: it is a
+         single transform over a short range, and it stops. */
+      .settle {
+        animation: settle linear both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 100%;
+      }
+    }
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fill {
+    to {
+      scale: 1 1;
+    }
+  }
+  @keyframes settle {
+    to {
+      transform: translateY(-6px);
+      opacity: 0.97;
+    }
+  }
+
+  .transition-safe {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .transition-safe {
+      transition:
+        background-color 160ms ease-out,
+        border-color 160ms ease-out,
+        outline-color 160ms ease-out,
+        color 160ms ease-out,
+        box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 160ms ease-out;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lift:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  /* ── Coverage map ─────────────────────────────────────────────────────
+     Dots bloom in as the figure scrolls into view, offset by --d so the
+     clusters fill rather than flash. The torch is a soft light that follows
+     the cursor: thematically it is "what is near me", which is the product.
+     Both are transform/opacity only, so scrolling stays smooth.
+     ─────────────────────────────────────────────────────────────────── */
+  .cov-torch {
+    border-radius: inherit;
+    opacity: 0;
+    background: radial-gradient(
+      13rem 13rem at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, var(--color-accent) 20%, transparent),
+      transparent 70%
+    );
+  }
+  @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .cov-torch {
+      opacity: var(--spot, 0);
+      transition: opacity 320ms ease-out;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .cov-dots circle {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: bloom linear both;
+        animation-timeline: view();
+        animation-range: entry calc(6% + var(--d, 0%)) entry calc(64% + var(--d, 0%));
+      }
+      .cov-label {
+        animation: fade-in linear both;
+        animation-timeline: view();
+        animation-range: entry 45% cover 12%;
+      }
+    }
+
+    .ribbon-drift {
+      transform-origin: 50% 50%;
+      animation: ribbon-drift 34s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes bloom {
+    from {
+      opacity: 0;
+      scale: 0.2;
+    }
+  }
+
+  @keyframes ribbon-drift {
+    from {
+      transform: translate3d(0, 0, 0) scaleY(1);
+    }
+    to {
+      transform: translate3d(-2.5%, 1.5%, 0) scaleY(1.09);
+    }
+  }
+
+  /* ── Mega-menu ────────────────────────────────────────────────────────
+     The panel is full-bleed, so `details` is `static` and the panel is
+     positioned against the header. No JavaScript: <details> gives click,
+     keyboard and screen-reader behaviour for free.
+     ─────────────────────────────────────────────────────────────────── */
+  /* ── Mega-menu ────────────────────────────────────────────────────────
+     Opens on hover, and on keyboard focus via :focus-within.
+
+     The transition is on `visibility` and `translate` ONLY — never `opacity`.
+     An opacity transition here promotes the panel to its own compositing
+     layer, and because it overlaps other promoted layers (the blurred aurora,
+     the hero canvas) Chrome then composites it translucent and the page shows
+     straight through. That bug cost real time to find; the fix is to move the
+     panel rather than fade it. Do not add opacity here.
+     ─────────────────────────────────────────────────────────────────── */
+  .menu-panel {
+    visibility: hidden;
+    translate: 0 -8px;
+  }
+  /* `:has(:focus-visible)` rather than `:focus-within`.
+     `:focus-within` matched a MOUSE click on the trigger, so the panel stayed
+     open until you clicked somewhere else on the page. `:focus-visible` only
+     matches keyboard focus, so clicking does nothing and the panel closes the
+     moment the cursor leaves — while Tab still opens and traverses it. */
+  .menu:hover .menu-panel,
+  .menu:has(:focus-visible) .menu-panel {
+    visibility: visible;
+    translate: 0 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-panel {
+      transition:
+        translate 200ms cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 200ms;
+    }
+  }
+
+  .menu-chev {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-chev {
+      transition: rotate 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  }
+  .menu:hover .menu-chev,
+  .menu:has(:focus-visible) .menu-chev {
+    rotate: 180deg;
+  }
+
+  /* ── Pointer spotlight ────────────────────────────────────────────────
+     A very low-opacity violet that tracks the cursor across a card. The
+     custom properties are written by components/effects.tsx; if that never
+     runs, --spot stays unset and the layer is invisible. Fine pointers only.
+     ─────────────────────────────────────────────────────────────────── */
+  .spotlight {
+    position: relative;
+  }
+  /* The coverage map draws its own torch inside the figure, so suppress the
+     generic card spotlight there and avoid stacking two lights. */
+  .spotlight:has(.cov)::before {
+    display: none;
+  }
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      16rem 16rem at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, var(--color-accent) 13%, transparent),
+      transparent 68%
+    );
+  }
+  @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .spotlight::before {
+      opacity: var(--spot, 0);
+      transition: opacity 260ms ease-out;
+    }
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--color-card);
+    color: var(--color-ink);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-raise);
+  }
+  .skip-link:focus {
+    left: 8px;
+    top: 8px;
+  }
+}

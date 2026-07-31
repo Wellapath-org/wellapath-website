@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Read(//Users/iamjohnseyi/Documents/project/**)",
+      "Bash(node -e ' *)",
+      "Bash(npm ls *)",
+      "Bash(cp '__TRACKED_VAR__/Screenshot 2026-07-30 at 17.41.30.png' public/app-screens/01-splash.png)",
+      "Bash(cp '__TRACKED_VAR__/Screenshot 2026-07-30 at 17.45.40.png' public/app-screens/02-home.png)",
+      "Bash(cp '__TRACKED_VAR__/Screenshot 2026-07-30 at 17.42.51.png' public/app-screens/03-welcome.png)",
+      "Bash(cp '__TRACKED_VAR__/Screenshot 2026-07-30 at 17.43.24.png' public/app-screens/04-body-area-search.png)",
+      "Bash(cp '__TRACKED_VAR__/Screenshot 2026-07-30 at 17.43.32.png' public/app-screens/05-body-map.png)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(node scripts/sync-kb.mjs)",
+      "Bash(node *)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/fontsource/fonts/inter:vf@latest/latin-wght-normal.woff2\" -o public/fonts/inter-latin-var.woff2)",
+      "Bash(npx next *)"
+    ]
+  }
+}

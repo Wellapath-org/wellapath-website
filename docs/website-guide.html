@@ -1,0 +1,1474 @@
+<title>WellaPath — Website Brand, Content &amp; Experience Guide</title>
+
+<style>
+  /* ── Tokens ─────────────────────────────────────────────────────────────
+     Accent is #6B4EFF because the Flutter app already owns it (23 usages).
+     Neutrals carry a deliberate violet bias so they read as chosen.
+     Triage green/amber/red are SEMANTIC ONLY — never decoration. §5.1
+  ------------------------------------------------------------------------ */
+  :root {
+    --ground:      #FBFAFC;
+    --ground-sunk: #F3F1F7;
+    --card:        #FFFFFF;
+    --ink:         #16141F;
+    --ink-soft:    #443E57;
+    --ink-mute:    #6A6382;
+    --rule:        #E4E1EC;
+    --rule-firm:   #CFCADC;
+    --accent:      #6B4EFF;
+    --accent-ink:  #4A2FD6;
+    --accent-wash: #F1EDFF;
+
+    --triage-safe:  #157F4B;
+    --triage-warn:  #8A5A00;
+    --triage-crit:  #C0281F;
+
+    --font-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-body:    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono:    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --font-quote:   ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:      #0F0E15;
+      --ground-sunk: #16141E;
+      --card:        #1A1825;
+      --ink:         #EDEBF2;
+      --ink-soft:    #C3BED4;
+      --ink-mute:    #9A94B0;
+      --rule:        #292539;
+      --rule-firm:   #3B3552;
+      --accent:      #9B86FF;
+      --accent-ink:  #B9AAFF;
+      --accent-wash: #1E1934;
+
+      --triage-safe:  #5DD39E;
+      --triage-warn:  #E8B457;
+      --triage-crit:  #FF8A80;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0F0E15;
+    --ground-sunk: #16141E;
+    --card:        #1A1825;
+    --ink:         #EDEBF2;
+    --ink-soft:    #C3BED4;
+    --ink-mute:    #9A94B0;
+    --rule:        #292539;
+    --rule-firm:   #3B3552;
+    --accent:      #9B86FF;
+    --accent-ink:  #B9AAFF;
+    --accent-wash: #1E1934;
+    --triage-safe:  #5DD39E;
+    --triage-warn:  #E8B457;
+    --triage-crit:  #FF8A80;
+  }
+
+  :root[data-theme="light"] {
+    --ground:      #FBFAFC;
+    --ground-sunk: #F3F1F7;
+    --card:        #FFFFFF;
+    --ink:         #16141F;
+    --ink-soft:    #443E57;
+    --ink-mute:    #6A6382;
+    --rule:        #E4E1EC;
+    --rule-firm:   #CFCADC;
+    --accent:      #6B4EFF;
+    --accent-ink:  #4A2FD6;
+    --accent-wash: #F1EDFF;
+    --triage-safe:  #157F4B;
+    --triage-warn:  #8A5A00;
+    --triage-crit:  #C0281F;
+  }
+
+  /* ── Base ──────────────────────────────────────────────────────────── */
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 56px);
+  }
+
+  /* ── Masthead ──────────────────────────────────────────────────────── */
+  .masthead {
+    padding: clamp(56px, 9vw, 104px) 0 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    align-items: center;
+  }
+
+  .eyebrow .mark {
+    color: var(--accent-ink);
+    font-weight: 700;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 5.4vw, 3.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.033em;
+    font-weight: 760;
+    text-wrap: balance;
+    margin: 26px 0 0;
+    max-width: 22ch;
+  }
+
+  .standfirst {
+    margin: 22px 0 0;
+    font-size: clamp(1.02rem, 1.9vw, 1.2rem);
+    color: var(--ink-soft);
+    max-width: 60ch;
+    line-height: 1.6;
+  }
+
+  .meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 40px 0 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .meta-strip > div {
+    flex: 1 1 190px;
+    padding: 18px 22px 20px 0;
+  }
+
+  .meta-strip dt {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .meta-strip dd {
+    margin: 7px 0 0;
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 560;
+  }
+
+  /* ── Thesis ────────────────────────────────────────────────────────── */
+  .thesis {
+    padding: clamp(52px, 8vw, 92px) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .thesis p {
+    font-family: var(--font-quote);
+    font-size: clamp(1.45rem, 3.5vw, 2.25rem);
+    line-height: 1.28;
+    letter-spacing: -0.014em;
+    max-width: 30ch;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .thesis p em {
+    font-style: italic;
+    color: var(--accent-ink);
+  }
+
+  .thesis footer {
+    margin: 26px 0 0;
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+  }
+
+  /* ── Layout: TOC + body ────────────────────────────────────────────── */
+  .frame {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  @media (min-width: 1000px) {
+    .frame {
+      grid-template-columns: 216px minmax(0, 1fr);
+      gap: 64px;
+      align-items: start;
+    }
+    .toc {
+      position: sticky;
+      top: 34px;
+      padding: 52px 0 0;
+    }
+  }
+
+  .toc h2 {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+
+  .toc ol {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    counter-reset: toc;
+  }
+
+  .toc a {
+    display: flex;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    line-height: 1.35;
+    border-bottom: 1px solid transparent;
+  }
+
+  .toc a:hover { color: var(--accent-ink); }
+  .toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .toc a .n {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    padding-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 999px) {
+    .toc {
+      padding: 40px 0 0;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 28px;
+    }
+    .toc ol {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0 22px;
+    }
+  }
+
+  /* ── Sections ──────────────────────────────────────────────────────── */
+  main { padding-bottom: 96px; }
+
+  section.doc {
+    padding: clamp(46px, 6.5vw, 74px) 0 0;
+  }
+
+  section.doc > .head {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  section.doc > .head .num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-ink);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  section.doc h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.42rem, 2.9vw, 1.92rem);
+    line-height: 1.16;
+    letter-spacing: -0.022em;
+    font-weight: 700;
+    text-wrap: balance;
+    margin: 0;
+    max-width: 34ch;
+  }
+
+  section.doc h3 {
+    font-family: var(--font-display);
+    font-size: 1.06rem;
+    letter-spacing: -0.008em;
+    font-weight: 680;
+    margin: 38px 0 0;
+    max-width: 46ch;
+  }
+
+  section.doc h4 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin: 30px 0 0;
+  }
+
+  p, ul, ol.body-list, dl.spec {
+    max-width: var(--measure);
+  }
+
+  section.doc p { margin: 16px 0 0; color: var(--ink-soft); }
+  section.doc p strong { color: var(--ink); font-weight: 640; }
+
+  section.doc ul, section.doc ol.body-list {
+    margin: 16px 0 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  section.doc ul > li {
+    position: relative;
+    padding-left: 20px;
+    color: var(--ink-soft);
+  }
+
+  section.doc ul > li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0.62em;
+    width: 5px;
+    height: 1.5px;
+    background: var(--rule-firm);
+  }
+
+  section.doc ol.body-list {
+    counter-reset: bl;
+  }
+
+  section.doc ol.body-list > li {
+    position: relative;
+    padding-left: 28px;
+    color: var(--ink-soft);
+    counter-increment: bl;
+  }
+
+  section.doc ol.body-list > li::before {
+    content: counter(bl);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--accent-ink);
+    padding-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  li strong { color: var(--ink); font-weight: 640; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.855em;
+    background: var(--ground-sunk);
+    border: 1px solid var(--rule);
+    padding: 0.1em 0.36em;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  a.inline {
+    color: var(--accent-ink);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  /* ── Boundary block: the clinical line ─────────────────────────────── */
+  .boundary {
+    margin: 26px 0 0;
+    max-width: var(--measure);
+    background: var(--accent-wash);
+    border: 1px solid var(--rule-firm);
+    border-radius: 4px;
+    padding: 22px 24px;
+  }
+
+  .boundary p {
+    margin: 10px 0 0;
+    color: var(--ink);
+    font-family: var(--font-quote);
+    font-size: 1.08rem;
+    line-height: 1.5;
+  }
+
+  /* ── Triage blocks: stripe encodes the app's severity band ─────────── */
+  .triage-set {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 22px 0 0;
+    max-width: var(--measure);
+  }
+
+  .band {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--bandcolor);
+    background: var(--card);
+    padding: 18px 22px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .band.safe { --bandcolor: var(--triage-safe); }
+  .band.warn { --bandcolor: var(--triage-warn); }
+  .band.crit { --bandcolor: var(--triage-crit); }
+
+  .band .tier {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--bandcolor);
+  }
+
+  .band .said {
+    margin: 9px 0 0;
+    font-size: 1.02rem;
+    font-weight: 620;
+    color: var(--ink);
+  }
+
+  .band .why {
+    margin: 8px 0 0;
+    font-size: 14.5px;
+    color: var(--ink-mute);
+    line-height: 1.55;
+  }
+
+  /* ── Tables ────────────────────────────────────────────────────────── */
+  .table-wrap {
+    margin: 22px 0 0;
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 560px;
+    font-size: 14.5px;
+  }
+
+  thead th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--rule-firm);
+    white-space: nowrap;
+    background: var(--ground-sunk);
+  }
+
+  tbody td {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child { color: var(--ink); font-weight: 560; }
+  td .num, .tnum { font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 13px; }
+
+  .swatch {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.16);
+    vertical-align: -2px;
+    margin-right: 8px;
+  }
+
+  /* ── Do / Don't pairs ──────────────────────────────────────────────── */
+  .pairs {
+    display: grid;
+    gap: 12px;
+    margin: 22px 0 0;
+    max-width: var(--measure);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  @media (min-width: 700px) {
+    .pair { grid-template-columns: 1fr 1fr; }
+    .pair .no { border-right: 1px solid var(--rule); border-bottom: none; }
+  }
+
+  .pair .no, .pair .yes { padding: 15px 18px; }
+  .pair .no { background: var(--ground-sunk); border-bottom: 1px solid var(--rule); }
+  .pair .yes { background: var(--card); }
+
+  .pair .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 7px;
+  }
+
+  .pair .no .tag  { color: var(--triage-crit); }
+  .pair .yes .tag { color: var(--triage-safe); }
+  .pair p { margin: 0; font-size: 14.5px; line-height: 1.5; }
+
+  /* ── Receipts (proof figures) ──────────────────────────────────────── */
+  .receipts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+    gap: 1px;
+    margin: 24px 0 0;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .receipts > div {
+    background: var(--card);
+    padding: 20px 18px;
+  }
+
+  .receipts .fig {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.4vw, 2rem);
+    font-weight: 720;
+    letter-spacing: -0.028em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .receipts .cap {
+    margin: 9px 0 0;
+    font-size: 13px;
+    color: var(--ink-mute);
+    line-height: 1.45;
+  }
+
+  /* ── Page brief cards ──────────────────────────────────────────────── */
+  .briefs {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 24px 0 0;
+    max-width: var(--measure);
+  }
+
+  .brief {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    padding: 20px 22px;
+  }
+
+  .brief .route {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-ink);
+    font-weight: 640;
+  }
+
+  .brief h3 {
+    margin: 8px 0 0;
+    font-size: 1.04rem;
+    font-weight: 660;
+    color: var(--ink);
+  }
+
+  .brief dl {
+    margin: 14px 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .brief dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+
+  .brief dd { margin: 4px 0 0; font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
+
+  /* ── Checklist ─────────────────────────────────────────────────────── */
+  ul.check {
+    margin: 20px 0 0;
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  ul.check > li {
+    padding-left: 30px;
+    position: relative;
+    color: var(--ink-soft);
+  }
+
+  ul.check > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.28em;
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid var(--rule-firm);
+    border-radius: 3px;
+    background: var(--card);
+  }
+
+  /* ── Open questions ────────────────────────────────────────────────── */
+  .asks {
+    margin: 24px 0 0;
+    max-width: var(--measure);
+    border-top: 2px solid var(--accent);
+    background: var(--card);
+    border-radius: 0 0 4px 4px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+    padding: 6px 24px 22px;
+  }
+
+  .asks dl { display: flex; flex-direction: column; }
+  .asks dt {
+    margin-top: 20px;
+    font-weight: 640;
+    color: var(--ink);
+    font-size: 15.5px;
+  }
+  .asks dd { margin: 6px 0 0; color: var(--ink-mute); font-size: 14.5px; line-height: 1.55; }
+
+  footer.colophon {
+    border-top: 1px solid var(--rule);
+    margin-top: 80px;
+    padding: 30px 0 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+  }
+
+  ::selection { background: var(--accent); color: #fff; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span class="mark">WellaPath</span>
+      <span>Website Brand, Content &amp; Experience Guide</span>
+      <span>v1.0</span>
+    </div>
+
+    <h1>Trust is the only luxury good in consumer health.</h1>
+
+    <p class="standfirst">
+      This is the working brief for the team building <code>wellapath.org</code>. It covers what we
+      are allowed to claim, how the brand should sound and look, how to describe the product, and
+      the experience standards the site has to meet on a mid-range Android phone in Lagos. Read
+      §1 and §2 before designing anything.
+    </p>
+
+    <dl class="meta-strip">
+      <div>
+        <dt>Product</dt>
+        <dd>Clinical decision support (CDSS)</dd>
+      </div>
+      <div>
+        <dt>Market</dt>
+        <dd>Nigeria — Lagos, Kano, FCT</dd>
+      </div>
+      <div>
+        <dt>Site's job</dt>
+        <dd>Earn trust, then drive app installs</dd>
+      </div>
+      <div>
+        <dt>Audience for this doc</dt>
+        <dd>Designer, front-end developer, copywriter</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="thesis">
+    <p>WellaPath tells you <em>how urgently</em> to seek care, and where. It does not tell you what you have.</p>
+    <footer>
+      Every word on the website has to survive that sentence. It is not a legal disclaimer bolted on
+      at the end — it is the product, and it is also the most persuasive thing we own. A symptom app
+      that refuses to guess is more credible than one that pretends to know.
+    </footer>
+  </section>
+
+  <div class="frame">
+
+    <nav class="toc" aria-label="Contents">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#s1"><span class="n">01</span><span>The line that governs everything</span></a></li>
+        <li><a href="#s2"><span class="n">02</span><span>Positioning &amp; premium thesis</span></a></li>
+        <li><a href="#s3"><span class="n">03</span><span>The receipts</span></a></li>
+        <li><a href="#s4"><span class="n">04</span><span>Verbal identity</span></a></li>
+        <li><a href="#s5"><span class="n">05</span><span>Visual identity</span></a></li>
+        <li><a href="#s6"><span class="n">06</span><span>Describing the product</span></a></li>
+        <li><a href="#s7"><span class="n">07</span><span>Site map &amp; page briefs</span></a></li>
+        <li><a href="#s8"><span class="n">08</span><span>UX principles</span></a></li>
+        <li><a href="#s9"><span class="n">09</span><span>Performance budget</span></a></li>
+        <li><a href="#s10"><span class="n">10</span><span>Accessibility</span></a></li>
+        <li><a href="#s11"><span class="n">11</span><span>Legal &amp; safety</span></a></li>
+        <li><a href="#s12"><span class="n">12</span><span>SEO &amp; discovery</span></a></li>
+        <li><a href="#s13"><span class="n">13</span><span>Definition of done</span></a></li>
+        <li><a href="#s14"><span class="n">14</span><span>Open decisions</span></a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- ─────────────────────────────── 1 ─────────────────────────────── -->
+      <section class="doc" id="s1">
+        <div class="head"><span class="num">01</span><h2>The line that governs everything</h2></div>
+
+        <p>
+          WellaPath is a <strong>clinical decision support system</strong>. A user describes symptoms;
+          the app returns an urgency level, a short list of conditions those symptoms are consistent
+          with, and a route to real care. It never returns a diagnosis, and the website must never
+          imply that it does.
+        </p>
+
+        <p>
+          This is not caution for its own sake. Three separate forces make it binding: medical device
+          regulation treats "diagnosis" as a claim with consequences; app store health policies reject
+          apps that overclaim; and the users we most need to reach — a parent at 11pm with a feverish
+          child — are the ones most harmed by false confidence.
+        </p>
+
+        <div class="pairs">
+          <div class="pair">
+            <div class="no">
+              <span class="tag">Never publish</span>
+              <p>
+                "WellaPath diagnoses malaria." · "Find out what's wrong with you." · "AI doctor in
+                your pocket." · "94% accurate." · "Know your condition instantly."
+              </p>
+            </div>
+            <div class="yes">
+              <span class="tag">Publish instead</span>
+              <p>
+                "Know how urgently to act." · "Understand what your symptoms could mean — and what to
+                do next." · "Built on Nigerian clinical guidance." · "From symptoms to the right clinic."
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h3>The disclaimer is a design element, not fine print</h3>
+        <p>
+          The app already carries the right sentence: <em>"This is a symptom assessment, not a
+          diagnosis. Your symptoms may be caused by a condition not mentioned here."</em> On the
+          website, treat that line as a piece of the visual system — set in the same family as body
+          copy, at a legible size, in a considered position. Do not shrink it to 11px grey at the
+          bottom of the footer. Hidden disclaimers read as something to hide; a confidently placed
+          one reads as a brand that knows exactly what it is.
+        </p>
+      </section>
+
+      <!-- ─────────────────────────────── 2 ─────────────────────────────── -->
+      <section class="doc" id="s2">
+        <div class="head"><span class="num">02</span><h2>Positioning, and what "premium" actually means here</h2></div>
+
+        <p>
+          The brief asked for a top-tier premium brand. In health, premium is <strong>not</strong>
+          signalled the way it is in fashion or fintech. Gradients, hype, superlatives and stock
+          photos of laughing models actively destroy value here, because the category is crowded with
+          scams — miracle cures, fake pharmacies, WhatsApp health rumours. Every visual cue that
+          looks like marketing pushes us toward that crowd.
+        </p>
+
+        <p>
+          Premium in consumer health is signalled by <strong>restraint, precision and evidence</strong>:
+          generous whitespace, exact numbers, plain sentences, real photography, no claim we cannot
+          defend. The reference points are not wellness startups — they are institutions people
+          already trust with serious information.
+        </p>
+
+        <h3>Positioning statement</h3>
+        <div class="boundary">
+          <p>
+            For Nigerian households facing symptoms without easy access to a clinician, WellaPath is
+            the calm second opinion that tells you how urgently to act and where to go — built on
+            Nigerian clinical guidance, and private by design because nothing you enter leaves your
+            phone.
+          </p>
+        </div>
+
+        <h3>What we are competing against</h3>
+        <p>
+          Not other apps, mostly. The real alternatives are: asking a relative, asking a pharmacist
+          over the counter, searching symptoms and landing on American content that has never heard
+          of Lassa fever, or waiting to see if it gets worse. <strong>The last one is the enemy.</strong>
+          Late presentation is what kills, and "don't wait" is the emotional centre of the brand.
+        </p>
+
+        <h3>Brand character</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>We are</th><th>We are not</th><th>Consequence for the site</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Calm</td><td>Alarmist</td><td>No countdown timers, no red-everywhere, no fear-based headlines</td></tr>
+              <tr><td>Precise</td><td>Vague</td><td>Exact figures — "5,344 facilities", not "thousands"</td></tr>
+              <tr><td>Local</td><td>Imported</td><td>Nigerian faces, Nigerian place names, Nigerian conditions and seasons</td></tr>
+              <tr><td>Plain</td><td>Clinical-jargon</td><td>"Fast breathing", not "tachypnoea" — jargon only where a clinician is the reader</td></tr>
+              <tr><td>Restrained</td><td>Salesy</td><td>One primary action per page; no popups, no countdowns, no "limited offer"</td></tr>
+              <tr><td>Accountable</td><td>Evasive</td><td>Show what we don't cover as clearly as what we do</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─────────────────────────────── 3 ─────────────────────────────── -->
+      <section class="doc" id="s3">
+        <div class="head"><span class="num">03</span><h2>The receipts — use these, and only these</h2></div>
+
+        <p>
+          Specificity is the whole premium strategy, so these numbers are the most valuable copy
+          assets we have. They are taken from the shipped clinical artifacts. Do not round them up,
+          and do not invent new ones.
+        </p>
+
+        <div class="receipts">
+          <div><div class="fig">50</div><p class="cap">Conditions in the Nigerian knowledge base</p></div>
+          <div><div class="fig">75</div><p class="cap">Clinical triage rules — 13 global, 62 condition-specific</p></div>
+          <div><div class="fig">5,344</div><p class="cap">Mapped health facilities with coordinates</p></div>
+          <div><div class="fig">924</div><p class="cap">Of those flagged emergency-capable</p></div>
+          <div><div class="fig">3</div><p class="cap">Urgency levels: non-urgent, urgent, emergency</p></div>
+          <div><div class="fig">0</div><p class="cap">Symptom records stored on our servers</p></div>
+        </div>
+
+        <h3>The coverage claim has to be honest — and it is better honest</h3>
+        <p>
+          The facility directory covers <strong>Lagos (2,690), Kano (2,040) and the FCT (614)</strong>.
+          That is three states, not the federation. "Across Nigeria" would be an overclaim, and it
+          would be caught the first time someone in Enugu searched for a clinic.
+        </p>
+        <p>
+          Naming the three states is also the stronger marketing move: it sounds like a company that
+          has actually done the fieldwork, and it makes "coming to your state next" a credible promise
+          rather than a retraction. Where coverage is genuinely partial, say so in the same breath as
+          the strength.
+        </p>
+
+        <div class="pairs">
+          <div class="pair">
+            <div class="no"><span class="tag">Weak &amp; false</span><p>Find health facilities across Nigeria.</p></div>
+            <div class="yes"><span class="tag">Strong &amp; true</span><p>5,344 mapped facilities in Lagos, Kano and the FCT — with 924 flagged as emergency-capable.</p></div>
+          </div>
+          <div class="pair">
+            <div class="no"><span class="tag">Weak</span><p>Powered by advanced AI.</p></div>
+            <div class="yes"><span class="tag">Strong</span><p>75 clinical rules, written against Nigerian treatment guidance, that run entirely on your phone.</p></div>
+          </div>
+        </div>
+
+        <h3>Two proof points nobody else in this market has</h3>
+        <p>
+          These deserve their own moments on the site, because they are genuinely differentiated and
+          they are hard to copy.
+        </p>
+        <ol class="body-list">
+          <li>
+            <strong>Seasonal intelligence.</strong> The engine raises malaria's weighting during the
+            May–October rainy season, when transmission peaks in Nigeria. A generic symptom checker
+            treats a fever in July the same as a fever in January. Ours does not. This is the single
+            most compelling "built for here" story we have.
+          </li>
+          <li>
+            <strong>Who you are changes the urgency.</strong> Being under five, pregnant, or elderly
+            escalates the recommendation, because those groups decompensate faster. Same symptoms,
+            different advice — which is exactly what a clinician would do and exactly what a search
+            engine cannot.
+          </li>
+        </ol>
+      </section>
+
+      <!-- ─────────────────────────────── 4 ─────────────────────────────── -->
+      <section class="doc" id="s4">
+        <div class="head"><span class="num">04</span><h2>Verbal identity</h2></div>
+
+        <p>
+          Write at a <strong>reading age of about 12</strong> in Nigerian Standard English. Short
+          sentences. Active voice. Second person. No idioms that don't travel, and no Americanisms
+          ("ER", "shot", "acetaminophen" → "emergency", "injection", "paracetamol").
+        </p>
+
+        <h3>4.1 Tone shifts with urgency — this is the core rule</h3>
+        <p>
+          The app already does this well and the website must match it, because a visitor who has
+          seen the app should recognise the voice. Calm is the default; directness is earned by
+          severity. The stripe colours below are the app's own severity bands.
+        </p>
+
+        <div class="triage-set">
+          <div class="band safe">
+            <span class="tier">Non-urgent</span>
+            <p class="said">"Home self-care may be enough."</p>
+            <p class="why">Permissive, never dismissive. "May be" respects uncertainty. Always pair with what would change the answer: "If it gets worse or lasts more than three days, see a clinic."</p>
+          </div>
+          <div class="band warn">
+            <span class="tier">Urgent</span>
+            <p class="said">"You should consult a doctor."</p>
+            <p class="why">Clear instruction, no panic. Give a timeframe — "today" or "within 24 hours" beats "soon", which people read as "eventually".</p>
+          </div>
+          <div class="band crit">
+            <span class="tier">Emergency</span>
+            <p class="said">"Seek medical care immediately."</p>
+            <p class="why">Shortest sentences on the whole site. Imperative. One action visible, everything else out of the way. Never soften with "you may want to".</p>
+          </div>
+        </div>
+
+        <h3>4.2 Words we never use</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Banned</th><th>Because</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td>Diagnose / diagnosis</td><td>Regulatory claim we cannot make</td><td>Assessment, symptom check</td></tr>
+              <tr><td>"You have…"</td><td>States a fact about the body</td><td>"Your symptoms may be consistent with…"</td></tr>
+              <tr><td>Detect / identify</td><td>Implies certainty</td><td>Flag, suggest, indicate</td></tr>
+              <tr><td>Accurate / % accuracy</td><td>Invites a clinical-validation claim</td><td>Describe the method instead</td></tr>
+              <tr><td>Cure, treat, prescribe</td><td>We do neither</td><td>Guidance, advice, next step</td></tr>
+              <tr><td>Patient</td><td>Implies a clinical relationship</td><td>You, your child</td></tr>
+              <tr><td>Free consultation</td><td>Implies a clinician is involved</td><td>Free symptom check</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4.3 Microcopy rules</h3>
+        <ul>
+          <li>Buttons state the outcome: <code>Find nearby care</code>, <code>Start symptom check</code>. Never <code>Submit</code> or <code>Click here</code>.</li>
+          <li>The emergency action is always labelled with what it does — <code>Call emergency</code> — never an ambiguous icon alone.</li>
+          <li>Errors say what happened and the fix: "We couldn't load facilities. Check your connection and try again." No apologies, no error codes shown to users.</li>
+          <li>Numbers are digits, always: "3 days", not "three days" — faster to scan, and clearer to lower-literacy readers.</li>
+          <li>Sentence case for all headings and buttons. Title Case reads as American marketing.</li>
+        </ul>
+
+        <h4>Copy QA — two bugs already visible in the app mockups</h4>
+        <p>
+          Fix these in the app and don't reproduce them on the site: <code>"doctor.Schedule"</code> is
+          missing a space, and <code>"Seek medical care Immediately!"</code> capitalises mid-sentence.
+          At this price point, a typo in the most serious message on the screen costs more trust than
+          any visual polish can win back.
+        </p>
+      </section>
+
+      <!-- ─────────────────────────────── 5 ─────────────────────────────── -->
+      <section class="doc" id="s5">
+        <div class="head"><span class="num">05</span><h2>Visual identity</h2></div>
+
+        <p>
+          The app is the source of truth. The website extends it rather than inventing a parallel
+          look — a visitor moving from site to install must feel one product.
+        </p>
+
+        <h3>5.1 Palette</h3>
+        <p>
+          Violet <code>#6B4EFF</code> is the brand colour, taken from the app. The triage colours are
+          <strong>semantic only</strong>: they encode urgency and nothing else. Never use red as a
+          decorative accent, and never use the triage green for a marketing button — if red means
+          emergency everywhere except the newsletter box, it means nothing anywhere.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Role</th><th>App fill</th><th>Web text-safe</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Brand violet</td>
+                <td><span class="swatch" style="background:#6B4EFF"></span><span class="tnum">#6B4EFF</span></td>
+                <td><span class="tnum">#3D1F9E</span></td>
+                <td>5.0:1 on white — passes AA. The darker tone is already in the app; use it for links.</td>
+              </tr>
+              <tr>
+                <td>Ink</td>
+                <td><span class="swatch" style="background:#1A1A2E"></span><span class="tnum">#1A1A2E</span></td>
+                <td><span class="tnum">#16141F</span></td>
+                <td>Never pure black; the violet bias ties text to the accent.</td>
+              </tr>
+              <tr>
+                <td>Non-urgent</td>
+                <td><span class="swatch" style="background:#4CAF50"></span><span class="tnum">#4CAF50</span></td>
+                <td><span class="tnum">#157F4B</span></td>
+                <td>App uses Flutter's <code>Colors.green</code>. At 2.8:1 it fails even large-text contrast — never use it for wording.</td>
+              </tr>
+              <tr>
+                <td>Urgent</td>
+                <td><span class="swatch" style="background:#FBBF24"></span><span class="tnum">#FBBF24</span></td>
+                <td><span class="tnum">#8A5A00</span></td>
+                <td><strong>Worst offender:</strong> 1.9:1 on white — effectively invisible as text. Must darken.</td>
+              </tr>
+              <tr>
+                <td>Emergency</td>
+                <td><span class="swatch" style="background:#EF4444"></span><span class="tnum">#EF4444</span></td>
+                <td><span class="tnum">#C0281F</span></td>
+                <td>3.7:1 — fails AA for body text. Darken for any wording.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Colour must never be the only carrier of meaning. Every urgency state needs a text label as
+          well as a hue — colour-blind users and anyone reading in bright Lagos sunlight depend on it.
+        </p>
+
+        <h4>Note for the mobile team — there is no theme file</h4>
+        <p>
+          The Flutter app currently has no central theme or token file. Colours are written inline,
+          and the triage palette mixes Flutter's Material defaults (<code>Colors.green</code>,
+          <code>Colors.orange</code>, <code>Colors.red</code>) with custom hex values
+          (<code>#FBBF24</code>, <code>#F97316</code>, <code>#EF4444</code>, <code>#DC2626</code>).
+          Two different reds and two different ambers are in use for what is conceptually one thing.
+        </p>
+        <p>
+          The table above should become the shared source of truth for both surfaces — a
+          <code>tokens</code> file in the app and CSS custom properties on the web, generated from the
+          same list. Until that exists, app and website will drift, and "one product" is the thing
+          we are selling.
+        </p>
+
+        <h3>5.2 Typography</h3>
+        <p>
+          Pick <strong>one</strong> humanist sans and use its full weight range. A serif is optional
+          for long-form editorial only. Whatever is chosen must be self-hosted and subset — a font
+          request to a third-party CDN is both a privacy leak and a slow first render on Nigerian
+          networks.
+        </p>
+        <ul>
+          <li><strong>Body:</strong> 17–18px, line-height 1.6, measure capped at 68 characters. Do not go below 16px anywhere; this audience includes older readers on small screens.</li>
+          <li><strong>Display:</strong> tight tracking (−0.02em) at large sizes, weight 700+, <code>text-wrap: balance</code> on every headline.</li>
+          <li><strong>Numbers:</strong> <code>font-variant-numeric: tabular-nums</code> wherever figures align — the receipts in §3 especially.</li>
+          <li><strong>No all-caps body copy.</strong> Uppercase only for short mono labels, with 0.1em letter-spacing.</li>
+        </ul>
+
+        <h3>5.3 Imagery — where premium is won or lost</h3>
+        <p>
+          This is the highest-risk area. Generic medical stock photography — a white-coated model with
+          folded arms, a stethoscope on a blue gradient — will make the brand look exactly like the
+          scams it needs to be distinguished from.
+        </p>
+        <div class="pairs">
+          <div class="pair">
+            <div class="no"><span class="tag">Never</span><p>Western stock doctors. Blue-gradient medical abstractions. Glowing DNA helices, circuit-board brains, "AI" iconography. Smiling models pointing at phones.</p></div>
+            <div class="yes"><span class="tag">Always</span><p>Commissioned photography of Nigerian people in real settings — a mother in her own home, a pharmacist in a Lagos shop, a health centre in Kano. Natural light. Documentary, not staged.</p></div>
+          </div>
+        </div>
+        <p>
+          If a photo budget isn't available at launch, <strong>use the product UI instead of buying
+          stock</strong>. Real screens in clean device frames are more premium than any stock image,
+          and they carry information. Illustration is acceptable in the app's existing flat style,
+          but keep it to spot use — it should never carry a hero on its own.
+        </p>
+
+        <h3>5.4 Layout &amp; motion</h3>
+        <ul>
+          <li>Generous vertical rhythm. Whitespace is the cheapest premium signal available and the only one that also improves comprehension.</li>
+          <li>One primary action per screen. Two competing CTAs halve both.</li>
+          <li>Corner radius: small and consistent (4–8px). Heavy rounding reads as consumer-toy; sharp corners read as institutional. Sit deliberately between.</li>
+          <li>Motion is functional only — state changes, reveals under 200ms, no parallax, no scroll-jacking. Honour <code>prefers-reduced-motion</code>. Animation costs battery and CPU on the low-end devices most of our users hold.</li>
+        </ul>
+      </section>
+
+      <!-- ─────────────────────────────── 6 ─────────────────────────────── -->
+      <section class="doc" id="s6">
+        <div class="head"><span class="num">06</span><h2>How to describe the product — visually and verbally</h2></div>
+
+        <h3>6.1 Show the method, not a magic answer</h3>
+        <p>
+          The temptation is to show a screen saying "Malaria — 94%". That is the one thing we must
+          never show. It is also, conveniently, less interesting than the truth. The compelling story
+          is the <strong>reasoning</strong>: symptoms in, urgency and a route out.
+        </p>
+        <p>
+          Describe the flow in four honest beats, and use the real app screens for each:
+        </p>
+        <ol class="body-list">
+          <li><strong>Tell it where it hurts.</strong> Body area, then symptoms relevant to that area — not a list of 400 checkboxes.</li>
+          <li><strong>It weighs what you said.</strong> Against 50 conditions and 75 clinical rules, adjusted for age, pregnancy and season.</li>
+          <li><strong>It checks for danger signs first.</strong> Red flags override everything else. Confusion, convulsions, difficulty breathing, dark urine — these jump straight to emergency regardless of the score.</li>
+          <li><strong>It tells you what to do and where to go.</strong> One of three urgency levels, plus the nearest facilities that can actually treat it.</li>
+        </ol>
+
+        <p>
+          That third beat is worth a dedicated section on the site. "Red flags override the score" is
+          the most trust-building sentence in the entire product, because it is precisely the safety
+          logic a clinician would look for — and it is the opposite of a black box.
+        </p>
+
+        <h3>6.2 Explaining privacy visually</h3>
+        <p>
+          "Nothing you enter leaves your phone" is a headline claim, not a policy footnote. It is also
+          literally true: the scoring engine runs on-device and no symptom data is stored server-side.
+        </p>
+        <p>
+          Show it as a simple diagram: a phone containing the assessment, with one thin arrow leaving
+          it labelled <em>"the clinical rules come down"</em> — and no arrow going back up. One
+          honest diagram outperforms three paragraphs of privacy prose, and it is the kind of claim
+          competitors cannot copy without rebuilding their architecture.
+        </p>
+
+        <h3>6.3 Describing the conditions library</h3>
+        <p>
+          The 50 conditions are the site's largest content asset (see §12). Each one gets a page. For
+          every condition, lead with what a worried person actually needs, in this order:
+        </p>
+        <ul>
+          <li><strong>Danger signs — go now.</strong> Top of the page, before anything else. Someone in an emergency must not have to scroll.</li>
+          <li><strong>What it is, in two plain sentences.</strong></li>
+          <li><strong>Common symptoms</strong> in everyday words.</li>
+          <li><strong>Who is most at risk</strong> — the demographic modifiers, stated plainly.</li>
+          <li><strong>When it's most common</strong> — the seasonal story where one exists.</li>
+          <li><strong>What to do next</strong>, then the disclaimer, then the app CTA.</li>
+        </ul>
+        <p>
+          Never structure these pages as "symptoms → likely diagnosis". Structure them as
+          "symptoms → how urgently to act". Same content, and only one of those is a claim we can defend.
+        </p>
+      </section>
+
+      <!-- ─────────────────────────────── 7 ─────────────────────────────── -->
+      <section class="doc" id="s7">
+        <div class="head"><span class="num">07</span><h2>Site map &amp; page briefs</h2></div>
+
+        <p>
+          Eight routes at launch. Resist adding more; a small site executed precisely reads as more
+          premium than a large one padded out.
+        </p>
+
+        <div class="briefs">
+
+          <div class="brief">
+            <span class="route">/</span>
+            <h3>Home</h3>
+            <dl>
+              <dt>Job</dt><dd>In one screen, make a stranger believe this is serious, local, and safe to trust — then get the install.</dd>
+              <dt>Hero</dt><dd>Headline on urgency, not diagnosis. Suggested: "Know how urgently to act." Sub: what it does, for whom, where. Real app screen beside it, not an illustration.</dd>
+              <dt>Sections</dt><dd>How it works (§6.1 four beats) · Red flags override the score · Private by design (§6.2) · The receipts (§3) · Conditions we cover · Coverage, stated honestly · Install</dd>
+              <dt>Primary action</dt><dd>Get the app. One button, repeated at natural intervals — never a popup.</dd>
+              <dt>Never</dt><dd>Carousel hero. Fake testimonials. Accuracy percentages. Countdown or urgency-marketing devices.</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/how-it-works</span>
+            <h3>How it works</h3>
+            <dl>
+              <dt>Job</dt><dd>Convert the sceptical and the clinically literate — including partners and health workers evaluating us.</dd>
+              <dt>Content</dt><dd>The four beats in depth, with a real worked example. Walk one fever in July through to an urgent recommendation, showing how season and age changed it. This single example does more than any feature list.</dd>
+              <dt>Must include</dt><dd>Red-flag override logic · what the app deliberately does not do · that clinical artifacts are versioned and reviewed.</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/conditions</span>
+            <h3>Conditions library — index and 50 detail pages</h3>
+            <dl>
+              <dt>Job</dt><dd>Organic search entry at the exact moment of worry, and proof of clinical depth.</dd>
+              <dt>Structure</dt><dd>Index filterable by body area and by "common in Nigeria". Detail pages per §6.3.</dd>
+              <dt>Note</dt><dd>This is the highest-traffic part of the site long-term. Someone searching "dark urine fever Lagos" at 2am should land here and be told to go now.</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/find-care</span>
+            <h3>Find care</h3>
+            <dl>
+              <dt>Job</dt><dd>Prove the facility directory is real, and be genuinely useful to someone without the app.</dd>
+              <dt>Content</dt><dd>Search by state and area. Show type, whether emergency-capable, and distance. Be explicit that only 45 records currently carry a phone number — an empty field the user expected to be filled is worse than a labelled gap.</dd>
+              <dt>Coverage</dt><dd>Lagos, Kano, FCT — named, with counts. "Your state next" as a capture, not a claim.</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/privacy</span>
+            <h3>Privacy &amp; data</h3>
+            <dl>
+              <dt>Job</dt><dd>Turn compliance into a selling point.</dd>
+              <dt>Content</dt><dd>Plain-language summary first, legal text second. State what we never collect. NDPR obligations addressed explicitly (§11).</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/clinical-safety</span>
+            <h3>Clinical safety &amp; sources</h3>
+            <dl>
+              <dt>Job</dt><dd>The page that wins institutional trust — partners, health authorities, journalists, investors.</dd>
+              <dt>Content</dt><dd>Sources behind the knowledge base. Who reviews it. How versioning works. Named clinical reviewers with credentials, once we can. Limitations, stated by us before anyone else states them for us.</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/partners</span>
+            <h3>For clinics, employers &amp; NGOs</h3>
+            <dl>
+              <dt>Job</dt><dd>Open the B2B channel. Different voice: this reader may be a clinician or a procurement officer, so precision beats simplicity here.</dd>
+              <dt>Primary action</dt><dd>Book a conversation. A form, not an app install.</dd>
+            </dl>
+          </div>
+
+          <div class="brief">
+            <span class="route">/about</span>
+            <h3>About</h3>
+            <dl>
+              <dt>Job</dt><dd>Answer "who is behind this, and why should I believe them?" — the decisive question in health.</dd>
+              <dt>Content</dt><dd>Real names, real faces, real credentials. Why Nigeria, why these conditions. Anonymous health brands do not get trusted, and shouldn't be.</dd>
+            </dl>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ─────────────────────────────── 8 ─────────────────────────────── -->
+      <section class="doc" id="s8">
+        <div class="head"><span class="num">08</span><h2>UX principles</h2></div>
+
+        <h3>8.1 Design for the worst moment, not the best</h3>
+        <p>
+          Assume the visitor is frightened, one-handed, on a cracked mid-range Android, on patchy
+          data, possibly at night, possibly holding a sick child. Every decision follows from that
+          picture rather than from a designer's 27-inch monitor.
+        </p>
+        <ul>
+          <li><strong>Emergency information is never behind an interaction.</strong> No accordion, no tab, no "read more" on a danger sign.</li>
+          <li><strong>Touch targets 48×48px minimum</strong>, with 8px between adjacent targets.</li>
+          <li><strong>Thumb reach:</strong> primary actions in the lower half of the viewport on mobile.</li>
+          <li><strong>Sunlight legibility:</strong> test outdoors, not just in a dark room. Low-contrast grey-on-grey disappears entirely at noon.</li>
+          <li><strong>No dark patterns, ever.</strong> No fake scarcity, no guilt-trip unsubscribe, no pre-checked consent. In health this is not merely distasteful — it is the fastest way to lose the trust the whole brand rests on.</li>
+        </ul>
+
+        <h3>8.2 Trust architecture</h3>
+        <p>
+          Trust signals are load-bearing structure, not decoration. Place them where doubt actually
+          occurs: next to the claim that provokes it. A privacy line belongs beside the symptom-check
+          CTA, not only on <code>/privacy</code>. Clinical sourcing belongs on condition pages, not
+          only on <code>/clinical-safety</code>.
+        </p>
+
+        <h3>8.3 Forms</h3>
+        <ul>
+          <li>Ask for the minimum. Every field is a reason to leave, and in health it is also a liability.</li>
+          <li>Label above the field, always visible. Placeholder-only labels fail the moment typing starts.</li>
+          <li>Validate on blur, not on keystroke. Errors beside the field, in words.</li>
+          <li>Nigerian phone formats accepted in every common shape — <code>0803…</code>, <code>+234803…</code>, with spaces. Never reject a valid number on formatting.</li>
+        </ul>
+      </section>
+
+      <!-- ─────────────────────────────── 9 ─────────────────────────────── -->
+      <section class="doc" id="s9">
+        <div class="head"><span class="num">09</span><h2>Performance budget</h2></div>
+
+        <p>
+          In Nigeria, mobile data is bought in bundles and page weight is a direct cost to the user.
+          A heavy site is not just slow — it is expensive, and it is a health site failing the people
+          with the least. Treat these as <strong>build-failing budgets</strong>, not aspirations.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Metric</th><th>Budget</th><th>Why this number</th></tr></thead>
+            <tbody>
+              <tr><td>Largest Contentful Paint</td><td class="tnum">&lt; 2.5s on 4G · &lt; 5s on 3G</td><td>Measured throttled, on a mid-range Android — not on desktop fibre</td></tr>
+              <tr><td>Total page weight</td><td class="tnum">&lt; 500 KB</td><td>Roughly the cost ceiling before a bundle-conscious user notices</td></tr>
+              <tr><td>JavaScript shipped</td><td class="tnum">&lt; 120 KB gzipped</td><td>Parse cost on low-end CPUs dominates, not download</td></tr>
+              <tr><td>Fonts</td><td class="tnum">≤ 2 files, subset, self-hosted</td><td>No third-party font request: privacy and latency</td></tr>
+              <tr><td>Images</td><td class="tnum">AVIF/WebP, responsive, lazy below fold</td><td>Never ship a 2MB hero JPEG</td></tr>
+              <tr><td>Lighthouse mobile</td><td class="tnum">≥ 95 across all four</td><td>Accessibility and SEO are non-negotiable in this category</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Recommended approach</h3>
+        <p>
+          Static-first: a statically generated site (Next.js static export, Astro, or similar) on a
+          CDN with African edge presence. Condition pages are static content and must never require
+          JavaScript to read. The facility search is the one genuinely dynamic feature — build it so
+          the page renders and is readable before that JavaScript arrives.
+        </p>
+        <p>
+          <strong>Every page must be readable with JavaScript disabled or failed.</strong> On flaky
+          connections, partial script failure is common — and a health page that renders blank is the
+          worst possible outcome.
+        </p>
+      </section>
+
+      <!-- ─────────────────────────────── 10 ─────────────────────────────── -->
+      <section class="doc" id="s10">
+        <div class="head"><span class="num">10</span><h2>Accessibility</h2></div>
+
+        <p>
+          <strong>WCAG 2.2 AA is the floor.</strong> This is a health service: users may have impaired
+          vision, tremor, low literacy, or be reading in a second language while distressed. Access
+          is a clinical safety property, not a checkbox.
+        </p>
+        <ul>
+          <li>Contrast: 4.5:1 body text, 3:1 large text and UI boundaries. The app's amber and red both fail as text — use the darkened values in §5.1.</li>
+          <li>Never colour alone: every urgency state carries a text label.</li>
+          <li>Full keyboard operation with a visible focus ring. Never <code>outline: none</code> without a replacement.</li>
+          <li>Semantic HTML and one <code>h1</code> per page. Landmarks: <code>header</code>, <code>nav</code>, <code>main</code>, <code>footer</code>.</li>
+          <li>Real alt text on informative images; empty <code>alt=""</code> on decorative ones.</li>
+          <li>Test with a screen reader on the emergency path specifically. If one flow gets manual testing, it is that one.</li>
+          <li>Support 200% zoom and text-only resize without loss of content.</li>
+        </ul>
+      </section>
+
+      <!-- ─────────────────────────────── 11 ─────────────────────────────── -->
+      <section class="doc" id="s11">
+        <div class="head"><span class="num">11</span><h2>Legal &amp; safety guardrails</h2></div>
+
+        <p>Non-negotiable, and cheaper to build in than to retrofit.</p>
+        <ul>
+          <li><strong>Disclaimer placement:</strong> on the home page, on every condition page, and on any page showing an urgency level. Legible, not hidden (§1).</li>
+          <li><strong>Emergency signposting:</strong> every page footer carries how to reach emergency help. Never let a distressed visitor hunt for it.</li>
+          <li><strong>No testimonials that imply diagnosis.</strong> "WellaPath told me I had typhoid" cannot be published even if a user genuinely said it. Acceptable: "It told me not to wait, and I went in that night."</li>
+          <li><strong>No before/after or outcome claims.</strong> No survival or recovery statistics attributed to using the app.</li>
+          <li><strong>NDPR compliance:</strong> Nigeria Data Protection Regulation applies. Lawful basis stated, consent for analytics that is genuinely opt-in and not pre-checked, a named contact for data requests, and a documented retention period.</li>
+          <li><strong>Analytics restraint:</strong> a privacy-respecting, cookieless tool by preference. Never send symptom or condition-page detail to a third-party ad network — that would leak health interest data and contradict the core privacy claim.</li>
+          <li><strong>No third-party ad pixels on condition pages.</strong> This is the single most sensitive category of browsing data on the site.</li>
+        </ul>
+      </section>
+
+      <!-- ─────────────────────────────── 12 ─────────────────────────────── -->
+      <section class="doc" id="s12">
+        <div class="head"><span class="num">12</span><h2>SEO &amp; discovery</h2></div>
+
+        <p>
+          The 50 condition pages are the growth engine. People search symptoms, in their own words,
+          usually at night. Most of what they currently find was written for American readers and
+          has never heard of Lassa fever.
+        </p>
+        <ul>
+          <li><strong>Target symptom language, not clinical names.</strong> "Fever and dark urine" earns more qualified traffic than "haemoglobinuria".</li>
+          <li><strong>Localise deliberately:</strong> "malaria symptoms in children Nigeria", "cholera signs Lagos". This is where we can genuinely outrank global sites, because we are more relevant, not because we are bigger.</li>
+          <li><strong>Structured data:</strong> <code>MedicalWebPage</code> and <code>MedicalCondition</code> schema on condition pages; <code>Organization</code> sitewide. Health results are heavily curated — schema and visible authorship both matter.</li>
+          <li><strong>Show authorship and review dates.</strong> "Reviewed by [clinician], March 2026" is both a ranking factor in this category and a genuine trust signal.</li>
+          <li><strong>Seasonal content:</strong> publish ahead of the rainy season and outbreak periods. The engine already knows about seasonality; the content calendar should too.</li>
+          <li><strong>Never optimise a symptom page into a diagnosis claim</strong> to chase a keyword. The ranking is not worth the risk, and the pages that overclaim are exactly the ones health-search updates demote.</li>
+        </ul>
+      </section>
+
+      <!-- ─────────────────────────────── 13 ─────────────────────────────── -->
+      <section class="doc" id="s13">
+        <div class="head"><span class="num">13</span><h2>Definition of done</h2></div>
+
+        <p>No page ships until every line here is true of it.</p>
+        <ul class="check">
+          <li>No banned word from §4.2 appears anywhere in the copy</li>
+          <li>The disclaimer is present, legible, and not visually suppressed</li>
+          <li>Emergency contact information is reachable from the footer of this page</li>
+          <li>Every urgency state carries a text label as well as a colour</li>
+          <li>All text meets 4.5:1 contrast; amber and red use the darkened §5.1 values</li>
+          <li>Fully keyboard operable, with a visible focus state throughout</li>
+          <li>Screen-reader pass completed on any page that shows an urgency level</li>
+          <li>Lighthouse mobile ≥ 95 on performance, accessibility, best practices and SEO</li>
+          <li>Page weight under 500 KB; JavaScript under 120 KB gzipped</li>
+          <li>Readable and navigable with JavaScript disabled</li>
+          <li>Tested on a real mid-range Android over throttled 3G — not only in a desktop browser</li>
+          <li>Tested outdoors in direct sunlight</li>
+          <li>Coverage claims name Lagos, Kano and the FCT; nothing claims national coverage</li>
+          <li>Every statistic traces to a shipped clinical artifact and matches §3 exactly</li>
+          <li>No third-party ad or analytics pixel on any condition page</li>
+          <li>Consent for analytics is opt-in and not pre-checked</li>
+        </ul>
+      </section>
+
+      <!-- ─────────────────────────────── 14 ─────────────────────────────── -->
+      <section class="doc" id="s14">
+        <div class="head"><span class="num">14</span><h2>Open decisions</h2></div>
+
+        <p>
+          These need answers from the founder before the relevant work starts. Each one changes the
+          build rather than merely the wording.
+        </p>
+
+        <div class="asks">
+          <dl>
+            <dt>Who clinically reviews the knowledge base, and may we name them?</dt>
+            <dd>A named reviewer with credentials is the strongest trust asset available, and §12 depends on it for health-search credibility. Blocks <code>/clinical-safety</code>.</dd>
+
+            <dt>Is the primary conversion an app install, or a web symptom check?</dt>
+            <dd>If the assessment ever runs on the web, the on-device privacy claim needs rewording and the engine needs a second home. Recommend install-only at launch — it keeps the privacy story absolutely clean.</dd>
+
+            <dt>English only at launch?</dt>
+            <dd>Hausa, Yoruba and Igbo would widen reach considerably, and Kano coverage in particular argues for Hausa. It changes typography, layout and the content pipeline, so it must be decided before build rather than retrofitted.</dd>
+
+            <dt>Is there existing brand identity beyond the app's violet?</dt>
+            <dd>Logo, wordmark, any typeface licence. If not, that is a prerequisite piece of work, and the palette in §5.1 should be treated as derived-from-app rather than final.</dd>
+
+            <dt>Which emergency number do we publish?</dt>
+            <dd>112 nationally, but state services differ and Lagos has its own. Getting this wrong is a safety issue, not a content one. Needs verification per covered state.</dd>
+
+            <dt>Is B2B in scope for launch?</dt>
+            <dd>If <code>/partners</code> ships, it needs a real offer and a real pipeline behind it. An empty B2B page is worse than none.</dd>
+          </dl>
+        </div>
+      </section>
+
+      <footer class="colophon">
+        <span>WellaPath — Website Guide v1.0</span>
+        <span>Clinical decision support · not a diagnosis engine</span>
+        <span>Figures verified against shipped artifacts</span>
+      </footer>
+
+    </main>
+  </div>
+</div>

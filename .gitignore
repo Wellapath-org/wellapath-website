@@ -1,0 +1,36 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# builds
+.next
+out
+build
+dist
+
+# env — never commit secrets
+.env
+.env*.local
+.env.production
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# os / editor
+.DS_Store
+*.swp
+.idea
+
+# design source material, not part of the build.
+# Large reference captures and raw brand exports live outside the repo; the
+# optimised assets that the site actually uses are committed under public/.
+*.png
+!public/**/*.png
+!app/icon.png
+!app/apple-icon.png
+"app screen screenshots "/

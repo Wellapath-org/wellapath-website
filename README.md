@@ -45,6 +45,28 @@ To build a preview anyway:
 ALLOW_UNREVIEWED_RED_FLAGS=true npm run build
 ```
 
+## Launch signup (Resend)
+
+The "Notify me at launch" form posts to `/api/notify`, which adds the address to
+a Resend audience. It needs two environment variables:
+
+```bash
+cp .env.example .env.local     # then fill in the two Resend values
+npm run check:resend           # tells you exactly what is missing or wrong
+```
+
+| Variable | Where from |
+|---|---|
+| `RESEND_API_KEY` | [resend.com/api-keys](https://resend.com/api-keys) — "Sending access" is enough; this code only creates contacts, it never sends |
+| `RESEND_AUDIENCE_ID` | [resend.com/audiences](https://resend.com/audiences) — create an audience, copy its **ID**, not its name |
+
+Set the same two in **Vercel → Settings → Environment Variables**. Vercel only
+applies environment variables to deployments created *after* they are added, so
+redeploy once you have set them.
+
+Until they are set every signup returns an honest error and the address is
+written to the server log, so nothing is lost — but nothing is stored either.
+
 ## Where the facts come from
 
 Every figure is derived at build time from the shipped clinical artifacts in

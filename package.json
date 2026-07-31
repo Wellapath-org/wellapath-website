@@ -10,7 +10,8 @@
     "sync:kb": "node scripts/sync-kb.mjs",
     "check:copy": "node scripts/check-copy.mjs",
     "check:layout": "node scripts/check-layout.mjs",
-    "check": "npm run check:copy && npm run check:layout"
+    "check": "npm run check:copy && npm run check:layout",
+    "check:resend": "node scripts/check-resend.mjs"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",

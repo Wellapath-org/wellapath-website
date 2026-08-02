@@ -3,6 +3,7 @@ import { SITE } from '@/content/site'
 import { siteGraph, jsonLd } from '@/content/schema'
 import { SiteHeader, SiteFooter } from '@/components/chrome'
 import { IconDefaults } from '@/components/icons'
+import { Analytics } from '@/components/analytics'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -55,6 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteHeader />
           <main id="main">{children}</main>
           <SiteFooter />
+          {/* Opt-in, and it renders nothing at all under /conditions. */}
+          <Analytics />
         </IconDefaults>
         <script
           type="application/ld+json"

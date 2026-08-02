@@ -92,9 +92,9 @@ export default async function SegmentPage({
     <>
       <section className="relative overflow-hidden bg-ground">
         <div className="aurora-soft" aria-hidden="true" />
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 py-20 md:px-10 md:py-24">
-          <div className="relative z-1 grid min-w-0 items-center gap-14 lg:grid-cols-12">
-            <div className="min-w-0 lg:col-span-7">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 py-14 sm:px-6 sm:py-16 md:px-10 md:py-24">
+          <div className="relative z-1 grid min-w-0 items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-14">
+            <div className="min-w-0 md:col-span-7">
               <Eyebrow>{s.eyebrow}</Eyebrow>
               <TwoTone
                 as="h1"
@@ -112,7 +112,7 @@ export default async function SegmentPage({
               </div>
             </div>
 
-            <div className="mx-auto w-full max-w-[300px] lg:col-span-5 lg:ml-auto lg:mr-0">
+            <div className="mx-auto w-full max-w-[300px] md:col-span-5 md:ml-auto md:mr-0">
               <PhoneShell
                 label={
                   isConsumer
@@ -139,7 +139,7 @@ export default async function SegmentPage({
 
       {/* ── Facts strip ──────────────────────────────────────────────── */}
       <section className="relative bg-ground">
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 md:px-10">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 sm:px-6 md:px-10">
           <dl className="relative z-1 grid grid-cols-2 gap-x-8 gap-y-8 border-y border-rule py-10 md:grid-cols-4">
             {s.facts.map((f) => (
               <div key={f.label}>
@@ -162,7 +162,7 @@ export default async function SegmentPage({
               : 'Specifics, not adjectives.'
           }
         />
-        <div className="grid gap-x-16 gap-y-12 lg:grid-cols-2">
+        <div className="grid gap-x-16 gap-y-10 md:grid-cols-2 md:gap-y-12">
           {s.points.map((p) => {
             const Icon = ICONS[p.icon] ?? Waypoints
             return (
@@ -239,11 +239,11 @@ export default async function SegmentPage({
       </Section>
 
       <Section tone="ground" space="normal">
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
-          <div className="min-w-0 lg:col-span-7">
+        <div className="grid gap-8 md:grid-cols-12 md:items-start">
+          <div className="min-w-0 md:col-span-7">
             <GetTheApp id={`get-the-app-${s.slug}`} />
           </div>
-          <div className="min-w-0 lg:col-span-5">
+          <div className="min-w-0 md:col-span-5">
             <Disclaimer />
           </div>
         </div>

@@ -94,14 +94,23 @@ export function Section({
   className?: string
 }) {
   const bg = { ground: 'bg-ground', sunk: 'bg-sunk', navy: 'bg-navy text-white' }[tone]
+  // White space that reads as composure on a 1280px screen reads as dead air on
+  // a 360px one, where a section's padding alone can outweigh its content. The
+  // tone change between sections already signals the break on a phone, so the
+  // gap does less work there and can afford to be smaller. Desktop is unchanged.
   const pad = {
-    tight: 'py-14 md:py-16',
-    normal: 'py-20 md:py-24',
-    loose: 'py-24 md:py-36',
+    tight: 'py-10 sm:py-12 md:py-16',
+    normal: 'py-14 sm:py-16 md:py-24',
+    loose: 'py-16 sm:py-20 md:py-36',
   }[space]
   return (
     <section id={id} className={`relative ${bg} ${className}`}>
-      <div className={`relative mx-auto w-full max-w-[1120px] px-6 md:px-10 ${pad} ${rails ? 'rails' : ''}`}>
+      {/* px-5 below sm: at 320px the old px-6 spent 48px of a 320px screen on
+          margins. Five more pixels of line length per side is the difference
+          between four words a line and five. */}
+      <div
+        className={`relative mx-auto w-full max-w-[1120px] px-5 sm:px-6 md:px-10 ${pad} ${rails ? 'rails' : ''}`}
+      >
         <div className="relative z-1 min-w-0">{children}</div>
       </div>
     </section>
@@ -120,7 +129,7 @@ export function SectionHeader({
   className?: string
 }) {
   return (
-    <div className={`measure-wide mb-12 ${className}`}>
+    <div className={`measure-wide mb-8 sm:mb-10 md:mb-12 ${className}`}>
       {eyebrow && (
         <div className="mb-4">
           <Eyebrow>{eyebrow}</Eyebrow>
@@ -147,20 +156,20 @@ export function PageHeader({
   return (
     <section className="relative overflow-hidden bg-ground">
       <div className="aurora-soft" aria-hidden="true" />
-      <div className="rails relative mx-auto w-full max-w-[1120px] px-6 py-20 md:px-10 md:py-24">
+      <div className="rails relative mx-auto w-full max-w-[1120px] px-5 py-14 sm:px-6 sm:py-16 md:px-10 md:py-24">
         <div
-          className={`relative z-1 ${aside ? 'grid items-center gap-14 lg:grid-cols-12' : ''}`}
+          className={`relative z-1 ${aside ? 'grid items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-14' : ''}`}
         >
-          <div className={`min-w-0 ${aside ? 'lg:col-span-7' : ''}`}>
+          <div className={`min-w-0 ${aside ? 'md:col-span-7' : ''}`}>
             {eyebrow && (
-              <div className="mb-5">
+              <div className="mb-4 sm:mb-5">
                 <Eyebrow>{eyebrow}</Eyebrow>
               </div>
             )}
             <TwoTone lead={lead} rest={rest} as="h1" size="display" className="measure-wide" />
-            {children && <div className="mt-8">{children}</div>}
+            {children && <div className="mt-6 sm:mt-8">{children}</div>}
           </div>
-          {aside && <div className="min-w-0 lg:col-span-5">{aside}</div>}
+          {aside && <div className="min-w-0 md:col-span-5">{aside}</div>}
         </div>
       </div>
     </section>
@@ -172,12 +181,21 @@ export function PageHeader({
    is one idea plus one visual.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* Class strings are written out in full — Tailwind scans source text, so a
-   template literal like `lg:col-span-${n}` would never be generated. */
+/**
+ * Written out in full because Tailwind scans source text: a template-built
+ * class name like `md:col-span-${n}` is never generated.
+ *
+ * These pair at `md` (768px), not `lg` (1024px). At `lg` every tablet in
+ * portrait fell through to the stacked phone layout: an iPad at 820px showed a
+ * 320px-wide mock centred in an 820px viewport with 250px of dead margin either
+ * side. Measured, moving the pairing to 768px took the home page from 13,403px
+ * to 11,358px at that width. 768px is comfortably enough for a 7/5 split, so
+ * the tablet now gets a tablet layout instead of a stretched phone one.
+ */
 const RATIOS = {
-  '7/5': ['lg:col-span-7', 'lg:col-span-5'],
-  '6/6': ['lg:col-span-6', 'lg:col-span-6'],
-  '5/7': ['lg:col-span-5', 'lg:col-span-7'],
+  '7/5': ['md:col-span-7', 'md:col-span-5'],
+  '6/6': ['md:col-span-6', 'md:col-span-6'],
+  '5/7': ['md:col-span-5', 'md:col-span-7'],
 } as const
 
 export function Split({
@@ -196,10 +214,12 @@ export function Split({
   const [a, b] = RATIOS[ratio]
   return (
     <div
-      className={`grid gap-12 lg:grid-cols-12 lg:gap-16 ${align === 'center' ? 'lg:items-center' : 'lg:items-start'}`}
+      className={`grid gap-8 sm:gap-10 md:grid-cols-12 md:gap-12 lg:gap-16 ${
+        align === 'center' ? 'md:items-center' : 'md:items-start'
+      }`}
     >
-      <div className={`min-w-0 ${a} ${reverse ? 'lg:order-2' : ''}`}>{children}</div>
-      <div className={`min-w-0 ${b} ${reverse ? 'lg:order-1' : ''}`}>{aside}</div>
+      <div className={`min-w-0 ${a} ${reverse ? 'md:order-2' : ''}`}>{children}</div>
+      <div className={`min-w-0 ${b} ${reverse ? 'md:order-1' : ''}`}>{aside}</div>
     </div>
   )
 }

@@ -4,10 +4,10 @@
  * operable and screen-reader announced with zero JavaScript.
  */
 import Link from 'next/link'
-import { MENU, NAV, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER } from '@/content/site'
+import { MENU, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER } from '@/content/site'
 import { Button } from './ui'
 import { EmergencyCard } from './clinical'
-import { BellRing, ChevronDown } from 'lucide-react'
+import { BellRing, ChevronDown, X, Phone } from 'lucide-react'
 
 /* ── Wordmark ─────────────────────────────────────────────────────────────
    From the app splash: lowercase "wellapath" with the tick. Drawn as SVG so
@@ -55,10 +55,21 @@ export function TickMark({ className = 'h-5 w-5' }: { className?: string }) {
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
+/**
+ * Destinations the mobile sheet already surfaces outside the grouped lists:
+ * MENU's own top-level rows, plus the "Get the app" button pinned at the
+ * bottom. Filtering the groups against this is what keeps one scrolling list
+ * from showing the same page twice.
+ */
+const SHORTCUT_HREFS = new Set([
+  ...MENU.filter((m) => m.href).map((m) => m.href!),
+  '/#get-the-app',
+])
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-rule bg-ground">
-      <div className="mx-auto flex w-full max-w-[1080px] items-center justify-between gap-6 px-6 py-3 md:px-10">
+      <div className="mx-auto flex w-full max-w-[1080px] items-center justify-between gap-4 px-5 py-3 sm:gap-6 sm:px-6 md:px-10">
         <Link
           href="/"
           className="flex min-h-12 shrink-0 items-center"
@@ -74,7 +85,7 @@ export function SiteHeader() {
             /about, /partners and the four /for/* pages existed only in the
             footer.
             ─────────────────────────────────────────────────────────────── */}
-        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 nav:flex">
           {MENU.map((item) =>
             item.href ? (
               <Link
@@ -142,40 +153,106 @@ export function SiteHeader() {
           </div>
         </nav>
 
-        <details className="group relative lg:hidden">
-          <summary className="flex min-h-12 min-w-12 cursor-pointer list-none items-center justify-center rounded-lg border border-rule px-4 text-body font-semibold text-ink [&::-webkit-details-marker]:hidden">
-            Menu
+        {/* ── Mobile navigation ─────────────────────────────────────────
+            A full-width sheet, not a floating dropdown. The old panel was
+            288px wide holding 1,225px of links inside a 572px box: it scrolled
+            internally with no affordance, left a stray strip of hero showing
+            beside it at 360px, and repeated five destinations because the flat
+            NAV list and the mega-menu columns overlap. Twenty-three entries do
+            not fit in a dropdown, and pretending otherwise is what made it
+            feel unfinished on a phone.
+
+            So: it fills the width, takes the viewport below the header, keeps
+            the mega-menu's own groupings rather than flattening them, and
+            scrolls in one place. Still <details>/<summary>, so it stays
+            keyboard operable and screen-reader announced with no JavaScript.
+
+            The panel is positioned against the <header>, which is sticky and
+            therefore the containing block, so `top-full` sits it exactly under
+            the bar and `100% ` in the height resolves to the bar's own height.
+            100dvh, not 100vh, because a mobile URL bar collapses on scroll and
+            vh would leave the last link under it. */}
+        <details className="group nav:hidden [&_summary::-webkit-details-marker]:hidden">
+          <summary
+            className="flex min-h-12 min-w-12 cursor-pointer list-none items-center justify-center gap-2 rounded-lg border border-rule px-4 text-body font-semibold text-ink transition-safe group-open:border-ink group-open:bg-ink group-open:text-white"
+            aria-label="Main menu"
+          >
+            <span className="group-open:hidden">Menu</span>
+            <span className="hidden group-open:inline">Close</span>
+            <X className="hidden size-4 group-open:block" aria-hidden="true" />
           </summary>
-          <div className="absolute right-0 top-full mt-3 w-72 rounded-lg border border-rule bg-card p-3 shadow-lift">
-            <nav aria-label="Main" className="flex max-h-[70vh] flex-col overflow-y-auto">
-              {NAV.map((item) => (
+
+          <div className="absolute inset-x-0 top-full h-[calc(100dvh-100%)] overflow-y-auto overscroll-contain border-t border-rule bg-ground">
+            <nav aria-label="Main" className="mx-auto w-full max-w-[1080px] px-5 pb-10 pt-2 sm:px-6">
+              {/* Shortcuts first, then the grouped detail.
+                  MENU carries /conditions, /coverage and /about twice on
+                  purpose: once as a top-level shortcut, once inside the
+                  relevant mega-menu column. Two entry points read as two
+                  routes to the same place when they sit side by side in a
+                  panel, but as one repeated line in a single scrolling list,
+                  so the sheet shows the shortcut and drops the later copy. */}
+              {MENU.filter((m) => m.href).map((m) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  className="transition-safe flex min-h-12 items-center rounded-md px-3 text-body text-ink hover:bg-sunk"
+                  key={m.title}
+                  href={m.href!}
+                  className="transition-safe flex min-h-14 items-center border-b border-rule text-h3 font-semibold text-ink"
                 >
-                  {item.label}
+                  {m.title}
                 </Link>
               ))}
-              {MENU.filter((m) => m.columns).map((m) => (
-                <div key={m.title} className="mt-3 border-t border-rule pt-3">
-                  <p className="text-eyebrow px-3 font-mono uppercase text-ink-mute">{m.title}</p>
-                  {m.columns?.flatMap((c) => c.links).map((l) => (
-                    <Link
-                      key={l.href + l.label}
-                      href={l.href}
-                      className="transition-safe flex min-h-12 items-center rounded-md px-3 text-body text-ink-soft hover:bg-sunk hover:text-ink"
-                    >
-                      {l.label}
-                    </Link>
-                  ))}
+
+              {MENU.filter((m) => m.columns).map((item) => (
+                <div key={item.title} className="border-b border-rule py-5">
+                  <p className="text-eyebrow font-mono uppercase text-ink-mute">{item.title}</p>
+                  {item.columns?.map((col) => {
+                    const links = col.links.filter((l) => !SHORTCUT_HREFS.has(l.href))
+                    if (links.length === 0) return null
+                    return (
+                      <div key={col.heading} className="mt-4">
+                        <p className="text-small font-semibold text-ink">{col.heading}</p>
+                        <ul className="mt-1">
+                          {links.map((l) => (
+                            <li key={l.href + l.label}>
+                              {/* py-2 and the leading-tight note keep a row
+                                  with a note the same visual weight as one
+                                  without. Left to itself the two-line row read
+                                  as cramped next to the single-line rows above
+                                  it, which made the list look mis-set. */}
+                              <Link
+                                href={l.href}
+                                className="transition-safe flex min-h-12 flex-col justify-center gap-0.5 py-2 text-ink-soft"
+                              >
+                                <span className="text-body leading-snug">{l.label}</span>
+                                {l.note && (
+                                  <span className="text-small leading-snug text-ink-mute">
+                                    {l.note}
+                                  </span>
+                                )}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  })}
                 </div>
               ))}
-              <div className="mt-3 border-t border-rule pt-3">
+
+              <div className="mt-6">
                 <Button href="/#get-the-app" full>
                   Get the app
                 </Button>
               </div>
+
+              {/* Emergency help is reachable from the footer of every page, and
+                  §11 does not let the menu be the one surface that hides it. */}
+              <a
+                href={`tel:${EMERGENCY.national}`}
+                className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-lg border border-triage-crit text-body font-semibold text-triage-crit"
+              >
+                <Phone className="size-4" aria-hidden="true" />
+                Emergency: call {EMERGENCY.national}
+              </a>
             </nav>
           </div>
         </details>
@@ -192,7 +269,7 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-rule bg-sunk">
-      <div className="rails relative mx-auto w-full max-w-[1080px] px-6 py-16 md:px-10">
+      <div className="rails relative mx-auto w-full max-w-[1080px] px-5 py-12 sm:px-6 sm:py-14 md:px-10 md:py-16">
         <div className="relative z-1">
           <EmergencyCard />
 

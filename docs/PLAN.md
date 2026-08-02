@@ -187,7 +187,7 @@ Carried from §14, narrowed to what actually blocks work:
 3. **Where should the capture form POST?** It targets `/api/notify` and `/api/partners`, which do not
    exist yet. Until they do, a submission 404s.
 4. **Is `/partners` in scope?** It ships with a real form and real technical claims. If there is no
-   pipeline behind it, remove it from `NAV` rather than soften it.
+   pipeline behind it, remove it from `MENU` rather than soften it.
 5. **Confirm 112 per state.** The app already publishes 112 and the site now matches it, so this is
    verification rather than a blocker — but Lagos runs its own line and §14 is right that getting it
    wrong is a safety issue.

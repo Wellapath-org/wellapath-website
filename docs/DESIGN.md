@@ -131,18 +131,28 @@ Stripe. **Any change to the aurora must be re-measured against the text it sits 
 17px on a low-DPI Android in daylight, and it has true `tnum` figures for the receipts. Swap to
 Source Sans 3 Variable if the letter of §5.2 is preferred — it is one token.
 
-| Token | Size / line-height | Weight | Use |
-|---|---|---|---|
-| `--text-hero` | `clamp(2.75rem, 5.2vw, 4.25rem)` / 1.08 | 700 | Home `h1` only |
-| `--text-display` | `clamp(2.25rem, 4vw, 3.25rem)` / 1.12 | 700 / 400 | Section headers, page `h1` |
-| `--text-h1` | `clamp(2rem, 3.2vw, 2.75rem)` / 1.15 | 400–700 | Hero sub, condition names |
-| `--text-h2` | `clamp(1.625rem, 2.4vw, 2.125rem)` / 1.2 | 700 | Subsection heads |
-| `--text-h3` | `1.3125rem` / 1.3 | 600–700 | Card titles |
-| `--text-body-lg` | `1.1875rem` / 1.6 | 400 | Page intros |
-| `--text-body` | `1.0625rem` / 1.6 | 400 | Default prose |
-| `--text-small` | `0.9375rem` (15px) / 1.5 | 400 | Captions — **absolute floor** |
-| `--text-label` | `0.75rem` (12px), `0.09em`, uppercase | 600 | 1–3 word labels ONLY |
-| `--text-figure` | `clamp(2.75rem, 4.6vw, 3.75rem)` / 1 | **400** | Stats |
+These are the shipped values. This table drifted from `globals.css` once already; if you change a
+token, change the row.
+
+| Token | @360 | @1280 | Line-height | Weight | Use |
+|---|---|---|---|---|---|
+| `--text-hero` | 36px | 68px | 1.08 | 700 | Home `h1` only |
+| `--text-display` | 28px | 48px | 1.15 | 700 / 400 | Section headers, page `h1` |
+| `--text-h1` | 25px | 40px | 1.18 | 400–700 | Hero sub, condition names |
+| `--text-h2` | 21px | 30px | 1.25 | 700 | Subsection heads |
+| `--text-h3` | 18px | 20px | 1.4 | 600–700 | Card titles |
+| `--text-body-lg` | 19px | 19px | 1.6 | 400 | Page intros |
+| `--text-body` | 17px | 17px | 1.62 | 400 | Default prose |
+| `--text-small` | 15px | 15px | 1.5 | 400 | Captions — **absolute floor** |
+| `--text-eyebrow` | 13px, `0.08em`, uppercase | | 1.5 | 500 | 1–3 word labels ONLY |
+| `--text-figure` | 32px | 56px | 1.02 | **400** | Stats |
+
+**Every heading clamp is `min, intercept + slope·vw, max`, never a bare `vw` middle term.** That
+distinction is not pedantry; it was a real bug. `clamp(2.75rem, 5.2vw, 4.25rem)` looks fluid and is
+not: `5.2vw` at 360px is 18.7px, far below the 44px floor, so the floor won on every phone and the
+hero rendered at 44px — 12% of the screen's width on one word. Headings never shrank below tablet
+size, and the home page ran 19,309px on a 320px screen against 10,446px on a desktop. Each slope is
+solved between two real widths (360px and 1280px), with the min holding the line at 320px.
 
 **Stats are set at weight 400, not bold.** That single choice is most of why they read as expensive
 rather than loud. Do not "fix" it.
@@ -153,6 +163,35 @@ device dies past three, which is the most common way to get this wrong.
 
 Floors, enforced by `scripts/check-layout.mjs`: nothing below 15px in prose; 12px only for uppercase
 labels; measure capped at 62ch (`.measure`) or 74ch (`.measure-wide`).
+
+### Breakpoints
+
+Four steps, and each one has a reason rather than a convention behind it.
+
+| Step | Width | What changes |
+|---|---|---|
+| base | < 640 | One column. `px-5`, the tightest section padding, smallest heading sizes |
+| `sm` | 640 | `px-6`, one notch more section padding. Still one column |
+| `md` | 768 | **Two-column layouts pair up.** `Split`, `PageHeader`, every hero |
+| `nav` | **900** | The full navigation bar replaces the menu sheet |
+| `lg` | 1024 | Three-column grids; the widest section padding |
+
+**`md`, not `lg`, is where two columns begin.** Pairing at `lg` meant every tablet in portrait fell
+through to the stacked phone layout: an iPad at 820px showed a 320px-wide product mock centred in an
+820px viewport with 250px of dead margin either side. Moving the pairing to 768px took the home page
+from 13,403px to 11,358px at that width. Three-column grids stay at `lg`, because 768px split three
+ways with a 64px gutter leaves 186px a column, which is narrower than the content needs.
+
+**`nav` is 900px because that is what the bar measures**: wordmark 134 + five items 489 + button 135
++ gutters = 891px laid out. It cannot appear at `md` without wrapping, and holding it to `lg` handed
+every tablet a hamburger it did not need. When you add a nav item, re-measure and move the token.
+
+**The mobile menu is a full-width sheet, not a dropdown.** It shipped as a 288px floating panel
+holding 1,225px of links in a 572px box: it scrolled silently inside itself with no affordance, left
+a strip of hero showing beside it, and listed five destinations twice because the flat nav list and
+the mega-menu columns overlapped. Twenty-three entries do not fit in a dropdown. `check-layout.mjs`
+now opens the sheet at six widths and fails on a panel that is not full-bleed, that runs past the
+viewport, that has a link under 44px, or that lists the same href twice.
 
 ---
 

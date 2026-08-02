@@ -30,7 +30,7 @@ npm run dev         # http://localhost:3000
 
 ```bash
 npm run build && npm start   # production
-npm run check                # copy + layout/a11y checks (needs the site running on :3737)
+npm run check                # phone + copy + layout/a11y + SEO (needs the site running on :3737)
 ```
 
 ### The build will fail, and that is correct
@@ -80,6 +80,34 @@ are written to the server log, so nothing is lost — but nothing is stored eith
 Numbers are normalised to E.164 (`+234XXXXXXXXXX`) on the way in, so the same
 number typed as `08031234567`, `+234 803 123 4567` or `(0803) 123-4567` is one
 contact, not three. See `content/phone.ts`.
+
+## SEO
+
+Four things are enforced by `npm run check:seo` rather than remembered:
+
+- **A canonical on every indexable route.** The navigation links to six
+  `/conditions?…` filter URLs, which without one are six near-identical pages.
+- **A 1200x630 share card on every page**, generated at build from
+  `components/og-card.tsx`. Condition pages get their own, carrying the
+  condition name and its urgency.
+- **Titles and descriptions that fit a result** — under 65 and 165 characters,
+  unique across routes, and never starting mid-phrase.
+- **The sitemap lists every indexable route and nothing that is noindex.** It is
+  built from the same constants the navigation reads, so a new segment page
+  cannot be added without appearing in it.
+
+Structured data lives in one place, `content/schema.ts`: `Organization` and
+`WebSite` sitewide, `MedicalWebPage` + `MedicalCondition` + `BreadcrumbList` on
+condition pages, `BreadcrumbList` on the segment pages.
+
+**`reviewedBy` and `lastReviewed` are deliberately absent.** They are the two
+fields a health site most wants, and both assert clinical sign-off that 36 of
+the 48 danger-sign labels have not had. `check-seo.mjs` fails the build if
+either appears. Add them the day a clinician signs off, not before.
+
+Two things are missing because the repo has nothing true to put in them: the
+`sameAs` social links and a `contactPoint` on the Organization schema. Both are
+worth adding to `content/schema.ts` once real accounts exist.
 
 ## Where the facts come from
 

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: 'Privacy',
   description:
     'What WellaPath collects, what it never collects, and why the symptom assessment runs entirely on your phone. Plain language first, legal text second.',
+  alternates: { canonical: '/privacy' },
 }
 
 export default function PrivacyPage() {

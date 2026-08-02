@@ -195,6 +195,38 @@ viewport, that has a link under 44px, or that lists the same href twice.
 
 ---
 
+### Share cards
+
+`components/og-card.tsx` renders every `opengraph-image` route: 1200x630, the
+violet edge, two-tone heading, and the disclaimer line. A card is the only piece
+of this site that travels without its page, so "a symptom assessment, not a
+diagnosis" travels on it. Condition cards additionally carry the urgency
+timeframe in its semantic triage colour.
+
+The card fonts are **static TTF instances in `assets/og/`**, not the woff2 the
+site ships. Satori cannot read woff2 and cannot read a variable font. To re-cut
+them after a font change:
+
+```bash
+pip3 install fonttools brotli
+python3 - <<'EOF'
+from fontTools.ttLib import TTFont
+from fontTools.varLib.instancer import instantiateVariableFont
+for wght, name in [(400, 'Inter-Regular'), (700, 'Inter-Bold')]:
+    f = TTFont('public/fonts/inter-latin-var.woff2')
+    instantiateVariableFont(f, {'wght': wght}, inplace=True)
+    f.flavor = None
+    f.save(f'assets/og/{name}.ttf')
+EOF
+```
+
+They sit outside `public/` on purpose: they are needed at build time and never
+by a browser, and a second copy of Inter would be 130 KB of dead weight on a
+phone. Satori also resolves no custom properties, so the brand colours are
+repeated as literals in that file and must be kept in step with `@theme` by hand.
+
+---
+
 ## 4. Shape, depth, motion
 
 **Radius** — `4 / 6 / 8 / 10 / 16 / 20`. Cards 16px, buttons 8px, inputs/tiles 10px, phone shell

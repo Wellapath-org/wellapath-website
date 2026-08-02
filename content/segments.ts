@@ -16,6 +16,25 @@ export type Segment = {
   slug: string
   eyebrow: string
   lead: string
+  /**
+   * The meta description, written rather than reused.
+   *
+   * `intro` is hero copy: it runs 200+ characters because it has a whole page
+   * to sit on. A result listing shows about 160 and cuts the rest mid-clause,
+   * so the sentence that reaches the reader has to be written to that length.
+   * Keep it under 158.
+   */
+  metaDescription: string
+  /**
+   * The <title>, written rather than derived.
+   *
+   * It used to be built as `eyebrow.replace(/^For /, '') + ': ' + lead`, which
+   * put "clinicians: Read the rules. Challenge them." in front of anyone who
+   * found this page in a search. A heading that works above a hero does not
+   * automatically work as a search result, so the two are written separately.
+   * Keep it under 48 characters: the " · WellaPath" suffix takes 12 more.
+   */
+  metaTitle: string
   rest: string
   intro: string
   /** The three-to-four things this audience actually cares about. */
@@ -31,6 +50,9 @@ export type Segment = {
 export const SEGMENTS: Record<string, Segment> = {
   households: {
     slug: 'households',
+    metaTitle: 'Symptom guidance for Nigerian households',
+    metaDescription:
+      'Go in tonight, or wait until morning? WellaPath tells you how urgently to act and which nearby facility can treat it. Free, and it works offline.',
     eyebrow: 'For households',
     lead: 'For the 11pm decision.',
     rest: 'Go in tonight, or wait until morning?',
@@ -76,6 +98,9 @@ export const SEGMENTS: Record<string, Segment> = {
 
   'health-facilities': {
     slug: 'health-facilities',
+    metaTitle: 'For clinics and hospitals in Nigeria',
+    metaDescription:
+      'People arriving at the right level of care at the right time, plus an accurate listing in a directory covering Lagos, Kano and the FCT.',
     eyebrow: 'For health facilities',
     lead: 'Patients who arrive at the right time.',
     rest: 'Late presentation is the failure mode you can least control.',
@@ -115,6 +140,9 @@ export const SEGMENTS: Record<string, Segment> = {
 
   clinicians: {
     slug: 'clinicians',
+    metaTitle: 'For doctors and clinicians in Nigeria',
+    metaDescription:
+      'Review the knowledge base, challenge a rule, or put your name to guidance that reaches thousands of Nigerian households. The rules are published.',
     eyebrow: 'For clinicians',
     lead: 'Read the rules. Challenge them.',
     rest: 'The knowledge base is not a black box.',
@@ -157,6 +185,9 @@ export const SEGMENTS: Record<string, Segment> = {
 
   'public-health': {
     slug: 'public-health',
+    metaTitle: 'For ministries and NGOs in Nigeria',
+    metaDescription:
+      'Seasonal and demographic escalation modelled across 50 conditions, running offline on the phones your population already owns.',
     eyebrow: 'For ministries & NGOs',
     lead: 'Triage that runs on the phones people already own.',
     rest: 'Offline, on-device, aligned to Nigerian guidance.',

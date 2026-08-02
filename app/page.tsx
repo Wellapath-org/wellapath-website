@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
   Section,
@@ -39,6 +40,16 @@ import {
   MapPin,
   Lock,
 } from 'lucide-react'
+
+/**
+ * The home page inherits its title and description from the root layout, which
+ * is correct: they are the site's own. It needs the canonical stated anyway.
+ * Without it the origin is reachable at several URLs a crawler treats as
+ * separate pages, and the one that gets indexed is chosen for us.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 export default function HomePage() {
   const seasonal = getSeasonalConditions()

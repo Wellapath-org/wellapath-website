@@ -34,6 +34,7 @@ import { RECEIPTS, COVERAGE } from '@/content/site'
 export const metadata: Metadata = {
   title: 'Coverage',
   description: `WellaPath maps ${RECEIPTS.facilities.toLocaleString('en-NG')} health facilities across Lagos, Kano and the FCT, of which ${RECEIPTS.emergencyCapable} are flagged emergency-capable. Three states, named, not "across Nigeria".`,
+  alternates: { canonical: '/coverage' },
 }
 
 export default function CoveragePage() {

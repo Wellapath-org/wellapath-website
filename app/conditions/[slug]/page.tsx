@@ -22,7 +22,8 @@ import { DangerSigns, Disclaimer, UrgencyBadge, UrgencyCard } from '@/components
 import { getAllConditions, getCondition } from '@/content/conditions'
 import { assertRedFlagsReviewed } from '@/content/red-flag-labels'
 import { URGENCY_COPY } from '@/content/urgency'
-import { SITE, RECEIPTS } from '@/content/site'
+import { conditionSchema, jsonLd } from '@/content/schema'
+import { RECEIPTS } from '@/content/site'
 
 export function generateStaticParams() {
   return getAllConditions().map((c) => ({ slug: c.slug }))
@@ -37,12 +38,21 @@ export async function generateMetadata({
   const c = getCondition(slug)
   if (!c) return {}
 
-  // §12: target symptom language, not clinical names.
-  const symptomWords = c.symptoms.slice(0, 4).map((s) => s.label.toLowerCase()).join(', ')
+  // §12: target symptom language, not clinical names. The symptom words are
+  // the part worth having in a description, so the sentence around them is
+  // kept short and the LIST is what gives, one word at a time, until the whole
+  // thing fits inside the ~160 characters a result actually shows. A fixed
+  // slice(0, 4) overran on conditions with long symptom names and the tail got
+  // replaced by an ellipsis in the one place a reader was reading it.
+  const frame = (words: string) =>
+    `${c.name} in Nigeria: ${words}. The danger signs that mean go now, and how urgently to seek care. Not a diagnosis.`
+
+  let symptoms = c.symptoms.map((s) => s.label.toLowerCase())
+  while (symptoms.length > 1 && frame(symptoms.join(', ')).length > 158) symptoms.pop()
 
   return {
     title: `${c.name}: symptoms and how urgently to act`,
-    description: `${c.name} in Nigeria: the danger signs that mean go now, common symptoms (${symptomWords}), who is most at risk, and how urgently to seek care. Not a diagnosis.`,
+    description: frame(symptoms.join(', ')),
     keywords: [
       c.name.toLowerCase(),
       `${c.name.toLowerCase()} symptoms Nigeria`,
@@ -62,29 +72,12 @@ export default async function ConditionPage({ params }: { params: Promise<{ slug
 
   const copy = URGENCY_COPY[c.urgency]
 
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'MedicalWebPage',
-    name: `${c.name}: symptoms and how urgently to act`,
-    url: `${SITE.url}/conditions/${c.slug}`,
-    inLanguage: 'en-NG',
-    publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
-    about: {
-      '@type': 'MedicalCondition',
-      name: c.name,
-      alternateName: c.localExpressions,
-      signOrSymptom: c.symptoms.map((s) => ({ '@type': 'MedicalSignOrSymptom', name: s.label })),
-      typicalTest: undefined,
-    },
-    // The site never claims to diagnose; the page's purpose is triage guidance.
-    mainContentOfPage: { '@type': 'WebPageElement', cssSelector: '#main' },
-  }
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(conditionSchema(c)) }}
       />
 
       <div className="relative overflow-hidden border-b border-rule bg-ground">

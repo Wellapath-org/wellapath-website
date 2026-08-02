@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: 'Clinical safety',
   description:
     'Where WellaPath’s clinical content comes from, how it is versioned and reviewed, and the limitations we state before anyone states them for us.',
+  alternates: { canonical: '/clinical-safety' },
 }
 
 export default function ClinicalSafetyPage() {

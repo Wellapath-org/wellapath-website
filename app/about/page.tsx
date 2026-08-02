@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'About',
   description:
     'Who builds WellaPath, why Nigeria, and why a symptom app that refuses to guess is more useful than one that pretends to know.',
+  alternates: { canonical: '/about' },
 }
 
 export default function AboutPage() {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { PageHeader, Section, SectionHeader, Card, Prose } from '@/components/ui'
+import { AnalyticsChoice } from '@/components/analytics'
 import { PrivacyDiagram, Disclaimer } from '@/components/clinical'
 
 export const metadata: Metadata = {
@@ -68,6 +69,7 @@ export default function PrivacyPage() {
                 'Your email address or WhatsApp number, only if you give it to us for launch notification',
                 'Anonymous, aggregate counts of app downloads',
                 'Crash reports, if your device is set to send them. These contain no symptom data',
+                'Which marketing pages get visited, and only if you say yes when asked. Never a condition page',
               ].map((x) => (
                 <li key={x} className="text-body flex gap-3 text-ink-soft">
                   <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
@@ -76,8 +78,9 @@ export default function PrivacyPage() {
               ))}
             </ul>
             <p className="text-small mt-4 text-ink-mute">
-              This website sets no cookies and runs no third-party analytics or advertising scripts.
-              There is no cookie banner because there is nothing to consent to.
+              This website sets no cookies and sends nothing to a third party unless you answer yes
+              to the one question we ask. Decline, ignore it, or browse with JavaScript off, and no
+              analytics script is ever loaded.
             </p>
           </Card>
         </div>
@@ -109,16 +112,40 @@ export default function PrivacyPage() {
             group, and we do not pass the number to anyone.
           </p>
           <p>
-            <strong>Analytics restraint.</strong> If we ever add analytics, it will be a cookieless,
-            privacy-respecting tool, it will be genuinely opt-in and never pre-checked, and it will
-            never run on a condition page. Condition-page browsing is the most sensitive category of
-            data on this site and we will not send it to a third party.
+            <strong>Analytics.</strong> We use Google Analytics on the marketing pages, and only
+            for people who choose it. We said this would be opt-in and never pre-checked, and never
+            on a condition page. Both hold. The banner has two buttons of equal weight and neither
+            is preselected; nothing loads until you press Accept. Declining, ignoring it, or
+            browsing with JavaScript off all mean no request reaches Google at all.
+          </p>
+          <p>
+            <strong>Condition pages are never counted.</strong> Nothing under{' '}
+            <a href="/conditions">/conditions</a> is reported, whatever you chose, and the banner
+            does not appear there either. What you are worried about is the most sensitive thing
+            this site could know, and we would rather not know it. One honest limit: Google&rsquo;s
+            script cannot be unloaded once it is running, so if you accept on a marketing page and
+            then open a condition guide, it is still in memory. It is told nothing. Every visit we
+            report is sent by hand, and condition pages are not on the list.
+          </p>
+          <p>
+            <strong>What Google receives, if you accept.</strong> The page you visited, roughly
+            where you are, and what kind of device you used. Google sets its own cookies at that
+            point. It never receives symptoms, because the assessment runs on your phone and there
+            is no path for that data to reach us, let alone them.
           </p>
           <p>
             <strong>Contact for data requests.</strong> A named data protection contact will be
             published here before launch.
           </p>
         </Prose>
+
+        {/* Consent that cannot be withdrawn is not consent, which is the NDPR
+            basis this whole page rests on. The control is here rather than in a
+            footer link because this is the page someone reads when they want to
+            change their mind. */}
+        <div className="mt-10">
+          <AnalyticsChoice />
+        </div>
 
         <div className="mt-10 rounded-xl bg-accent-wash ring ring-accent/15 p-6">
           <h2 className="text-h3 font-bold text-ink">Full legal text</h2>

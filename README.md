@@ -114,6 +114,33 @@ Still missing: a `contactPoint` on the Organization schema. There is no
 published inbox in the repo to point at, and inventing one is worse than
 omitting it.
 
+## Analytics
+
+Google Analytics 4 (`G-YT2G413V4Z`), opt-in, and never on a condition page.
+Both constraints come from commitments already published on `/privacy`, so both
+are enforced by `npm run check:analytics` against the running site rather than
+trusted to stay true.
+
+- **Nothing loads before Accept.** Not consent-mode-denied, not loaded and
+  throttled: the script is absent. Declining, ignoring the banner, or browsing
+  with JavaScript off all mean zero requests to Google.
+- **Nothing under `/conditions` is loaded on or reported**, including the filter
+  URLs, and the banner does not appear there either. What someone is worried
+  about is the most sensitive thing this site could know.
+- **The banner has two buttons of equal weight**, neither preselected. The check
+  fails if their fills differ or one is more than 1.6x the width of the other.
+- **Consent can be withdrawn** from the control on `/privacy`. The NDPR basis is
+  consent, and consent that cannot be withdrawn is not consent.
+
+One honest limit, stated on `/privacy` too: gtag cannot be unloaded once
+injected. If someone accepts on a marketing page and then opens a condition
+guide, the script is still in memory. It is told nothing — `send_page_view` is
+false and every page view is issued by hand for allowed paths only, which is
+what check 6 in that script proves.
+
+The choice is stored in `localStorage`, not a cookie. A cookie would be the one
+cookie set before any consent existed, which is the thing being asked about.
+
 ## Where the facts come from
 
 Every figure is derived at build time from the shipped clinical artifacts in

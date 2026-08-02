@@ -4,7 +4,7 @@
  * operable and screen-reader announced with zero JavaScript.
  */
 import Link from 'next/link'
-import { MENU, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER } from '@/content/site'
+import { MENU, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER, SOCIALS } from '@/content/site'
 import { Button } from './ui'
 import { EmergencyCard } from './clinical'
 import { BellRing, ChevronDown, X, Phone } from 'lucide-react'
@@ -322,9 +322,30 @@ export function SiteFooter() {
           </div>
 
           <div className="mt-16 border-t border-rule pt-8">
-            <Link href="/" className="inline-flex min-h-12 items-center">
-              <Wordmark />
-            </Link>
+            <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
+              <Link href="/" className="inline-flex min-h-12 items-center">
+                <Wordmark />
+              </Link>
+
+              {/* The same array the Organization schema uses for sameAs. A
+                  sameAs the site does not visibly link to is a claim with
+                  nothing behind it, and people look for these in a footer. */}
+              <ul className="flex flex-wrap items-center gap-x-6">
+                {SOCIALS.map((s) => (
+                  <li key={s.href}>
+                    <a
+                      href={s.href}
+                      rel="me noopener noreferrer"
+                      target="_blank"
+                      className="transition-safe flex min-h-12 items-center text-small text-ink-soft hover:text-ink"
+                    >
+                      {s.label}
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p className="text-small measure-wide mt-4 text-ink-soft">{DISCLAIMER}</p>
             <p className="text-small mt-5 text-ink-mute">
               © {new Date().getFullYear()} {SITE.name}. Clinical decision support for Nigeria.

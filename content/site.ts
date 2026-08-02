@@ -189,6 +189,24 @@ export const MENU: {
  * without a fifth column. Every route on the site appears here — the footer is
  * the complete map, the mega-menu is the shortcut.
  */
+/**
+ * The official accounts.
+ *
+ * Two jobs, and they have to agree. They are the Organization schema's
+ * `sameAs`, which is how a search engine ties the site to the profiles and
+ * treats them as one entity; and they are the links in the footer, because a
+ * `sameAs` the site does not visibly link to is a claim with nothing behind it.
+ * Both read this array, so they cannot drift apart.
+ *
+ * There is no X/Twitter account, so there is no `twitter:site` tag. An empty
+ * handle is worse than an absent one.
+ */
+export const SOCIALS = [
+  { label: 'Instagram', handle: '@wellapath_', href: 'https://www.instagram.com/wellapath_/' },
+  { label: 'Facebook', handle: 'wellapath', href: 'https://www.facebook.com/wellapath' },
+  { label: 'LinkedIn', handle: 'wellapath', href: 'https://www.linkedin.com/company/wellapath' },
+] as const
+
 export const FOOTER_GROUPS = [
   {
     title: 'Product',

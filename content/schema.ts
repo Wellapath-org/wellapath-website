@@ -20,11 +20,12 @@
  * authoritative government and health sites. Marking up FAQs here would render
  * nothing and would be reaching for authority the site has not earned yet.
  *
- * `sameAs` and `contactPoint` on Organization. There is no social account or
- * published contact address in this repo to point at. Both are worth adding
- * once they exist; neither is worth inventing.
+ * `contactPoint` on Organization. There is no published contact address in this
+ * repo to point at, and inventing one is worse than omitting it. Add it when
+ * there is a real inbox. (`sameAs` used to be in this list; the Instagram,
+ * Facebook and LinkedIn accounts now exist, so it is populated from SOCIALS.)
  */
-import { SITE } from './site'
+import { SITE, SOCIALS } from './site'
 import type { Condition } from './conditions'
 import { URGENCY_COPY } from './urgency'
 
@@ -44,6 +45,11 @@ export function organizationSchema() {
       url: `${SITE.url}/brand/wordmark.png`,
       caption: SITE.name,
     },
+    // The official accounts. This is how a search engine joins the site and the
+    // profiles into one entity rather than four unrelated things with the same
+    // name. The footer links to the same array, because a sameAs the site does
+    // not visibly link to is an assertion with nothing behind it.
+    sameAs: SOCIALS.map((s) => s.href),
     // Three states, named. §3 forbids "across Nigeria", and that applies to the
     // machine-readable copy as much as to the visible copy.
     areaServed: [

@@ -147,6 +147,37 @@ for (const route of ROUTES) {
     fail(`${route} — JSON-LD asserts clinical review, which no clinician has given`)
 }
 
+// ── the official accounts ──────────────────────────────────────────────────
+// sameAs is how a search engine ties this site to the profiles. A typo here is
+// silent: the schema still validates, it just points at nothing.
+{
+  await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' })
+  const r = await page.evaluate(() => {
+    const blocks = [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .map((s) => JSON.parse(s.textContent ?? '{}'))
+      .flatMap((d) => d['@graph'] ?? [d])
+    const org = blocks.find((b) => b['@type'] === 'Organization')
+    const footer = [...document.querySelectorAll('footer a[href^="http"]')].map((a) => a.href)
+    return { sameAs: org?.sameAs ?? [], footer }
+  })
+
+  const EXPECTED = [
+    'https://www.instagram.com/wellapath_/',
+    'https://www.facebook.com/wellapath',
+    'https://www.linkedin.com/company/wellapath',
+  ]
+  for (const url of EXPECTED) {
+    if (!r.sameAs.includes(url)) fail(`schema — sameAs is missing ${url}`)
+    // The schema and the footer read one array; if they disagree, one drifted.
+    if (!r.footer.some((f) => f.replace(/\/$/, '') === url.replace(/\/$/, '')))
+      fail(`footer — does not link to ${url}, which the schema claims as sameAs`)
+  }
+  for (const url of r.sameAs) {
+    if (!EXPECTED.includes(url)) fail(`schema — unexpected sameAs entry ${url}`)
+  }
+  note(`sameAs: ${r.sameAs.length} accounts, all linked from the footer`)
+}
+
 // ── filter URLs must point home ────────────────────────────────────────────
 // The navigation links to these, so they get crawled whether or not they are
 // in the sitemap.

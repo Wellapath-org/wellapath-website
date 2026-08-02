@@ -105,9 +105,14 @@ fields a health site most wants, and both assert clinical sign-off that 36 of
 the 48 danger-sign labels have not had. `check-seo.mjs` fails the build if
 either appears. Add them the day a clinician signs off, not before.
 
-Two things are missing because the repo has nothing true to put in them: the
-`sameAs` social links and a `contactPoint` on the Organization schema. Both are
-worth adding to `content/schema.ts` once real accounts exist.
+The official accounts live in `SOCIALS` (`content/site.ts`) and are read twice:
+by the Organization schema's `sameAs`, and by the footer links. `check-seo.mjs`
+fails if the two disagree, because a `sameAs` the site does not visibly link to
+is a claim with nothing behind it.
+
+Still missing: a `contactPoint` on the Organization schema. There is no
+published inbox in the repo to point at, and inventing one is worse than
+omitting it.
 
 ## Where the facts come from
 

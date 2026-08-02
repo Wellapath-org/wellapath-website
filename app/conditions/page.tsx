@@ -9,6 +9,7 @@ import { RECEIPTS } from '@/content/site'
 export const metadata: Metadata = {
   title: `All ${RECEIPTS.conditions} conditions`,
   description: `The ${RECEIPTS.conditions} conditions in WellaPath's Nigerian knowledge base. Every page leads with the danger signs and what to do next, never with a diagnosis.`,
+  alternates: { canonical: '/conditions' },
 }
 
 /** Filters are links, not JavaScript. The page works with scripting disabled. */

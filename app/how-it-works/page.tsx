@@ -18,6 +18,7 @@ import { getSeasonalConditions } from '@/content/conditions'
 export const metadata: Metadata = {
   title: 'How it works',
   description: `The method behind WellaPath: ${RECEIPTS.conditions} conditions, ${RECEIPTS.rules} clinical rules, danger signs that override the score, and adjustments for age, pregnancy and season.`,
+  alternates: { canonical: '/how-it-works' },
 }
 
 export default function HowItWorksPage() {

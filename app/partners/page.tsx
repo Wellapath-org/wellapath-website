@@ -13,7 +13,8 @@ import { RECEIPTS } from '@/content/site'
 export const metadata: Metadata = {
   title: 'For clinics, employers & NGOs',
   description:
-    'WellaPath for organisations: triage guidance built on Nigerian clinical guidance, an on-device architecture, and a facility directory covering Lagos, Kano and the FCT.',
+    'Triage guidance built on Nigerian clinical guidance, an on-device architecture, and a facility directory across Lagos, Kano and the FCT.',
+  alternates: { canonical: '/partners' },
 }
 
 export default function PartnersPage() {

@@ -10,9 +10,10 @@
     "sync:kb": "node scripts/sync-kb.mjs",
     "check:copy": "node scripts/check-copy.mjs",
     "check:layout": "node scripts/check-layout.mjs",
-    "check": "npm run check:phone && npm run check:copy && npm run check:layout",
+    "check": "npm run check:phone && npm run check:copy && npm run check:layout && npm run check:seo",
     "check:resend": "node scripts/check-resend.mjs",
-    "check:phone": "tsx scripts/check-phone.mjs"
+    "check:phone": "tsx scripts/check-phone.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

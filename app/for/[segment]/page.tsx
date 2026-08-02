@@ -24,6 +24,7 @@ import { GetTheApp } from '@/components/chrome'
 import { Disclaimer } from '@/components/clinical'
 import { PhoneShell, ResultCard, FacilityListMock } from '@/components/product'
 import { SEGMENTS, SEGMENT_SLUGS } from '@/content/segments'
+import { breadcrumbSchema, jsonLd } from '@/content/schema'
 import { AUDIENCES } from '@/content/site'
 import Link from 'next/link'
 import {
@@ -70,8 +71,8 @@ export async function generateMetadata({
   const s = SEGMENTS[segment]
   if (!s) return {}
   return {
-    title: `${s.eyebrow.replace(/^For /, '')}: ${s.lead}`,
-    description: s.intro,
+    title: s.metaTitle,
+    description: s.metaDescription,
     alternates: { canonical: `/for/${s.slug}` },
   }
 }
@@ -90,6 +91,19 @@ export default async function SegmentPage({
 
   return (
     <>
+      {/* Two levels deep, so breadcrumbs replace the raw URL in a result. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            '@context': 'https://schema.org',
+            ...breadcrumbSchema([
+              { name: 'Home', path: '/' },
+              { name: s.eyebrow, path: `/for/${s.slug}` },
+            ]),
+          }),
+        }}
+      />
       <section className="relative overflow-hidden bg-ground">
         <div className="aurora-soft" aria-hidden="true" />
         <div className="rails relative mx-auto w-full max-w-[1120px] px-5 py-14 sm:px-6 sm:py-16 md:px-10 md:py-24">

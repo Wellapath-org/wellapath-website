@@ -33,6 +33,16 @@
   /* Delete the default palette. Everything below is deliberate. */
   --color-*: initial;
 
+  /* ── Breakpoints ──────────────────────────────────────────────────────
+     One addition to the defaults. The full navigation measures 891px laid
+     out — wordmark 134, five items 489, the button 135, plus gutters — so it
+     cannot appear at `md` (768) without wrapping, and holding it back to `lg`
+     (1024) handed every tablet in portrait a hamburger it did not need.
+     900px is the first width where the real bar fits, so that is where it
+     appears. Measured, not picked.
+     ─────────────────────────────────────────────────────────────────── */
+  --breakpoint-nav: 56.25rem; /* 900px */
+
   --color-white: #ffffff;
   --color-black: #000000;
   --color-transparent: transparent;
@@ -90,20 +100,42 @@
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
 
-  --text-hero: clamp(2.75rem, 5.2vw, 4.25rem);
-  --text-hero--line-height: 1.06;
-  --text-hero--letter-spacing: -0.034em;
-  --text-display: clamp(2.125rem, 3.8vw, 3rem);
-  --text-display--line-height: 1.12;
-  --text-display--letter-spacing: -0.028em;
-  --text-h1: clamp(1.875rem, 3vw, 2.5rem);
-  --text-h1--line-height: 1.15;
-  --text-h1--letter-spacing: -0.024em;
-  --text-h2: clamp(1.5rem, 2.2vw, 1.875rem);
-  --text-h2--line-height: 1.22;
-  --text-h2--letter-spacing: -0.02em;
-  --text-h3: 1.25rem;
-  --text-h3--line-height: 1.35;
+  /* ── Fluid headings ───────────────────────────────────────────────────
+     Every clamp is `min, intercept + slope*vw, max`, tuned so the middle term
+     is the one doing the work from 320px upward.
+
+     The earlier scale used a bare vw middle term, which was the bug. At 360px
+     `5.2vw` is 18.7px, far under the 2.75rem floor, so the floor won every
+     time and a phone rendered a 44px hero: 12% of the screen's width on one
+     word. Headings never shrank below tablet size, and the home page ran to
+     19,300px on a 320px screen against 10,400px on a desktop. The reading
+     order was right; there was simply twice as much scrolling to reach it.
+
+     The slopes below are solved between two real devices rather than guessed:
+     the value at 360px (the commonest Android width in Nigeria) and the value
+     at 1280px, with the min holding the line at 320px. Desktop font sizes are
+     unchanged; the line-heights are 2-3% looser, because a 36px heading
+     wrapping to three lines on a phone needs the room and the same value has
+     to serve both ends. That adds about 1% to a desktop page's height. */
+
+  /* 34px @320 · 36px @360 · 38px @390 · 68px @1280 */
+  --text-hero: clamp(2.125rem, 1.4675rem + 3.478vw, 4.25rem);
+  --text-hero--line-height: 1.08;
+  --text-hero--letter-spacing: -0.032em;
+  /* 28px @320 · 28px @360 · 29px @390 · 48px @1280 */
+  --text-display: clamp(1.75rem, 1.261rem + 2.174vw, 3rem);
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.026em;
+  /* 24px @320 · 25px @360 · 26px @390 · 40px @1280 */
+  --text-h1: clamp(1.5rem, 1.196rem + 1.63vw, 2.5rem);
+  --text-h1--line-height: 1.18;
+  --text-h1--letter-spacing: -0.022em;
+  /* 21px @320 · 21px @360 · 22px @390 · 30px @1280 */
+  --text-h2: clamp(1.3125rem, 1.093rem + 0.978vw, 1.875rem);
+  --text-h2--line-height: 1.25;
+  --text-h2--letter-spacing: -0.018em;
+  --text-h3: clamp(1.125rem, 1.06rem + 0.2vw, 1.25rem);
+  --text-h3--line-height: 1.4;
   --text-h3--letter-spacing: -0.012em;
   --text-body-lg: 1.1875rem;
   --text-body-lg--line-height: 1.6;
@@ -114,8 +146,11 @@
   --text-eyebrow: 0.8125rem;
   --text-eyebrow--line-height: 1.5;
   --text-eyebrow--letter-spacing: 0.08em;
-  --text-figure: clamp(2.5rem, 4.2vw, 3.5rem);
-  --text-figure--line-height: 1;
+  /* 32px @320 · 32px @360 · 33px @390 · 56px @1280. Stat figures sit two to a
+     row on a phone, and "5,344" at the old 40px floor left the label beneath
+     it wrapping to three lines. */
+  --text-figure: clamp(2rem, 1.413rem + 2.609vw, 3.5rem);
+  --text-figure--line-height: 1.02;
   --text-figure--letter-spacing: -0.03em;
 
   /* ── Shape ────────────────────────────────────────────────────────────

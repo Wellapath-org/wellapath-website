@@ -41,9 +41,9 @@ export default function CoveragePage() {
     <>
       <section className="relative overflow-hidden bg-ground">
         <div className="aurora-soft" aria-hidden="true" />
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 py-20 md:px-10 md:py-24">
-          <div className="relative z-1 grid min-w-0 items-center gap-14 lg:grid-cols-12">
-            <div className="min-w-0 lg:col-span-7">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 py-14 sm:px-6 sm:py-16 md:px-10 md:py-24">
+          <div className="relative z-1 grid min-w-0 items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-14">
+            <div className="min-w-0 md:col-span-7">
               <Eyebrow>Coverage</Eyebrow>
               <div className="h-5" />
               <h1 className="text-display font-bold text-ink">
@@ -78,7 +78,7 @@ export default function CoveragePage() {
 
             {/* The globe if the browser can afford it, the phone screen if not.
                 Both say the same thing; only one costs 84 KB. */}
-            <div className="mx-auto w-full max-w-[380px] lg:col-span-5 lg:ml-auto lg:mr-0">
+            <div className="mx-auto w-full max-w-[380px] md:col-span-5 md:ml-auto md:mr-0">
               <Globe>
                 <div className="mx-auto w-full max-w-[320px]">
                   <PhoneShell label="The WellaPath app listing nearby facilities in Lagos by distance, with one marked emergency-capable.">
@@ -93,7 +93,7 @@ export default function CoveragePage() {
 
       {/* ── The numbers ───────────────────────────────────────────────── */}
       <section className="relative bg-ground">
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 md:px-10">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 sm:px-6 md:px-10">
           <div className="reveal relative z-1">
             <StatRow>
               <Stat
@@ -115,7 +115,7 @@ export default function CoveragePage() {
           924-of-5,344 share that is flagged emergency-capable.
           ─────────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-ground">
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 pt-16 md:px-10 md:pt-20">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 pt-12 sm:px-6 sm:pt-14 md:px-10 md:pt-20">
           <div className="relative z-1 measure-wide">
             <Eyebrow>The network</Eyebrow>
             <TwoTone
@@ -199,7 +199,7 @@ export default function CoveragePage() {
 
       {/* ── Next states ───────────────────────────────────────────────── */}
       <Section tone="ground">
-        <div className="grid gap-16 lg:grid-cols-[1fr_1fr] lg:items-center">
+        <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-16 md:items-center">
           <div>
             <TwoTone
               lead="Your state next."
@@ -221,7 +221,7 @@ export default function CoveragePage() {
       </Section>
 
       <Section tone="sunk">
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+        <div className="grid gap-8 md:grid-cols-[1.15fr_0.85fr] md:items-start">
           <GetTheApp />
           <Disclaimer />
         </div>

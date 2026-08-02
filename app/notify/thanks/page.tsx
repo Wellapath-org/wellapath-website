@@ -69,7 +69,7 @@ export default async function ThanksPage({
     <>
       <section className="relative overflow-hidden bg-ground">
         <div className="aurora-soft" aria-hidden="true" />
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 py-24 md:px-10 md:py-32">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 py-16 sm:px-6 sm:py-20 md:px-10 md:py-32">
           <div className="relative z-1 measure-wide">
             <span
               className={`inline-flex size-11 items-center justify-center rounded-full ${

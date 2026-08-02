@@ -4,7 +4,7 @@
  *
  * §14 flags that an empty B2B page is worse than none. This ships with a real
  * form and a concrete description of what a partnership involves; if the offer
- * behind it is not ready, remove the route from NAV rather than softening it.
+ * behind it is not ready, remove the route from MENU rather than softening it.
  */
 import type { Metadata } from 'next'
 import { PageHeader, Section, SectionHeader, Card, Button } from '@/components/ui'
@@ -78,7 +78,7 @@ export default function PartnersPage() {
       </Section>
 
       <Section tone="ground">
-        <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+        <div className="grid gap-8 md:grid-cols-[1fr_0.9fr] md:gap-10 md:items-start">
           <div>
             <SectionHeader
               lead="Book a conversation."

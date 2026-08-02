@@ -180,13 +180,6 @@ export const MENU: {
   { title: 'About', href: '/about' },
 ]
 
-export const NAV = [
-  { href: '/how-it-works', label: 'How it works' },
-  { href: '/conditions', label: 'Conditions' },
-  { href: '/coverage', label: 'Coverage' },
-  { href: '/clinical-safety', label: 'Clinical safety' },
-  { href: '/for/health-facilities', label: 'For partners' },
-] as const
 
 /**
  * Footer columns.

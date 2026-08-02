@@ -100,7 +100,7 @@ export default function AboutPage() {
       </Section>
 
       <Section tone="sunk">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-start">
+        <div className="grid gap-8 md:grid-cols-[1fr_0.8fr] md:items-start">
           <Card className="p-7">
             <h2 className="text-h2 font-bold text-ink">Talk to us</h2>
             <p className="text-body measure mt-3 text-ink-soft">

@@ -18,7 +18,7 @@ export default function PrivacyPage() {
       />
 
       <Section tone="ground">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center">
+        <div className="grid gap-8 sm:gap-10 md:grid-cols-[1fr_1fr] md:gap-12 md:items-center">
           <Prose>
             <p>
               The symptom assessment runs on your device. The clinical rules are downloaded to your

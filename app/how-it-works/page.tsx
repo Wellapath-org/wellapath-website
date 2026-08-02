@@ -120,7 +120,7 @@ export default function HowItWorksPage() {
 
       {/* ── Match strength, not percentages ──────────────────────────── */}
       <Section tone="ground">
-        <div className="grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
+        <div className="grid gap-8 sm:gap-10 md:grid-cols-[1fr_0.8fr] md:gap-12 md:items-center">
           <div>
             <SectionHeader
               eyebrow="What we will not show you"
@@ -190,7 +190,7 @@ export default function HowItWorksPage() {
 
       {/* ── Versioning ──────────────────────────────────────────────── */}
       <Section tone="ground">
-        <div className="grid gap-12 lg:grid-cols-2 [&>*]:min-w-0">
+        <div className="grid gap-8 sm:gap-10 md:grid-cols-2 md:gap-12 [&>*]:min-w-0">
           <div>
             <SectionHeader
               eyebrow="Versioned and reviewed"
@@ -242,7 +242,7 @@ export default function HowItWorksPage() {
 
       {/* ── Privacy ─────────────────────────────────────────────────── */}
       <Section tone="sunk">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center [&>*]:min-w-0">
+        <div className="grid gap-8 sm:gap-10 md:grid-cols-2 md:gap-12 md:items-center [&>*]:min-w-0">
           <div>
             <SectionHeader eyebrow="Privacy" lead="And none of it leaves the phone." />
             <div className="measure space-y-4 text-body text-ink-soft">
@@ -260,7 +260,7 @@ export default function HowItWorksPage() {
       </Section>
 
       <Section tone="ground">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-start">
+        <div className="grid gap-8 md:grid-cols-[1fr_0.8fr] md:items-start">
           <GetTheApp />
           <Disclaimer />
         </div>

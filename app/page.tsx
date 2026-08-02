@@ -52,9 +52,9 @@ export default function HomePage() {
           ─────────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-ground">
         <AuroraLayer />
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-14 md:px-10 md:pb-28 md:pt-20">
-          <div className="relative z-1 grid min-w-0 items-center gap-14 lg:grid-cols-12">
-            <div className="min-w-0 lg:col-span-7">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12 md:px-10 md:pb-28 md:pt-20">
+          <div className="relative z-1 grid min-w-0 items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-14">
+            <div className="min-w-0 md:col-span-7">
               <Eyebrow>Clinical decision support · Nigeria</Eyebrow>
 
               <h1 className="text-hero mt-6 font-bold text-ink">Know how urgently to act.</h1>
@@ -76,7 +76,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="settle mx-auto w-full max-w-[320px] lg:col-span-5 lg:ml-auto lg:mr-0">
+            <div className="settle mx-auto w-full max-w-[320px] md:col-span-5 md:ml-auto md:mr-0">
               <PhoneShell label="The WellaPath assessment result screen, showing an urgent recommendation and the conditions the symptoms are consistent with.">
                 <ResultCard
                   urgency="urgent"
@@ -93,7 +93,7 @@ export default function HomePage() {
 
       {/* ── The receipts ─────────────────────────────────────────────── */}
       <section className="relative bg-ground">
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 md:px-10">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 sm:px-6 md:px-10">
           <div className="relative z-1">
             <StatRow>
               <Stat value={RECEIPTS.conditions} label="Conditions in the Nigerian knowledge base" emphasis />
@@ -158,12 +158,12 @@ export default function HomePage() {
         <div className="rail-track relative">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -left-6 top-0 hidden h-full w-px bg-rule lg:block"
+            className="pointer-events-none absolute -left-6 top-0 hidden h-full w-px bg-rule md:block"
           >
             <div className="rail-fill h-full w-px bg-accent" />
           </div>
 
-          <ol className="stagger grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
+          <ol className="stagger grid gap-6 md:grid-cols-2 [&>*]:min-w-0">
           {[
             {
               n: 1,
@@ -242,9 +242,9 @@ export default function HomePage() {
         >
           <FlowRibbon />
         </div>
-        <div className="rails relative mx-auto w-full max-w-[1120px] px-6 py-24 md:px-10 md:py-36">
-          <div className="relative z-1 grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
-            <div className="min-w-0 lg:col-span-7">
+        <div className="rails relative mx-auto w-full max-w-[1120px] px-5 py-16 sm:px-6 sm:py-20 md:px-10 md:py-36">
+          <div className="relative z-1 grid gap-10 md:grid-cols-12 md:items-center md:gap-12 lg:gap-16">
+            <div className="min-w-0 md:col-span-7">
               <p className="text-eyebrow font-mono font-medium uppercase text-ink-on-navy">
                 Safety logic
               </p>
@@ -269,7 +269,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="min-w-0 space-y-4 lg:col-span-5">
+            <div className="min-w-0 space-y-4 md:col-span-5">
               {URGENCY_ORDER.map((u) => (
                 <UrgencyCard key={u} urgency={u} />
               ))}
@@ -455,11 +455,11 @@ export default function HomePage() {
 
       {/* ── Install ──────────────────────────────────────────────────── */}
       <Section tone="ground" space="normal">
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
-          <div className="min-w-0 lg:col-span-7">
+        <div className="grid gap-8 md:grid-cols-12 md:items-start">
+          <div className="min-w-0 md:col-span-7">
             <GetTheApp />
           </div>
-          <div className="min-w-0 lg:col-span-5">
+          <div className="min-w-0 md:col-span-5">
             <Disclaimer />
           </div>
         </div>

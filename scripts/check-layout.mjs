@@ -16,7 +16,11 @@ const BASE = process.argv[2] ?? 'http://localhost:3737'
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 const ROUTES = ['/', '/conditions', '/conditions/malaria', '/coverage', '/for/health-facilities', '/how-it-works', '/partners']
-const WIDTHS = [320, 360, 390]
+// 320 is the narrowest phone still in use; 360 is the commonest Android width
+// in Nigeria; 390 and 430 are current iPhone and iPhone Max; 768 and 820 are
+// iPad portrait, which used to fall through to the stacked phone layout and so
+// went unchecked at exactly the width where it looked worst.
+const WIDTHS = [320, 360, 390, 430, 768, 820]
 
 let failures = 0
 const fail = (m) => {
@@ -179,6 +183,49 @@ for (const route of ROUTES) {
   )
   if (zoomOverflow) fail(`${route} — content lost at 200% zoom`)
 
+  await page.close()
+}
+
+// ── the mobile menu ─────────────────────────────────────────────────────────
+// It is hidden above the `nav` breakpoint (900px), so every other check in this
+// file runs straight past it. The failures below are the ones it shipped with:
+// a 288px panel holding 1,225px of links, scrolling silently inside itself,
+// with five destinations listed twice.
+{
+  const page = await browser.newPage()
+  for (const width of [320, 360, 390, 430, 768, 820]) {
+    await page.setViewport({ width, height: 780, deviceScaleFactor: 1, isMobile: true, hasTouch: true })
+    await page.goto(BASE + '/', { waitUntil: 'networkidle0' })
+
+    const r = await page.evaluate((width) => {
+      const d = document.querySelector('header details')
+      if (!d) return { missing: true }
+      d.setAttribute('open', '')
+      const panel = d.querySelector(':scope > div')
+      const b = panel.getBoundingClientRect()
+      const links = [...panel.querySelectorAll('a')]
+      const small = links
+        .filter((a) => a.getBoundingClientRect().height < 44)
+        .map((a) => Math.round(a.getBoundingClientRect().height) + 'px "' + a.textContent.trim().slice(0, 24) + '"')
+      const hrefs = links.map((a) => a.getAttribute('href'))
+      const dupes = hrefs.filter((h, i) => hrefs.indexOf(h) !== i)
+      return {
+        left: Math.round(b.left), right: Math.round(b.right),
+        bottom: Math.round(b.bottom), vh: window.innerHeight,
+        small: small.slice(0, 3), dupes: [...new Set(dupes)].slice(0, 3),
+      }
+    }, width)
+
+    if (r.missing) { fail(`menu ${width}px — no <details> in the header`); continue }
+    // Full-bleed: a panel inset from the edge leaves a strip of page beside it.
+    if (r.left > 1 || r.right < width - 1)
+      fail(`menu ${width}px — panel spans ${r.left}..${r.right}, not the full ${width}px`)
+    if (r.bottom > r.vh + 1)
+      fail(`menu ${width}px — panel bottom at ${r.bottom} falls past the ${r.vh}px viewport`)
+    if (r.small.length) fail(`menu ${width}px — link under 44px: ${r.small.join(', ')}`)
+    if (r.dupes.length)
+      fail(`menu ${width}px — the same destination listed twice: ${r.dupes.join(', ')}`)
+  }
   await page.close()
 }
 

@@ -9,6 +9,7 @@ The WellaPath marketing website — `wellapath.org`.
 | **[`docs/WEBSITE_GUIDE.md`](docs/WEBSITE_GUIDE.md)** | The brand, content and experience guide. Read §1 and §2 before designing or writing anything. |
 | **[`docs/DESIGN.md`](docs/DESIGN.md)** | The design system — tokens, type scale, component specs. Derived from Stripe, governed by the guide. |
 | **[`docs/PLAN.md`](docs/PLAN.md)** | Build plan, verified figures, measured budgets, open decisions. |
+| **[`docs/PROGRESS.md`](docs/PROGRESS.md)** | Where the build stands today: what is done, what is measured, what is blocking launch. |
 
 `docs/website-guide.html` is the guide, styled — open it in a browser or print to PDF.
 

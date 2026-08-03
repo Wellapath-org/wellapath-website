@@ -4,6 +4,10 @@
 
 ---
 
+> **This is the plan, not the status.** For what actually exists, what is measured, and what is
+> blocking launch, read [`PROGRESS.md`](PROGRESS.md). Where the two disagree, PROGRESS is right
+> about the present and this file is right about the intent.
+
 ## 1. Decisions taken
 
 | Decision | Choice | Why |
@@ -156,8 +160,13 @@ honest, fast one-page site at `wellapath.org` that can absorb traffic while 5–
 
 ### Deliberately out of scope at launch
 
-Blog · testimonials in any form · pricing · chat widget · A/B testing · cookie banner (there are no
-cookies to consent to, and a banner for nothing is a dark pattern in the §8.1 sense).
+Blog · testimonials in any form · pricing · chat widget · A/B testing.
+
+~~Cookie banner~~ — this held until 2 August 2026, when Google Analytics was added at the founder's
+request. The reasoning was that a banner for nothing is a dark pattern in the §8.1 sense, and that
+is still true; what changed is that there is now something to consent to. The banner that exists is
+opt-in, has two buttons of equal weight with neither preselected, and never appears on a condition
+page. `scripts/check-analytics.mjs` holds it to that.
 
 ---
 
@@ -184,15 +193,17 @@ Carried from §14, narrowed to what actually blocks work:
    The single highest-value unblock by a distance.
 2. **Is `self_care` a fourth urgency state or a synonym for non-urgent?** One line in
    `content/urgency.ts` either way, but it changes the "3 urgency levels" receipt.
-3. **Where should the capture form POST?** It targets `/api/notify` and `/api/partners`, which do not
-   exist yet. Until they do, a submission 404s.
-4. **Is `/partners` in scope?** It ships with a real form and real technical claims. If there is no
-   pipeline behind it, remove it from `MENU` rather than soften it.
-5. **Confirm 112 per state.** The app already publishes 112 and the site now matches it, so this is
+3. **Confirm 112 per state.** The app already publishes 112 and the site now matches it, so this is
    verification rather than a blocker — but Lagos runs its own line and §14 is right that getting it
    wrong is a safety issue.
 
+The live list, including what has been added since, is in [`PROGRESS.md`](PROGRESS.md).
+
 **Answered since v1.0 of the guide:**
+
+- *Where should the capture form POST?* — `/api/notify`, which now exists and accepts an email
+  address or a WhatsApp number.
+- *Is `/partners` in scope?* — yes. It ships and is reachable from the navigation.
 
 - *Which emergency number?* — the app's home screen publishes **112**. The site matches it.
 - *Is there brand identity beyond the violet?* — **yes**, there is a wordmark: lowercase `wellapath`

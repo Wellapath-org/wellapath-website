@@ -9,12 +9,12 @@
  * The urgency colour is the semantic triage token, not decoration. §2.2 forbids
  * using these for anything else, and this is exactly the thing they are for.
  */
-import { ogCard, OG_SIZE, OG_CONTENT_TYPE } from '@/components/og-card'
+import { OG_SIZE, OG_CONTENT_TYPE } from '@/components/og-size'
 import { getAllConditions, getCondition } from '@/content/conditions'
 import { URGENCY_COPY } from '@/content/urgency'
 
 // Explicit: the card reads its fonts from disk with node:fs, which the edge
-// runtime cannot do. These render at build time, so this costs nothing at run.
+// runtime cannot do.
 export const runtime = 'nodejs'
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE
@@ -30,7 +30,12 @@ const TRIAGE: Record<string, string> = {
   emergency: '#c0281f',
 }
 
+// Imported here rather than at the top of the file: see the note in
+// app/opengraph-image.tsx. `next/og` must not be evaluated during metadata
+// resolution. A slug outside generateStaticParams renders on demand, which is
+// exactly the case that broke.
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { ogCard } = await import('@/components/og-card')
   const { slug } = await params
   const c = getCondition(slug)
   if (!c) {

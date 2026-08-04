@@ -124,13 +124,17 @@ if (!failed) {
 console.log('\n' + '─'.repeat(60))
 console.log('Database\n')
 
-const dbUrl = process.env.DATABASE_URL
+// Same order as content/db.ts. The Neon integration on Vercel sets POSTGRES_URL
+// and never DATABASE_URL, so checking only the latter reports a working
+// database as missing.
+const dbUrl =
+  process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING
 if (!dbUrl) {
   fail(
-    'DATABASE_URL is not set',
+    'No Postgres URL is set (DATABASE_URL or POSTGRES_URL)',
     'Nothing is being stored. Every signup is logged to the server console and lost on restart.',
-    'Create a Postgres database (Vercel > Storage > Neon), copy its connection string into\n' +
-      '  .env.local as DATABASE_URL, and set the same value in the Vercel project settings.',
+    'Create a Postgres database (Vercel > Storage > Neon). The integration sets POSTGRES_URL\n' +
+      '  on the project itself; for local use copy the pooled string into .env.local as DATABASE_URL.',
   )
 } else {
   try {
@@ -143,7 +147,7 @@ if (!dbUrl) {
     if (/relation "signups" does not exist/i.test(msg)) {
       console.log('  ✓ Connected. The signups table does not exist yet; the first signup creates it.')
     } else {
-      fail('Could not reach the database', msg, 'Check DATABASE_URL is the pooled connection string.')
+      fail('Could not reach the database', msg, 'Check the connection string is the pooled one.')
     }
   }
 }

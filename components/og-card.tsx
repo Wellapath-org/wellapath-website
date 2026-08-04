@@ -31,18 +31,54 @@ import { ImageResponse } from 'next/og'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-export const OG_SIZE = { width: 1200, height: 630 }
-export const OG_CONTENT_TYPE = 'image/png'
+import { OG_SIZE, OG_CONTENT_TYPE } from './og-size'
 
-/* Read once per build, not once per card. */
+export { OG_SIZE, OG_CONTENT_TYPE }
+
+/* Read on the first card drawn — NOT while this module is imported.
+
+   These two lines were `readFileSync` at module scope, and that shipped a bug
+   that only ever appeared in production. Next resolves the `opengraph-image`
+   convention by evaluating its module to read `alt`/`size`/`contentType`, and
+   for a route rendered on demand it does that per request rather than at build.
+   The read therefore ran inside metadata resolution — and on Vercel it threw,
+   because `join(process.cwd(), ...)` is not a path the file tracer can follow,
+   so assets/og/*.ttf is in no function's bundle. Locally the files are always
+   on disk, so it never reproduced; the fonts were only ever really present at
+   build time, which is exactly when the cards are drawn.
+
+   A throw there is swallowed into the metadata boundary: an empty <head>, then
+   "Application error: a client-side exception has occurred" on hydration. It
+   hit /conditions and /notify/thanks and nothing else, those being the only two
+   routes not prerendered — which made it look like a form bug, since the form
+   is how anyone reaches /notify/thanks.
+
+   Keeping the read inside the call makes importing this module free, which is
+   all the convention actually asks for. Still read once per process, so the 51
+   cards drawn during a build pay for the fonts once, exactly as before. */
 const fontDir = join(process.cwd(), 'assets', 'og')
-const INTER_REGULAR = readFileSync(join(fontDir, 'Inter-Regular.ttf'))
-const INTER_BOLD = readFileSync(join(fontDir, 'Inter-Bold.ttf'))
 
-const FONTS = [
-  { name: 'Inter', data: INTER_REGULAR, weight: 400 as const, style: 'normal' as const },
-  { name: 'Inter', data: INTER_BOLD, weight: 700 as const, style: 'normal' as const },
-]
+let fonts: { name: 'Inter'; data: Buffer; weight: 400 | 700; style: 'normal' }[] | null = null
+
+function getFonts() {
+  if (!fonts) {
+    fonts = [
+      {
+        name: 'Inter',
+        data: readFileSync(join(fontDir, 'Inter-Regular.ttf')),
+        weight: 400,
+        style: 'normal',
+      },
+      {
+        name: 'Inter',
+        data: readFileSync(join(fontDir, 'Inter-Bold.ttf')),
+        weight: 700,
+        style: 'normal',
+      },
+    ]
+  }
+  return fonts
+}
 
 /* The tokens from globals.css, repeated as literals because Satori resolves no
    custom properties. Keep them in step with @theme by hand. */
@@ -157,6 +193,6 @@ export function ogCard({ eyebrow, lead, rest, tag }: OgCard) {
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: FONTS },
+    { ...OG_SIZE, fonts: getFonts() },
   )
 }

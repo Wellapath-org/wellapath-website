@@ -9,6 +9,8 @@
  * Requires the site to be running (npm run build && npx next start).
  */
 
+import { reachable, announce } from './launch.mjs'
+
 const BASE = process.argv[2] ?? 'http://localhost:3737'
 
 const ROUTES = [
@@ -90,9 +92,12 @@ const fail = (route, msg) => {
 }
 const pass = () => checks++
 
-console.log(`\nChecking ${ROUTES.length} routes at ${BASE}\n`)
+const LIVE = reachable(ROUTES)
 
-for (const route of ROUTES) {
+console.log(`\nChecking ${LIVE.length} routes at ${BASE}\n`)
+announce(LIVE, ROUTES)
+
+for (const route of LIVE) {
   const res = await fetch(BASE + route)
   if (!res.ok) {
     fail(route, `HTTP ${res.status}`)
@@ -175,7 +180,7 @@ for (const route of ROUTES) {
 
 console.log(`\n${'─'.repeat(60)}`)
 if (failures === 0) {
-  console.log(`✓ ${checks} checks passed across ${ROUTES.length} routes. No violations.`)
+  console.log(`✓ ${checks} checks passed across ${LIVE.length} routes. No violations.`)
 } else {
   console.log(`✗ ${failures} violation${failures === 1 ? '' : 's'} (${checks} checks passed).`)
   process.exit(1)

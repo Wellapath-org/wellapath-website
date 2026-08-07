@@ -29,7 +29,9 @@ import {
   SeverityMock,
   MockFrame,
 } from '@/components/product'
-import { RECEIPTS, COVERAGE, AUDIENCES } from '@/content/site'
+import { Waitlist } from '@/components/waitlist'
+import { LAUNCHED } from '@/content/launch'
+import { RECEIPTS, COVERAGE, AUDIENCES, SITE } from '@/content/site'
 import { getSeasonalConditions, getAllConditions } from '@/content/conditions'
 import { URGENCY_ORDER } from '@/content/urgency'
 import {
@@ -46,12 +48,37 @@ import {
  * is correct: they are the site's own. It needs the canonical stated anyway.
  * Without it the origin is reachable at several URLs a crawler treats as
  * separate pages, and the one that gets indexed is chosen for us.
+ *
+ * Before launch this route is the waitlist instead, so the title and
+ * description have to be the waitlist's: the layout's default describes a
+ * product a visitor cannot get yet, and that description is what shows in a
+ * search result and in a WhatsApp preview, which is where most of this traffic
+ * will come from.
  */
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
+  ...(LAUNCHED
+    ? {}
+    : {
+        title: `Join the waitlist · ${SITE.name}`,
+        description:
+          'Feeling sick but not sure how bad it is? WellaPath tells you how urgently to seek care, and where. Join the waitlist for early access.',
+        openGraph: {
+          title: `Join the waitlist · ${SITE.name}`,
+          description:
+            'Feeling sick but not sure how bad it is? WellaPath tells you how urgently to seek care, and where. Join the waitlist for early access.',
+        },
+      }),
 }
 
-export default function HomePage() {
+export default function RootPage() {
+  // The site is written and deployed; it is simply not open yet. See
+  // content/launch.ts for what flips this and what stays reachable meanwhile.
+  if (!LAUNCHED) return <Waitlist />
+  return <HomePage />
+}
+
+function HomePage() {
   const seasonal = getSeasonalConditions()
   const conditions = getAllConditions()
 

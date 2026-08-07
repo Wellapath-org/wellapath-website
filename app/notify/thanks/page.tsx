@@ -10,6 +10,7 @@ import type { Metadata } from 'next'
 import { Section, TwoTone, Eyebrow, Button, Prose } from '@/components/ui'
 import { Disclaimer } from '@/components/clinical'
 import { EMERGENCY } from '@/content/site'
+import { LAUNCHED } from '@/content/launch'
 import { Check, TriangleAlert, Phone } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -88,10 +89,13 @@ export default async function ThanksPage({
             </div>
             <TwoTone as="h1" size="display" lead={c.lead} rest={c.rest} className="mt-4" />
 
+            {/* Before launch /how-it-works is closed and would bounce the
+                visitor straight back here. Offering one link that works beats
+                two where the first is a round trip. */}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href="/how-it-works">See how it works</Button>
-              <Button href="/" variant="secondary">
-                Back to the site
+              {LAUNCHED && <Button href="/how-it-works">See how it works</Button>}
+              <Button href="/" variant={LAUNCHED ? 'secondary' : 'primary'}>
+                {LAUNCHED ? 'Back to the site' : 'Back to the waitlist'}
               </Button>
             </div>
           </div>
@@ -123,9 +127,15 @@ export default async function ThanksPage({
               <p>{c.fix}</p>
               <p>
                 If you need care now, do not wait on us. Call{' '}
-                <a href={`tel:${EMERGENCY.national}`}>{EMERGENCY.national}</a> in an emergency, or
-                read the <a href="/conditions">condition guides</a>, which need no app and no
-                sign-up.
+                <a href={`tel:${EMERGENCY.national}`}>{EMERGENCY.national}</a> in an emergency
+                {LAUNCHED ? (
+                  <>
+                    , or read the <a href="/conditions">condition guides</a>, which need no app and
+                    no sign-up.
+                  </>
+                ) : (
+                  '.'
+                )}
               </p>
             </>
           )}

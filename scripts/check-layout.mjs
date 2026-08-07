@@ -15,6 +15,8 @@ import puppeteer from 'puppeteer-core'
 const BASE = process.argv[2] ?? 'http://localhost:3737'
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
+import { reachable, announce, LAUNCHED } from './launch.mjs'
+
 const ROUTES = ['/', '/conditions', '/conditions/malaria', '/coverage', '/for/health-facilities', '/how-it-works', '/partners']
 // 320 is the narrowest phone still in use; 360 is the commonest Android width
 // in Nigeria; 390 and 430 are current iPhone and iPhone Max; 768 and 820 are
@@ -34,9 +36,12 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--force-color-profile=srgb'],
 })
 
-console.log(`\nLayout checks at ${BASE}\n`)
+const LIVE = reachable(ROUTES)
 
-for (const route of ROUTES) {
+console.log(`\nLayout checks at ${BASE}\n`)
+announce(LIVE, ROUTES)
+
+for (const route of LIVE) {
   const page = await browser.newPage()
   await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }])
 
@@ -191,7 +196,10 @@ for (const route of ROUTES) {
 // file runs straight past it. The failures below are the ones it shipped with:
 // a 288px panel holding 1,225px of links, scrolling silently inside itself,
 // with five destinations listed twice.
-{
+//
+// Pre-launch there is no menu to check and that is the design: every
+// destination in it is closed, so the header is the wordmark and one button.
+if (LAUNCHED) {
   const page = await browser.newPage()
   for (const width of [320, 360, 390, 430, 768, 820]) {
     await page.setViewport({ width, height: 780, deviceScaleFactor: 1, isMobile: true, hasTouch: true })

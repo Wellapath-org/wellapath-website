@@ -23,6 +23,8 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const ORIGIN = 'https://wellapath.org'
 
 /** Indexable routes. Anything here must be canonical, titled and described. */
+import { reachable, announce, LAUNCHED } from './launch.mjs'
+
 const ROUTES = [
   '/',
   '/how-it-works',
@@ -56,13 +58,16 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox'],
 })
 
+const LIVE = reachable(ROUTES)
+
 console.log(`\nSEO checks at ${BASE}\n`)
+announce(LIVE, ROUTES)
 
 const page = await browser.newPage()
 const seenTitles = new Map()
 const seenDescriptions = new Map()
 
-for (const route of ROUTES) {
+for (const route of LIVE) {
   await page.goto(BASE + route, { waitUntil: 'domcontentloaded' })
 
   const m = await page.evaluate(() => {
@@ -181,7 +186,7 @@ for (const route of ROUTES) {
 // ── filter URLs must point home ────────────────────────────────────────────
 // The navigation links to these, so they get crawled whether or not they are
 // in the sitemap.
-for (const filtered of ['/conditions?urgency=emergency', '/conditions?seasonal=true']) {
+for (const filtered of !LAUNCHED ? [] : ['/conditions?urgency=emergency', '/conditions?seasonal=true']) {
   await page.goto(BASE + filtered, { waitUntil: 'domcontentloaded' })
   const canonical = await page.evaluate(
     () => document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
@@ -206,10 +211,16 @@ for (const route of NOINDEX) {
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((x) => x[1])
   console.log(`\n  sitemap: ${urls.length} URLs`)
 
-  for (const route of ROUTES) {
+  // Pre-launch the sitemap is deliberately one URL: everything else 307s back
+  // to it. Asserting the full list here would be asserting that we advertise
+  // 61 redirects.
+  for (const route of LAUNCHED ? LIVE : ['/']) {
     const want = `${ORIGIN}${route === '/' ? '' : route}`
     if (!urls.some((u) => u.replace(/\/$/, '') === want.replace(/\/$/, '')))
       fail(`sitemap — missing ${route}`)
+  }
+  if (!LAUNCHED && urls.length !== 1) {
+    fail(`sitemap — pre-launch it should list only the waitlist, found ${urls.length} URLs`)
   }
   for (const route of NOINDEX) {
     if (urls.some((u) => u.includes(route))) fail(`sitemap — lists noindex route ${route}`)
@@ -237,7 +248,7 @@ for (const route of NOINDEX) {
 }
 
 // ── the share card actually renders ────────────────────────────────────────
-for (const url of ['/opengraph-image', '/conditions/malaria/opengraph-image']) {
+for (const url of LAUNCHED ? ['/opengraph-image', '/conditions/malaria/opengraph-image'] : ['/opengraph-image']) {
   const res = await fetch(BASE + url)
   const type = res.headers.get('content-type') ?? ''
   const len = Number(res.headers.get('content-length') ?? 0)
@@ -250,7 +261,7 @@ await browser.close()
 
 console.log(`\n${'─'.repeat(60)}`)
 if (failures === 0) {
-  console.log(`✓ ${ROUTES.length} routes: titled, described, canonical, card, schema.\n`)
+  console.log(`✓ ${LIVE.length} routes: titled, described, canonical, card, schema.\n`)
 } else {
   console.log(`✗ ${failures} SEO violation${failures === 1 ? '' : 's'}.\n`)
   process.exit(1)

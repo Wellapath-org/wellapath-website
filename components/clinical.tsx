@@ -14,6 +14,7 @@
  */
 import { URGENCY_COPY, type DisplayUrgency } from '@/content/urgency'
 import { DISCLAIMER, EMERGENCY } from '@/content/site'
+import { LAUNCHED } from '@/content/launch'
 import type { RedFlagLabel } from '@/content/red-flag-labels'
 import Link from 'next/link'
 import { Button } from './ui'
@@ -144,12 +145,19 @@ export function EmergencyCard({
             Call {EMERGENCY.national} or go straight to the nearest emergency-capable facility. A
             phone call is faster than any assessment.
           </p>
+          {/* Before launch /coverage is closed, so the link would send the
+              reader back to the waitlist. The fact is worth stating either
+              way; only the link waits. */}
           {!compact && (
             <p className="text-small mt-4 text-ink-mute">
               {EMERGENCY.note} Coverage of emergency-capable facilities:{' '}
-              <Link href="/coverage" className="text-accent-ink underline underline-offset-2">
-                Lagos, Kano and the FCT
-              </Link>
+              {LAUNCHED ? (
+                <Link href="/coverage" className="text-accent-ink underline underline-offset-2">
+                  Lagos, Kano and the FCT
+                </Link>
+              ) : (
+                'Lagos, Kano and the FCT'
+              )}
               .
             </p>
           )}

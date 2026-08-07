@@ -24,6 +24,7 @@
  */
 import type { MetadataRoute } from 'next'
 import { SITE } from '@/content/site'
+import { LAUNCHED } from '@/content/launch'
 import { getAllConditions } from '@/content/conditions'
 import { SEGMENT_SLUGS } from '@/content/segments'
 import stamp from '@/content/artifacts/stamp.json'
@@ -46,6 +47,11 @@ function artifactsReleased(): Date | undefined {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  // Before launch there is one page, and listing the other 61 would be asking
+  // Google to crawl 61 redirects back to it. They return the moment LAUNCHED
+  // is set, which is a redeploy, which is when the sitemap is rebuilt anyway.
+  if (!LAUNCHED) return [{ url: SITE.url }]
+
   const marketing = [
     '',
     '/how-it-works',

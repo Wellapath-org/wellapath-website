@@ -17,6 +17,8 @@
  */
 import puppeteer from 'puppeteer-core'
 
+import { LAUNCHED } from './launch.mjs'
+
 const BASE = process.argv[2] ?? 'http://localhost:3737'
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const GA_HOSTS = /googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net/
@@ -143,7 +145,11 @@ const go = (url) => (page) => page.goto(url, { waitUntil: 'networkidle2' })
 }
 
 // ── 4. Condition pages: no script, no banner, even having accepted ─────────
-for (const route of ['/conditions', '/conditions/malaria', '/conditions?urgency=emergency']) {
+// Pre-launch these 307 to the waitlist, which does run analytics on consent, so
+// following the redirect would assert the opposite of what this checks.
+for (const route of !LAUNCHED
+  ? []
+  : ['/conditions', '/conditions/malaria', '/conditions?urgency=emergency']) {
   const { hits, result } = await watch(
     async (page) => {
       await page.goto(BASE + route, { waitUntil: 'networkidle2' })
@@ -165,12 +171,15 @@ for (const route of ['/conditions', '/conditions/malaria', '/conditions?urgency=
 // A check that only proves absence would pass if analytics were removed
 // entirely, which is not what was asked for.
 {
-  const { hits } = await watch(go(`${BASE}/how-it-works`), { consent: 'granted' })
-  if (!hits.length) fail('/how-it-works, accepted — nothing sent, so consent does not actually work')
+  const marketing = LAUNCHED ? '/how-it-works' : '/'
+  const { hits } = await watch(go(`${BASE}${marketing}`), { consent: 'granted' })
+  if (!hits.length) fail(`${marketing}, accepted — nothing sent, so consent does not actually work`)
   else ok(`accepted visitor on a marketing page: ${hits.length} request(s) sent`)
 }
 
 // ── 6. Navigating from marketing to a condition page reports nothing ───────
+// Needs a condition page to navigate to, so it waits for launch.
+if (LAUNCHED)
 // The honest limit stated on /privacy: the script stays in memory, but no
 // condition URL may ever be transmitted.
 {
@@ -205,7 +214,11 @@ await browser.close()
 
 console.log(`\n${'─'.repeat(60)}`)
 if (failures === 0) {
-  console.log('✓ Opt-in holds, and condition pages are never reported.\n')
+  console.log(
+    LAUNCHED
+      ? '✓ Opt-in holds, and condition pages are never reported.\n'
+      : '✓ Opt-in holds. The condition-page silence rule is not checked while the site is closed.\n',
+  )
 } else {
   console.log(`✗ ${failures} consent violation${failures === 1 ? '' : 's'}.\n`)
   process.exit(1)

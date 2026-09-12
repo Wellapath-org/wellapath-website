@@ -101,7 +101,9 @@ export async function POST(req: NextRequest) {
       console.error(`[notify] Could not save ${who} to Postgres:`, e)
     }
   } else if (whatsapp) {
-    console.error(`[notify] DATABASE_URL missing. Unsaved WhatsApp signup: ${who}`)
+    console.error(
+      `[notify] No Postgres URL (DATABASE_URL or POSTGRES_URL). Unsaved WhatsApp signup: ${who}`,
+    )
   }
 
   // ── Resend, for the email broadcast ────────────────────────────────────

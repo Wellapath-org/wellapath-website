@@ -15,8 +15,14 @@
  * thing that publishes a contact list.
  */
 import { NextResponse, type NextRequest } from 'next/server'
+import { LAUNCHED, openBeforeLaunch } from '@/content/launch'
 
-export const config = { matcher: '/admin/:path*' }
+// Everything except the build output and the two asset folders, because before
+// launch this has a second job: sending the closed pages back to the waitlist.
+// The /admin gate below is unchanged and runs regardless of launch state.
+export const config = {
+  matcher: ['/((?!_next/static|_next/image).*)'],
+}
 
 /** Length-independent, constant-time-ish compare. Avoids leaking length by
  *  early return, which a naive === does. */
@@ -41,6 +47,20 @@ function deny(message: string) {
 }
 
 export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
+
+  // ── The pre-launch gate ──────────────────────────────────────────────────
+  // 307 and not 308. A permanent redirect is cached by the browser and by every
+  // proxy in between, and would still be sending people away from /conditions
+  // days after launch, with no way to reach the visitors holding the cache.
+  // The whole point of this redirect is that it stops being true.
+  if (!LAUNCHED && !openBeforeLaunch(pathname)) {
+    return NextResponse.redirect(new URL('/', req.nextUrl.origin), 307)
+  }
+
+  // The lock below is only for /admin. Everything else is done here.
+  if (!pathname.startsWith('/admin')) return NextResponse.next()
+
   const user = process.env.ADMIN_USER
   const password = process.env.ADMIN_PASSWORD
 

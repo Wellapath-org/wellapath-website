@@ -18,7 +18,7 @@
 export const LAUNCHED = process.env.LAUNCHED === 'true'
 
 /** Kept in step with OPEN_PATHS in content/launch.ts. */
-const OPEN = new Set(['/', '/privacy', '/notify/thanks'])
+const OPEN = new Set(['/', '/privacy', '/support', '/notify/thanks'])
 
 export function openNow(route) {
   if (LAUNCHED) return true

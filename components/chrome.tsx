@@ -301,7 +301,9 @@ export function SiteHeader() {
  * behind it. check-seo asserts that pairing on every route.
  *
  * The mock also had a "Terms & Support" link. There is no terms page to point
- * it at, so it is not here rather than being a link to nothing.
+ * it at, so terms is not here rather than being a link to nothing. Support IS
+ * here: /support exists, stays open before launch, and the store listings
+ * require it to be reachable from the site's footer.
  */
 function WaitlistFooter() {
   return (
@@ -327,6 +329,14 @@ function WaitlistFooter() {
                       className="transition-safe flex min-h-12 items-center text-small text-ink-soft hover:text-ink"
                     >
                       Privacy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/support"
+                      className="transition-safe flex min-h-12 items-center text-small text-ink-soft hover:text-ink"
+                    >
+                      Support
                     </Link>
                   </li>
                   {SOCIALS.map((s) => (

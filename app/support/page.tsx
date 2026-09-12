@@ -7,7 +7,7 @@ import { Mail, Bug, MapPin, Smartphone, Trash2 } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Support',
   description:
-    'How to reach the WellaPath team: report a bug, correct a facility listing, or ask about your data. One address, and an answer within two working days.',
+    'How to reach the WellaPath team: report a bug, correct a facility listing, or ask about your data. We aim to respond within two working days.',
   alternates: { canonical: '/support' },
 }
 
@@ -25,7 +25,7 @@ export default function SupportPage() {
       <PageHeader
         eyebrow="Support"
         lead="We answer every message."
-        rest={`Bugs, wrong facility details, data questions and anything else: one address, and an answer within ${SUPPORT.responseTime}.`}
+        rest={`Bugs, wrong facility details, data questions and anything else: one address. We aim to respond within ${SUPPORT.responseTime}.`}
       >
         <a
           href={`mailto:${SUPPORT.email}`}

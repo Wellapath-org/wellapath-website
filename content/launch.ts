@@ -28,9 +28,12 @@ export const LAUNCHED = process.env.LAUNCHED === 'true'
  *
  * `/privacy` is on this list for a reason that is not obvious: the capture form
  * links to it at the moment consent is given, and NDPR consent that points at a
- * page the visitor cannot open is not informed consent. `/notify/thanks` is
- * where the form lands, and `/api/notify` is where it posts. `/admin` stays
- * reachable so the signups it collects can be read, still behind HTTP Basic.
+ * page the visitor cannot open is not informed consent. `/support` is what the
+ * Google Play and App Store listings point at, and store review happens while
+ * the site is closed, so a redirect here would read as a missing support
+ * channel. `/notify/thanks` is where the form lands, and `/api/notify` is
+ * where it posts. `/admin` stays reachable so the signups it collects can be
+ * read, still behind HTTP Basic.
  *
  * Everything else redirects to the waitlist.
  */
@@ -38,6 +41,7 @@ const OPEN_PATHS = new Set([
   '/',
   '/notify/thanks',
   '/privacy',
+  '/support',
   '/api/notify',
   '/robots.txt',
   '/sitemap.xml',

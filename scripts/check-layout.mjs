@@ -17,7 +17,7 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 import { reachable, announce, LAUNCHED } from './launch.mjs'
 
-const ROUTES = ['/', '/conditions', '/conditions/malaria', '/coverage', '/for/health-facilities', '/how-it-works', '/partners']
+const ROUTES = ['/', '/conditions', '/conditions/malaria', '/coverage', '/for/health-facilities', '/how-it-works', '/partners', '/support']
 // 320 is the narrowest phone still in use; 360 is the commonest Android width
 // in Nigeria; 390 and 430 are current iPhone and iPhone Max; 768 and 820 are
 // iPad portrait, which used to fall through to the stacked phone layout and so

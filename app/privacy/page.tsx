@@ -121,19 +121,22 @@ export default function PrivacyPage() {
             quietly reverse later: the app has no code path that transmits them.
           </p>
           <p>
-            <strong>Crash reporting.</strong> If the app crashes, Apple and Google collect a crash
-            report when your device settings allow it, and pass it to us through their developer
-            consoles. During testing on TestFlight and Google Play, this is how we learn a build is
-            failing. A crash report describes the state of the code, not what was typed into it: it
-            carries no symptom answers and no location. The app ships no third-party crash or
-            analytics kit of its own.
+            <strong>Crash reporting.</strong> If the app crashes, Apple and Google may collect a
+            crash report when your device settings allow it, and pass it to us through their
+            developer consoles. During testing on TestFlight and Google Play, this is how we learn
+            a build is failing. A crash report describes the state of the code, not what was typed
+            into it: it carries no symptom answers and no location. The app includes the Sentry
+            crash-reporting library as a dependency, but in the current build it is not configured
+            and its telemetry is disabled, so it sends nothing to Sentry: no crash data, no
+            analytics, no symptom data. If we ever turn it on, this policy changes first.
           </p>
           <p>
             <strong>Third-party services.</strong> For this website: Vercel hosts it, Neon holds
             the launch-list database, Resend sends the one launch email, and Google Analytics runs
             only for visitors who opt in, as described below. For the app: Apple and Google
-            distribute it and handle crash reports as above. None of these companies receives
-            symptom data, because symptom data never leaves your phone.
+            distribute it and handle crash reports as above, and Sentry&rsquo;s library is present
+            but switched off, receiving nothing. None of these companies receives symptom data,
+            because symptom data never leaves your phone.
           </p>
           <p>
             <strong>Sharing.</strong> We do not sell personal data, and we do not share it with
@@ -210,7 +213,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             <strong>Contact for data requests.</strong> Email{' '}
-            <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a> and expect an answer within{' '}
+            <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a>. We aim to respond within{' '}
             {SUPPORT.responseTime}. A named data protection contact will be published here before
             public launch.
           </p>

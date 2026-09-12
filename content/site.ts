@@ -48,8 +48,9 @@ export const EMERGENCY = {
  * Support contact.
  *
  * One address for everything: bugs, wrong facility details, privacy requests.
- * The response-time promise is published on /support and in /privacy, so it
- * lives here once rather than drifting apart across pages.
+ * The stated aim ("we aim to respond within …", never an unconditional
+ * guarantee) is published on /support and in /privacy, so it lives here once
+ * rather than drifting apart across pages.
  */
 export const SUPPORT = {
   email: 'support@wellapath.org',

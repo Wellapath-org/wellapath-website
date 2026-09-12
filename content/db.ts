@@ -26,13 +26,36 @@ export type SignupRow = {
   createdAt: Date
 }
 
+/**
+ * The connection string, under whichever name it arrived.
+ *
+ * The Neon integration on Vercel provisions `POSTGRES_URL` and friends; it does
+ * not create `DATABASE_URL`. Reading only the latter meant the database was
+ * attached and working while `dbConfigured()` answered false, so every signup
+ * that included a WhatsApp number was reported to the visitor as a failure —
+ * the number has nowhere but Postgres to go, so `numberLost` in the notify
+ * route treated it as unsaved.
+ *
+ * `POSTGRES_URL` is the pooled endpoint, which is the right one for a function
+ * that opens a connection per request. The non-pooling URL is last, as a
+ * fallback rather than a preference.
+ */
+function connectionString() {
+  return (
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_URL_NON_POOLING ||
+    ''
+  )
+}
+
 export function dbConfigured() {
-  return Boolean(process.env.DATABASE_URL)
+  return Boolean(connectionString())
 }
 
 function sql() {
-  const url = process.env.DATABASE_URL
-  if (!url) throw new Error('DATABASE_URL is not set')
+  const url = connectionString()
+  if (!url) throw new Error('No Postgres URL is set (DATABASE_URL or POSTGRES_URL)')
   return neon(url)
 }
 

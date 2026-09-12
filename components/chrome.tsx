@@ -5,6 +5,7 @@
  */
 import Link from 'next/link'
 import { MENU, FOOTER_GROUPS, EMERGENCY, SITE, DISCLAIMER, SOCIALS } from '@/content/site'
+import { LAUNCHED } from '@/content/launch'
 import { Button } from './ui'
 import { EmergencyCard } from './clinical'
 import { BellRing, ChevronDown, X, Phone } from 'lucide-react'
@@ -66,7 +67,30 @@ const SHORTCUT_HREFS = new Set([
   '/#get-the-app',
 ])
 
+/**
+ * Before launch the nav would be a menu of redirects: every destination in
+ * MENU is closed, and offering twenty-three links that all land back on the
+ * waitlist is worse than offering none. So the header is the wordmark and the
+ * one action the page has.
+ */
+function WaitlistHeader() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-navy">
+      <div className="mx-auto flex w-full max-w-[1080px] items-center justify-between gap-4 px-5 py-3 sm:px-6 md:px-10">
+        <Link href="/" className="flex min-h-12 shrink-0 items-center" aria-label={SITE.name}>
+          <Wordmark className="brightness-0 invert" />
+        </Link>
+        <Button href="#get-the-app" variant="onNavy" showIcon={false}>
+          <span className="whitespace-nowrap">Join waitlist</span>
+        </Button>
+      </div>
+    </header>
+  )
+}
+
 export function SiteHeader() {
+  if (!LAUNCHED) return <WaitlistHeader />
+
   return (
     <header className="sticky top-0 z-50 border-b border-rule bg-ground">
       <div className="mx-auto flex w-full max-w-[1080px] items-center justify-between gap-4 px-5 py-3 sm:gap-6 sm:px-6 md:px-10">
@@ -266,7 +290,91 @@ export function SiteHeader() {
    last, and never styled as fine print. Then Stripe's ruled column grid.
    ───────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The pre-launch footer.
+ *
+ * Trimmed to what is reachable and what is required: the emergency card (§11
+ * applies to a waitlist exactly as it applies to a condition page), privacy,
+ * because the form links to it at the moment consent is given, and the three
+ * official accounts, because the Organization schema lists them under `sameAs`
+ * and a `sameAs` the site does not visibly link to is a claim with nothing
+ * behind it. check-seo asserts that pairing on every route.
+ *
+ * The mock also had a "Terms & Support" link. There is no terms page to point
+ * it at, so terms is not here rather than being a link to nothing. Support IS
+ * here: /support exists, stays open before launch, and the store listings
+ * require it to be reachable from the site's footer.
+ */
+function WaitlistFooter() {
+  return (
+    <footer className="border-t border-rule bg-sunk">
+      <div className="rails relative mx-auto w-full max-w-[1080px] px-5 py-12 sm:px-6 sm:py-14 md:px-10 md:py-16">
+        <div className="relative z-1">
+          <EmergencyCard />
+
+          <div className="mt-12 border-t border-rule pt-8">
+            <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
+              <Link href="/" className="inline-flex min-h-12 items-center">
+                <Wordmark />
+              </Link>
+
+              {/* A real landmark, not decoration. These four links are the
+                  only navigation the closed site has, and check-copy asserts
+                  every page carries a <nav> for exactly that reason. */}
+              <nav aria-label="Footer">
+                <ul className="flex flex-wrap items-center gap-x-6">
+                  <li>
+                    <Link
+                      href="/privacy"
+                      className="transition-safe flex min-h-12 items-center text-small text-ink-soft hover:text-ink"
+                    >
+                      Privacy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/support"
+                      className="transition-safe flex min-h-12 items-center text-small text-ink-soft hover:text-ink"
+                    >
+                      Support
+                    </Link>
+                  </li>
+                  {SOCIALS.map((s) => (
+                    <li key={s.href}>
+                      <a
+                        href={s.href}
+                        rel="me noopener noreferrer"
+                        target="_blank"
+                        className="transition-safe flex min-h-12 items-center text-small text-ink-soft hover:text-ink"
+                      >
+                        {s.label}
+                        <span className="sr-only"> (opens in a new tab)</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+
+            <p className="text-small measure-wide mt-4 text-ink-soft">
+              {SITE.domain} · Built for Nigerians, by people who understand the gap between symptoms
+              and care.
+            </p>
+            <p className="text-small measure-wide mt-4 text-ink-soft">{DISCLAIMER}</p>
+            <p className="text-small mt-5 text-ink-mute">
+              © {new Date().getFullYear()} {SITE.name}. Clinical decision support for Nigeria.
+              Lagos, Kano and the FCT. Not yet national.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
 export function SiteFooter() {
+  if (!LAUNCHED) return <WaitlistFooter />
+
   return (
     <footer className="border-t border-rule bg-sunk">
       <div className="rails relative mx-auto w-full max-w-[1080px] px-5 py-12 sm:px-6 sm:py-14 md:px-10 md:py-16">
@@ -363,7 +471,30 @@ export function SiteFooter() {
    (§8.1). Label above the field and always visible (§8.3).
    ───────────────────────────────────────────────────────────────────────── */
 
-export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
+/**
+ * The wording is a prop, the form is not.
+ *
+ * The waitlist page needs this to say "join the waitlist" rather than "get the
+ * app", and that is the entire difference. Copying the form to change four
+ * sentences would give the site two capture forms posting to one endpoint, two
+ * sets of field ids, and two places to get the NDPR line wrong. The defaults
+ * are the launch-day wording, so every existing caller is unchanged.
+ */
+export function GetTheApp({
+  id = 'get-the-app',
+  heading = 'Get the app.',
+  headingRest = 'It is free, and no account is needed.',
+  intro = 'WellaPath is coming to Android and iPhone. Leave an email address or a WhatsApp number and we will tell you once, on the day it is live. Nothing else, ever.',
+  promise = 'One message, at launch.',
+  submitLabel = 'Notify me at launch',
+}: {
+  id?: string
+  heading?: string
+  headingRest?: string
+  intro?: string
+  promise?: string
+  submitLabel?: string
+}) {
   return (
     <div
       id={id}
@@ -372,13 +503,10 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
       <div className="aurora-soft" aria-hidden="true" />
       <div className="relative z-1">
         <h2 className="text-h2 font-bold text-ink">
-          Get the app.
-          <span className="font-normal text-ink-soft"> It is free, and no account is needed.</span>
+          {heading}
+          <span className="font-normal text-ink-soft"> {headingRest}</span>
         </h2>
-        <p className="text-body measure mt-4 text-ink-soft">
-          WellaPath is coming to Android and iPhone. Leave an email address or a WhatsApp number and
-          we will tell you once, on the day it is live. Nothing else, ever.
-        </p>
+        <p className="text-body measure mt-4 text-ink-soft">{intro}</p>
 
         <form action="/api/notify" method="POST" className="relative mt-8 max-w-md">
           {/* Honeypot. Hidden from people and from screen readers, so anything
@@ -434,12 +562,12 @@ export function GetTheApp({ id = 'get-the-app' }: { id?: string }) {
 
           <div className="mt-6">
             <Button type="submit" full icon={BellRing}>
-              Notify me at launch
+              {submitLabel}
             </Button>
           </div>
           <p className="text-small mt-4 text-ink-mute">
-            One message, at launch. Either field on its own is enough. We do not sell or share your
-            details, and we delete the list 30 days after. See our{' '}
+            {promise} Either field on its own is enough. We do not sell or share your details, and
+            we delete the list 30 days after. See our{' '}
             <Link href="/privacy" className="text-accent-ink underline underline-offset-2">
               privacy page
             </Link>

@@ -154,7 +154,10 @@ export async function getSignups(days = 30): Promise<SignupReport> {
       )
     }
   } else {
-    warnings.push('DATABASE_URL is not set, so no signups are being stored. Set it and redeploy.')
+    warnings.push(
+      'No Postgres URL is set (DATABASE_URL or POSTGRES_URL), so no signups are being stored. ' +
+        'Set one and redeploy.',
+    )
   }
 
   // ── Resend, for anything collected before the database existed ──────────

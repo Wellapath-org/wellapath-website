@@ -10,9 +10,11 @@ about what was intended.
 
 ## In one line
 
-The site is **feature-complete and deployable**. It is **not launchable**, and the thing standing in
-the way is not code: 36 of 48 danger-sign labels have no clinician's signature, and the build
-refuses to complete without one.
+The site is **feature-complete and deployed, but closed**: `wellapath.org` is a waitlist until the
+app ships, and every route except the front door, `/privacy` and `/support` redirects back to it.
+Those two stay open because Google Play and TestFlight review point at them. What still stands
+between the full site and launch is not code: 36 of 48 danger-sign labels have no clinician's
+signature, and the build refuses to complete without one.
 
 ---
 
@@ -33,21 +35,38 @@ Against the build order in `PLAN.md` §5.
 
 Added since the plan was written, because they were asked for rather than foreseen: the four
 `/for/*` segment pages, the WhatsApp signup channel, the `/admin/signups` dashboard, the
-analytics consent layer, and (for the Play/TestFlight internal-testing review) `/support` plus a
-privacy policy expanded to cover the app's location permission, crash reporting, third parties,
-children and deletion, with an effective date and `support@wellapath.org` as the contact.
+analytics consent layer, the pre-launch waitlist mode, and (for the Play/TestFlight
+internal-testing review) `/support` plus a privacy policy expanded to cover the app's location
+permission, crash reporting, third parties, children and deletion, with an effective date and
+`support@wellapath.org` as the contact.
 
 ---
 
 ## What is live in the repo
 
 13 page templates producing **65 pages**: 11 fixed routes, 50 condition guides and 4 segment
-pages, the last two generated from data. 63 of them are indexable and in the sitemap; `/admin/signups`
-and `/notify/thanks` are deliberately not.
+pages, the last two generated from data. 63 of them are indexable and in the sitemap once
+launched; `/admin/signups` and `/notify/thanks` are deliberately not.
+
+All of it currently sits behind the launch switch. `LAUNCHED` unset means the front door is a
+waitlist, the sitemap lists one URL, and every route outside the allowlist in
+`content/launch.ts` (`/`, `/privacy`, `/support`, the signup path, `/admin`) 307s back to `/`.
+Setting `LAUNCHED=true` in Vercel and redeploying opens the full site; that is the whole launch
+operation. The default is closed, which is the safe direction for the mistake of a missing
+variable.
+
+### Store testing
+
+Internal testing on Google Play and Apple TestFlight is being set up against the closed site.
+PR #1 (merged 12 September) added `/support` and rewrote `/privacy` for store review, with the
+app's data practices confirmed by the team before merge. Both URLs were verified after deploy:
+public, HTTPS, no sign-in, no redirect. The Play Console gets
+`https://wellapath.org/privacy` as the privacy policy URL and `support@wellapath.org` as the
+support email.
 
 | Area | State |
 |---|---|
-| Marketing pages | `/`, `/how-it-works`, `/coverage`, `/clinical-safety`, `/about`, `/partners`, `/privacy`, `/support` |
+| Marketing pages | `/`, `/how-it-works`, `/coverage`, `/clinical-safety`, `/about`, `/partners`, `/privacy`, `/support` (only the front door, `/privacy` and `/support` answer while closed) |
 | Segment pages | `/for/households`, `/for/health-facilities`, `/for/clinicians`, `/for/public-health` |
 | Conditions | `/conditions` + 50 guides, filterable by urgency and season without JavaScript |
 | Signup | Email **or** WhatsApp, either alone. Postgres is the source of truth, Resend is the mail copy |
@@ -59,7 +78,8 @@ and `/notify/thanks` are deliberately not.
 
 ## Measured, not estimated
 
-Re-measured on the built site on 2 August 2026.
+Re-measured on the built site on 2 August 2026, except `/support` (113 kB first load, within
+budget) and the sitemap counts, measured 12 September.
 
 | | Figure | Budget |
 |---|---|---|
@@ -68,7 +88,7 @@ Re-measured on the built site on 2 August 2026.
 | Heaviest route | `/how-it-works`, 115 kB | 120 kB |
 | Home page height @360px | 16,705 px | was 18,162 |
 | Home page height @820px | 11,358 px | was 13,403 |
-| Sitemap | 63 URLs | every indexable route |
+| Sitemap | 63 URLs launched, 1 while closed | every indexable route |
 
 111 kB of the 116 kB is React and the Next runtime. Our own code is under a kilobyte per route.
 
@@ -76,12 +96,16 @@ Re-measured on the built site on 2 August 2026.
 
 ## The checks
 
-`npm run check` runs all five against a built server on `:3737`. All five pass.
+`npm run check` runs all five against a built server on `:3737`. All five pass, in both modes.
+
+The suite is launch-aware: while the site is closed it checks only the routes that answer (70
+checks over 5 routes) and prints that it did, so a green run never claims more than it verified.
+The full run needs `LAUNCHED=true npm run build && LAUNCHED=true npm run check`.
 
 | Check | Asserts |
 |---|---|
 | `check:phone` | 13 written forms of one Nigerian number normalise identically; 8 invalid ones refused |
-| `check:copy` | 252 checks over 18 routes: banned words, the disclaimer, 112, one h1, landmarks, alt text, no em-dashes |
+| `check:copy` | 252 checks over 18 routes (launched): banned words, the disclaimer, 112, one h1, landmarks, alt text, no em-dashes |
 | `check:layout` | Overflow, 48px targets, font floors, focus, 200% zoom, reduced motion at 320/360/390/430/768/820, plus the mobile menu at each |
 | `check:seo` | Canonical, title and description length, share card, one h1, schema parses, sitemap completeness, `sameAs` matches the footer |
 | `check:analytics` | Nothing reaches Google before consent, nothing from a condition page ever, banner buttons of equal weight |
@@ -107,6 +131,7 @@ Needs: a named clinician to read `content/red-flag-labels.ts` and sign off. Noth
 ### 2. Environment variables on Vercel
 
 Set, then redeploy — Vercel only applies variables to deployments created after they are added.
+States below were last verified 3 August, except `LAUNCHED`.
 
 | Variable | State |
 |---|---|
@@ -115,6 +140,7 @@ Set, then redeploy — Vercel only applies variables to deployments created afte
 | `RESEND_AUDIENCE_ID` | `c838d74a-bfca-47da-b936-ae3435c97292` |
 | `ADMIN_USER`, `ADMIN_PASSWORD` | Gate `/admin/signups`. Missing means the route denies everything, which is the safe failure |
 | `ALLOW_UNREVIEWED_RED_FLAGS` | `true` while item 1 is open |
+| `LAUNCHED` | **Unset, deliberately.** The site stays a waitlist until it is `true`; setting it and redeploying is the whole launch operation |
 
 ### 3. Not yet done
 
@@ -157,6 +183,16 @@ Carried from `PLAN.md` §7, with what has since been settled.
 - *Cookie banner?* — `PLAN.md` §5 lists one as deliberately out of scope, on the grounds that there
   were no cookies to consent to. That changed when GA4 was added on 2 August. The banner exists,
   it is opt-in, and it appears only where analytics may run.
+- *What may the privacy policy claim about the app?* — confirmed by the team on 12 September:
+  facility sorting by distance happens on-device and precise location is never transmitted; the
+  assessment works with location permission declined; there is no account or sign-in, so
+  uninstalling removes everything the app stored. Sentry ships as a dependency but disabled: no
+  DSN, telemetry off, nothing sent. The policy says exactly that, and must be updated before
+  Sentry is ever activated. Do not claim the app ships without Sentry.
+- *Support contact and response time* — `support@wellapath.org` is approved as the privacy and
+  support contact. It is not a named Data Protection Officer and must not be described as one
+  until someone is formally appointed. The published line is "we aim to respond within two
+  working days", deliberately an aim rather than a guarantee.
 
 ---
 

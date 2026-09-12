@@ -1,6 +1,6 @@
 # Progress
 
-Where the build actually stands, as of **3 August 2026**.
+Where the build actually stands, as of **12 September 2026**.
 
 `PLAN.md` is the plan and does not change much. This file is the status, and changes every time
 something ships. If the two disagree, this one is right about what exists and `PLAN.md` is right
@@ -32,20 +32,22 @@ Against the build order in `PLAN.md` §5.
 | 8. Hardening | **Mostly done** | Copy, layout, a11y, SEO and consent all run as CI checks. Not yet run on a real Android over 3G |
 
 Added since the plan was written, because they were asked for rather than foreseen: the four
-`/for/*` segment pages, the WhatsApp signup channel, the `/admin/signups` dashboard, and the
-analytics consent layer.
+`/for/*` segment pages, the WhatsApp signup channel, the `/admin/signups` dashboard, the
+analytics consent layer, and (for the Play/TestFlight internal-testing review) `/support` plus a
+privacy policy expanded to cover the app's location permission, crash reporting, third parties,
+children and deletion, with an effective date and `support@wellapath.org` as the contact.
 
 ---
 
 ## What is live in the repo
 
-12 page templates producing **64 pages**: 10 fixed routes, 50 condition guides and 4 segment
-pages, the last two generated from data. 62 of them are indexable and in the sitemap; `/admin/signups`
+13 page templates producing **65 pages**: 11 fixed routes, 50 condition guides and 4 segment
+pages, the last two generated from data. 63 of them are indexable and in the sitemap; `/admin/signups`
 and `/notify/thanks` are deliberately not.
 
 | Area | State |
 |---|---|
-| Marketing pages | `/`, `/how-it-works`, `/coverage`, `/clinical-safety`, `/about`, `/partners`, `/privacy` |
+| Marketing pages | `/`, `/how-it-works`, `/coverage`, `/clinical-safety`, `/about`, `/partners`, `/privacy`, `/support` |
 | Segment pages | `/for/households`, `/for/health-facilities`, `/for/clinicians`, `/for/public-health` |
 | Conditions | `/conditions` + 50 guides, filterable by urgency and season without JavaScript |
 | Signup | Email **or** WhatsApp, either alone. Postgres is the source of truth, Resend is the mail copy |
@@ -66,7 +68,7 @@ Re-measured on the built site on 2 August 2026.
 | Heaviest route | `/how-it-works`, 115 kB | 120 kB |
 | Home page height @360px | 16,705 px | was 18,162 |
 | Home page height @820px | 11,358 px | was 13,403 |
-| Sitemap | 62 URLs | every indexable route |
+| Sitemap | 63 URLs | every indexable route |
 
 111 kB of the 116 kB is React and the Next runtime. Our own code is under a kilobyte per route.
 
@@ -79,7 +81,7 @@ Re-measured on the built site on 2 August 2026.
 | Check | Asserts |
 |---|---|
 | `check:phone` | 13 written forms of one Nigerian number normalise identically; 8 invalid ones refused |
-| `check:copy` | 238 checks over 17 routes: banned words, the disclaimer, 112, one h1, landmarks, alt text, no em-dashes |
+| `check:copy` | 252 checks over 18 routes: banned words, the disclaimer, 112, one h1, landmarks, alt text, no em-dashes |
 | `check:layout` | Overflow, 48px targets, font floors, focus, 200% zoom, reduced motion at 320/360/390/430/768/820, plus the mobile menu at each |
 | `check:seo` | Canonical, title and description length, share card, one h1, schema parses, sitemap completeness, `sameAs` matches the footer |
 | `check:analytics` | Nothing reaches Google before consent, nothing from a condition page ever, banner buttons of equal weight |
@@ -136,8 +138,10 @@ Carried from `PLAN.md` §7, with what has since been settled.
    `content/urgency.ts`, but it changes the published "3 urgency levels" receipt.
 3. **Confirm 112 per state.** The app publishes 112 and the site matches, so this is verification
    rather than a blocker. Lagos runs its own line.
-4. **A named data protection contact.** `/privacy` promises one will be published before launch, and
-   the Organization schema has no `contactPoint` for the same reason.
+4. **A named data protection contact.** `/privacy` now publishes `support@wellapath.org` as the
+   contact for data requests, which satisfies the store-review requirement, but the promise of a
+   *named* person before public launch stands, and the Organization schema still has no
+   `contactPoint` until there is one.
 5. **Should the launch signup send a confirmation email?** Double opt-in is a stronger NDPR
    position, but the copy currently reads "One email, at launch. Nothing else, ever." The copy would
    have to change first.

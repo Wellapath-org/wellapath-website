@@ -55,6 +55,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/partners',
     '/about',
     '/privacy',
+    '/support',
     ...SEGMENT_SLUGS.map((s) => `/for/${s}`),
   ]
 

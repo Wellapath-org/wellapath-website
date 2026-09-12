@@ -44,6 +44,18 @@ export const EMERGENCY = {
   needsVerification: true,
 } as const
 
+/**
+ * Support contact.
+ *
+ * One address for everything: bugs, wrong facility details, privacy requests.
+ * The response-time promise is published on /support and in /privacy, so it
+ * lives here once rather than drifting apart across pages.
+ */
+export const SUPPORT = {
+  email: 'support@wellapath.org',
+  responseTime: 'two working days',
+} as const
+
 export const COVERAGE = {
   states: [
     { name: 'Lagos', count: RECEIPTS.byState.Lagos },
@@ -170,6 +182,7 @@ export const MENU: {
         heading: 'Talk to us',
         links: [
           { href: '/partners', label: 'Book a conversation' },
+          { href: '/support', label: 'Support' },
           { href: '/about', label: 'About WellaPath' },
         ],
       },
@@ -235,6 +248,7 @@ export const FOOTER_GROUPS = [
       links: [
         { href: '/about', label: 'About WellaPath' },
         { href: '/about#team', label: 'The team' },
+        { href: '/support', label: 'Support' },
       ],
     },
   },

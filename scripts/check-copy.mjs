@@ -24,6 +24,7 @@ const ROUTES = [
   '/for/clinicians',
   '/for/public-health',
   '/privacy',
+  '/support',
   '/clinical-safety',
   '/partners',
   '/about',

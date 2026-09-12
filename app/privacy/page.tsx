@@ -2,6 +2,13 @@ import type { Metadata } from 'next'
 import { PageHeader, Section, SectionHeader, Card, Prose } from '@/components/ui'
 import { AnalyticsChoice } from '@/components/analytics'
 import { PrivacyDiagram, Disclaimer } from '@/components/clinical'
+import { SUPPORT } from '@/content/site'
+
+/**
+ * The date the policy speaks from. One constant, because it appears twice on
+ * the page and the two copies must never disagree.
+ */
+const EFFECTIVE = '12 September 2026'
 
 export const metadata: Metadata = {
   title: 'Privacy',
@@ -30,6 +37,11 @@ export default function PrivacyPage() {
               That means we cannot show you your history across devices, and we cannot recover an
               assessment if you lose your phone. We think that is the right trade.
             </p>
+            <p className="text-small text-ink-mute">
+              Effective {EFFECTIVE}. This policy covers the WellaPath app and this website,
+              wellapath.org. Questions and requests:{' '}
+              <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a>.
+            </p>
           </Prose>
           <div className="flex justify-center">
             <PrivacyDiagram />
@@ -37,7 +49,9 @@ export default function PrivacyPage() {
         </div>
       </Section>
 
-      <Section tone="sunk">
+      {/* id="collect": the footer has linked to /privacy#collect since the
+          Legal column existed; the anchor now actually exists. */}
+      <Section tone="sunk" id="collect">
         <SectionHeader lead="The short version" />
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-7">
@@ -88,6 +102,67 @@ export default function PrivacyPage() {
 
       <Section tone="ground">
         <SectionHeader
+          lead="The app, in detail"
+          rest="What each permission is for, and what happens when things go wrong."
+        />
+        <Prose wide>
+          <p>
+            <strong>Location permission.</strong> The app asks for location permission for one
+            purpose: to sort the facility directory by distance, so the nearest facility that can
+            treat the situation is at the top of the list. The sorting happens on your phone,
+            against a directory the app has already downloaded. Your precise location is never sent
+            to us and never stored by us. You can decline the permission; the symptom assessment
+            does not need it.
+          </p>
+          <p>
+            <strong>What stays on the device.</strong> Your symptom answers, your assessment
+            results and your precise location remain on your phone. They are not uploaded and not
+            backed up to our servers, and we cannot see them. This is not a policy choice we could
+            quietly reverse later: the app has no code path that transmits them.
+          </p>
+          <p>
+            <strong>Crash reporting.</strong> If the app crashes, Apple and Google collect a crash
+            report when your device settings allow it, and pass it to us through their developer
+            consoles. During testing on TestFlight and Google Play, this is how we learn a build is
+            failing. A crash report describes the state of the code, not what was typed into it: it
+            carries no symptom answers and no location. The app ships no third-party crash or
+            analytics kit of its own.
+          </p>
+          <p>
+            <strong>Third-party services.</strong> For this website: Vercel hosts it, Neon holds
+            the launch-list database, Resend sends the one launch email, and Google Analytics runs
+            only for visitors who opt in, as described below. For the app: Apple and Google
+            distribute it and handle crash reports as above. None of these companies receives
+            symptom data, because symptom data never leaves your phone.
+          </p>
+          <p>
+            <strong>Sharing.</strong> We do not sell personal data, and we do not share it with
+            anyone beyond the providers named above, who process it on our instructions. There is
+            no advertising on the app or the site, and no data goes to advertisers.
+          </p>
+          <p>
+            <strong>Security.</strong> Everything between your phone or browser and our servers
+            travels over HTTPS. The launch list lives in one database, and access to it is
+            password-protected and limited. The strongest protection sits upstream of all of this:
+            the most sensitive data never reaches us, so no breach of ours could expose it.
+          </p>
+          <p>
+            <strong>Children.</strong> WellaPath is written for adults. A parent or carer can use
+            it to check a child&rsquo;s symptoms, which is why the age questions exist, and those
+            answers stay on the phone like everything else. We do not knowingly collect personal
+            data from anyone under 18; the only personal data we collect at all is an email address
+            or WhatsApp number, typed into the launch form by the person it belongs to.
+          </p>
+          <p>
+            <strong>Deletion.</strong> Delete the app and everything it stored goes with it,
+            because it was stored nowhere else; there is no account to close. For anything held by
+            us, one email to <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a> removes it.
+          </p>
+        </Prose>
+      </Section>
+
+      <Section tone="sunk">
+        <SectionHeader
           eyebrow="NDPR"
           lead="Nigeria Data Protection Regulation"
           rest="Our obligations under the NDPR, stated plainly."
@@ -134,8 +209,10 @@ export default function PrivacyPage() {
             is no path for that data to reach us, let alone them.
           </p>
           <p>
-            <strong>Contact for data requests.</strong> A named data protection contact will be
-            published here before launch.
+            <strong>Contact for data requests.</strong> Email{' '}
+            <a href={`mailto:${SUPPORT.email}`}>{SUPPORT.email}</a> and expect an answer within{' '}
+            {SUPPORT.responseTime}. A named data protection contact will be published here before
+            public launch.
           </p>
         </Prose>
 
@@ -148,11 +225,11 @@ export default function PrivacyPage() {
         </div>
 
         <div className="mt-10 rounded-xl bg-accent-wash ring ring-accent/15 p-6">
-          <h2 className="text-h3 font-bold text-ink">Full legal text</h2>
+          <h2 className="text-h3 font-bold text-ink">This document is the policy</h2>
           <p className="text-body measure mt-2 text-ink-soft">
-            The formal privacy policy is being finalised with counsel and will be published here
-            before launch. It will not contradict anything above. The plain-language summary is the
-            binding description of what we do.
+            This plain-language text is WellaPath&rsquo;s privacy policy, effective {EFFECTIVE},
+            and the binding description of what we do. When our practices change, this page and its
+            date change with them, before the practice does.
           </p>
         </div>
 

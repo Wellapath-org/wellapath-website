@@ -32,6 +32,7 @@ const ROUTES = [
   '/partners',
   '/about',
   '/privacy',
+  '/support',
   '/for/households',
   '/for/health-facilities',
   '/for/clinicians',

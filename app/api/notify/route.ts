@@ -31,7 +31,7 @@
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { Resend } from 'resend'
-import { parseNigerianMobile } from '@/content/phone'
+import { parseMobile } from '@/content/phone'
 import { saveSignup, dbConfigured } from '@/content/db'
 
 export const runtime = 'nodejs'
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
   let whatsapp: string | null = null
   if (phoneGiven) {
-    const parsed = parseNigerianMobile(whatsappRaw)
+    const parsed = parseMobile(whatsappRaw)
     if (!parsed.ok) return back(req, { status: 'invalid-phone' })
     whatsapp = parsed.e164
   }

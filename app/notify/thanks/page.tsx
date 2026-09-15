@@ -44,8 +44,8 @@ const COPY: Record<Status, { eyebrow: string; lead: string; rest: string; fix: s
   },
   'invalid-phone': {
     eyebrow: 'Check the number',
-    lead: 'That did not look like a Nigerian mobile number.',
-    rest: 'We accept 0803 123 4567, +234 803 123 4567, and anything close.',
+    lead: 'That did not look like a mobile number.',
+    rest: 'We accept 0803 123 4567, +234 803 123 4567, and anything close. From outside Nigeria, start with your country code, like +44 or +1.',
     fix: 'Nothing was saved. Head back and check the digits. Spaces and brackets are fine.',
   },
   error: {

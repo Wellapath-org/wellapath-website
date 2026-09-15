@@ -557,7 +557,8 @@ export function GetTheApp({
             className="mt-2 min-h-12 w-full rounded-md bg-card px-4 text-body text-ink ring ring-field-border placeholder:text-ink-mute focus:ring-2 focus:ring-accent-ink"
           />
           <p id={`${id}-whatsapp-help`} className="text-small mt-2 text-ink-mute">
-            Nigerian mobile numbers. Any format is fine.
+            Any country. Nigerian numbers work in any format; from elsewhere, start with your
+            country code, like +44 or +1.
           </p>
 
           <div className="mt-6">

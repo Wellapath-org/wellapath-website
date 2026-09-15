@@ -104,7 +104,7 @@ The full run needs `LAUNCHED=true npm run build && LAUNCHED=true npm run check`.
 
 | Check | Asserts |
 |---|---|
-| `check:phone` | 13 written forms of one Nigerian number normalise identically; 8 invalid ones refused |
+| `check:phone` | 13 written forms of one Nigerian number normalise identically; 6 international numbers (+44, +1, 00…) accepted; 12 invalid ones refused |
 | `check:copy` | 252 checks over 18 routes (launched): banned words, the disclaimer, 112, one h1, landmarks, alt text, no em-dashes |
 | `check:layout` | Overflow, 48px targets, font floors, focus, 200% zoom, reduced motion at 320/360/390/430/768/820, plus the mobile menu at each |
 | `check:seo` | Canonical, title and description length, share card, one h1, schema parses, sitemap completeness, `sameAs` matches the footer |

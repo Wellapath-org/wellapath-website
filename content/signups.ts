@@ -76,7 +76,7 @@ function parseResendDate(value: string): Date {
 export type Signup = {
   id: string
   email: string | null
-  /** E.164, +234XXXXXXXXXX. Null when the person signed up by email only. */
+  /** E.164, +234XXXXXXXXXX or another country's code. Null when the person signed up by email only. */
   whatsapp: string | null
   /** 0803 123 4567. Null when there is no number. */
   whatsappDisplay: string | null

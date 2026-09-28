@@ -16,53 +16,35 @@ export default function DistributionPage() {
   const now = new Date()
 
   const android: LabelledFact[] = [
+    { label: '211 · track state', ...aged(MANUAL_FACTS.android211Track, now) },
+    { label: '211 · internal testers', ...aged(MANUAL_FACTS.android211Testers, now) },
     {
-      label: 'Version and build',
+      label: '215 · artifact',
       state: 'manual',
-      value: '0.3.0 (215)',
-      observedBy: 'Engineering',
-      observedAt: '2026-09-25',
-      source: 'Mobile repository build registry',
-      note: MOBILE_BUILD_NOTE,
-    },
-    {
-      label: 'Artifact verification',
-      state: 'manual',
-      value: 'Signed and verified, not uploaded',
+      value: '0.3.0 (215), signed and verified',
       observedBy: 'Engineering',
       observedAt: '2026-09-25',
       source: 'Mobile release record',
-      note: 'Signature verified, certificate matches the established upload key, bundle validation passed. Upload is a separate console action.',
+      note: `Signature verified, certificate matches the established upload key, bundle validation passed. ${MOBILE_BUILD_NOTE}`,
     },
-    { label: 'Uploaded to internal testing', ...aged(MANUAL_FACTS.android215Uploaded, now) },
-    { label: 'Internal testing availability', ...aged(MANUAL_FACTS.androidTesters, now) },
-    { label: 'Previous build on the track', ...aged(MANUAL_FACTS.android211Live, now) },
+    { label: '215 · track state', ...aged(MANUAL_FACTS.android215Track, now) },
+    { label: '215 · internal testers', ...aged(MANUAL_FACTS.android215Testers, now) },
     { label: 'App signing enrolment prompt', ...aged(MANUAL_FACTS.playAppSigningPrompt, now) },
   ]
 
   const ios: LabelledFact[] = [
+    { label: '211 · TestFlight availability', ...aged(MANUAL_FACTS.ios211Track, now) },
     {
-      label: 'Version and build',
+      label: '215 · artifact',
       state: 'manual',
-      value: '0.3.0 (215)',
-      observedBy: 'Engineering',
-      observedAt: '2026-09-25',
-      source: 'Mobile repository build registry',
-      note: MOBILE_BUILD_NOTE,
-    },
-    {
-      label: 'Artifact verification',
-      state: 'manual',
-      value: 'Signed, verified and uploaded',
+      value: '0.3.0 (215), signed and uploaded',
       observedBy: 'Engineering',
       observedAt: '2026-09-25',
       source: 'Mobile release record',
-      note: 'Exported as internal-testing-only, which bars external testing and beta review for this build by construction rather than by policy.',
+      note: `Exported internal-only, which bars external testing and beta review for this build by construction. The upload call returned success; that is not the same as availability. ${MOBILE_BUILD_NOTE}`,
     },
-    { label: 'Processing outcome', ...aged(MANUAL_FACTS.iosProcessing, now) },
-    { label: 'Visible in TestFlight', ...aged(MANUAL_FACTS.iosBuildVisible, now) },
-    { label: 'Internal testing availability', ...aged(MANUAL_FACTS.iosTesters, now) },
-    { label: 'Previous build still available', ...aged(MANUAL_FACTS.ios211Available, now) },
+    { label: '215 · processing outcome', ...aged(MANUAL_FACTS.ios215Track, now) },
+    { label: '215 · internal testers', ...aged(MANUAL_FACTS.ios215Testers, now) },
   ]
 
   return (

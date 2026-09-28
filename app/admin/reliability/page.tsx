@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
-import { FactPanel } from '@/components/admin'
+import { AdminHeader, FactPanel } from '@/components/admin'
 import type { LabelledFact } from '@/content/admin/facts'
 
 export const dynamic = 'force-dynamic'
@@ -61,34 +60,30 @@ export default function ReliabilityPage() {
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="Reliability."
-          rest="Crash diagnostics for engineering. Not product analytics."
-          className="mt-4"
+      <div>
+        <AdminHeader
+          title="Reliability"
+          summary="Crash diagnostics for engineering. Not product analytics."
         />
-        <Card className="mt-8 p-6" edge="ring" tone="sunk">
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-small text-ink-soft">
             This is engineering diagnostics: stack traces, sanitised, for finding faults. It is a
             different subsystem from Product Insights, with different data, separate switches and a
             separate approval. The two are deliberately never combined on one page.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
 
-      <Section tone="sunk" space="tight">
-        <div className="max-w-[720px]">
+      <div className="mt-5">
+        <div>
           <FactPanel title="Crash diagnostics" facts={sentry}>
             Disabled in the current build and every build so far.
           </FactPanel>
         </div>
-      </Section>
+      </div>
 
-      <Section tone="ground" space="tight">
-        <Card className="p-6" edge="ring">
+      <div>
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-body font-semibold text-ink">Why there are no numbers here.</p>
           <p className="text-body mt-2 text-ink-soft">
             Nothing is sending, so there is nothing to count. A zero in these rows would say the
@@ -100,8 +95,8 @@ export default function ReliabilityPage() {
             store privacy declarations in the same release, cleanup of the older keys, and a final
             production diff. It is not a switch.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
     </>
   )
 }

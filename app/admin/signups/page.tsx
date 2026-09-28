@@ -20,7 +20,8 @@
  *  - The table below is the accessible view of the same data, not an extra.
  */
 import type { Metadata } from 'next'
-import { Section, Eyebrow, TwoTone, Stat, StatRow, Button, Card } from '@/components/ui'
+import { Stat, StatRow, Button, Card } from '@/components/ui'
+import { AdminHeader, ScrollableTable } from '@/components/admin'
 import { getSignups } from '@/content/signups'
 import { csvDocument } from '@/content/csv'
 import { TriangleAlert, Download } from 'lucide-react'
@@ -50,16 +51,12 @@ export default async function SignupsPage() {
 
   if (!r.ok) {
     return (
-      <Section tone="ground" space="normal">
-        <Eyebrow>Launch signups</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="Cannot reach the signup list."
-          rest="The site itself is unaffected."
-          className="mt-4"
+      <div className="mt-6">
+        <AdminHeader
+          title="Waitlist"
+          summary="Cannot reach the signup list. The site itself is unaffected."
         />
-        <Card className="mt-8 p-6">
+        <Card className="mt-5 p-5">
           <p className="text-body flex items-start gap-3 text-ink">
             <TriangleAlert className="mt-1 size-5 shrink-0 text-triage-warn" aria-hidden="true" />
             <span>{r.error}</span>
@@ -77,7 +74,7 @@ export default async function SignupsPage() {
             meanwhile, so nothing is being lost.
           </p>
         </Card>
-      </Section>
+      </div>
     )
   }
 
@@ -105,22 +102,18 @@ export default async function SignupsPage() {
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="Launch signups."
-          rest={
+      <div>
+        <AdminHeader
+          title="Waitlist"
+          summary={
             r.whatsappOnly > 0
-              ? `${r.whatsappOnly} of them are reachable only on WhatsApp.`
-              : 'Email and WhatsApp, in one list.'
+              ? `Launch signups. ${r.whatsappOnly} are reachable only on WhatsApp.`
+              : 'Launch signups. Email and WhatsApp, in one list.'
           }
-          className="mt-4"
         />
 
         {r.warnings.length > 0 && (
-          <Card className="mt-8 p-6">
+          <Card className="mt-5 p-5">
             <p className="text-body flex items-start gap-3 font-semibold text-ink">
               <TriangleAlert className="mt-0.5 size-5 shrink-0 text-triage-warn" aria-hidden="true" />
               <span>The numbers below are real, but one part of the setup is incomplete.</span>
@@ -141,10 +134,10 @@ export default async function SignupsPage() {
             <Stat value={r.last7d} label="In the last 7 days" />
           </StatRow>
         </div>
-      </Section>
+      </div>
 
       {/* ── Signups per day ─────────────────────────────────────────────── */}
-      <Section tone="sunk" space="tight">
+      <div className="mt-6">
         <h2 className="text-h2 font-bold text-ink">Signups per day, by channel</h2>
         <p className="text-small mt-2 text-ink-mute">
           Last 30 days. Days with no signups are shown as gaps, not skipped. Anyone who gave a
@@ -210,10 +203,10 @@ export default async function SignupsPage() {
             </>
           )}
         </Card>
-      </Section>
+      </div>
 
       {/* ── The list ────────────────────────────────────────────────────── */}
-      <Section tone="ground" space="tight">
+      <div>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-h2 font-bold text-ink">Every signup</h2>
@@ -233,16 +226,16 @@ export default async function SignupsPage() {
           )}
         </div>
 
-        <div className="mt-6 w-full min-w-0 overflow-x-auto">
-          <table className="w-full border-collapse text-body">
+        <ScrollableTable label="The signup table">
+          <table className="text-small w-full min-w-[640px] border-collapse">
             <caption className="sr-only">
               Every launch signup, newest first, with the contact routes given and the date received.
             </caption>
             <thead>
-              <tr className="border-b-2 border-ink text-left">
-                <th scope="col" className="pb-3 font-semibold text-ink">Email</th>
-                <th scope="col" className="pb-3 font-semibold text-ink">WhatsApp</th>
-                <th scope="col" className="pb-3 font-semibold text-ink">Received</th>
+              <tr className="border-b border-ink text-left">
+                <th scope="col" className="pb-2 font-semibold text-ink">Email</th>
+                <th scope="col" className="pb-2 font-semibold text-ink">WhatsApp</th>
+                <th scope="col" className="pb-2 font-semibold text-ink">Received</th>
                 <th scope="col" className="pb-3 text-right font-semibold text-ink">Status</th>
               </tr>
             </thead>
@@ -277,7 +270,7 @@ export default async function SignupsPage() {
               )}
             </tbody>
           </table>
-        </div>
+        </ScrollableTable>
 
         <p className="text-small measure-wide mt-8 text-ink-mute">
           Under the NDPR these details are held on the basis of consent given at signup.{' '}
@@ -287,7 +280,7 @@ export default async function SignupsPage() {
           , and to deleting any single entry on request. That promise is only true if someone
           actually does it.
         </p>
-      </Section>
+      </div>
     </>
   )
 }

@@ -28,7 +28,7 @@
  * It expects a production server already running with the same credentials
  * this process has in its environment. `npm run check:admin` handles that.
  */
-import { ADMIN_SECTIONS } from '../content/admin/sections.ts'
+import { ADMIN_SECTIONS, ADMIN_GROUPS } from '../content/admin/sections.ts'
 import { csvField, csvDocument, defuseFormula } from '../content/csv.ts'
 import { aged, factText, panelKind } from '../content/admin/facts.ts'
 import {
@@ -223,14 +223,13 @@ function checkNoFalseZeros(pages) {
 function checkHonestSections(pages) {
   console.log('\nInactive and disabled sections are labelled as such')
 
-  assert(
-    pages['/admin/feedback'].includes('is not active'),
-    '/admin/feedback renders as inactive',
-  )
-  assert(
-    pages['/admin/support'].includes('is not active'),
-    '/admin/support renders as inactive',
-  )
+  for (const route of ['/admin/feedback', '/admin/support']) {
+    assert(
+      pages[route].includes('Not active. Nothing is collected.'),
+      `${route} renders as inactive`,
+    )
+    assert(pages[route].includes('Disabled'), `${route} labels the state Disabled`)
+  }
   assert(
     pages['/admin/reliability'].includes('Disabled'),
     '/admin/reliability reports crash reporting as disabled',
@@ -514,6 +513,173 @@ function checkFactModel() {
   assert(panelKind([]) === 'incomplete', 'an empty panel is never Live')
 }
 
+/* ────────────────────────────────────────────────────────────────────────
+ * 10. The admin shell is an admin shell, not the marketing site
+ * ──────────────────────────────────────────────────────────────────────── */
+function checkShell(pages) {
+  console.log('\nThe admin shell is separate from the marketing site')
+
+  // Markers that only the public chrome renders. If any appears under /admin,
+  // the root layout has started inheriting the website again.
+  const MARKETING = [
+    'Join waitlist',
+    'In an emergency, do not use an app',
+    'Built for Nigerians',
+    'id="site-nav"',
+  ]
+
+  for (const section of ADMIN_SECTIONS) {
+    const html = pages[section.href]
+
+    for (const marker of MARKETING) {
+      assert(!html.includes(marker), `${section.href} does not render "${marker}"`)
+    }
+
+    // The admin navigation is present, and is the admin one.
+    assert(
+      html.includes('aria-label="Admin sections"'),
+      `${section.href} renders the admin navigation`,
+    )
+    for (const group of ADMIN_GROUPS) {
+      assert(html.includes(group), `${section.href} navigation shows the ${group} group`)
+    }
+
+    // The navigation renders twice, once for the phone disclosure and once
+    // for the desktop sidebar, with CSS showing one. So the active marker
+    // appears once per instance, and both must point at this section.
+    const current = (html.match(/aria-current="page"/g) ?? []).length
+    assert(current === 2, `${section.href} marks the active item in both navs`, `found ${current}`)
+    const activeHref = new RegExp(
+      `href="${section.href.replace('/', '\\/')}"[^>]*aria-current="page"`,
+    )
+    assert(activeHref.test(html), `${section.href} marks itself active, not another section`)
+
+    // Every section is reachable from every other.
+    for (const other of ADMIN_SECTIONS) {
+      assert(
+        html.includes(`href="${other.href}"`),
+        `${section.href} links to ${other.href}`,
+      )
+    }
+
+    // One h1, and it is the compact page title rather than a display headline.
+    const h1s = (html.match(/<h1/g) ?? []).length
+    assert(h1s === 1, `${section.href} has exactly one h1`, `found ${h1s}`)
+
+    // Still not indexed, and still says so on the page.
+    assert(html.includes('Internal · Not indexed'), `${section.href} shows the internal label`)
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 11. The first screen answers the operational questions
+ * ──────────────────────────────────────────────────────────────────────── */
+function checkFirstViewport(pages) {
+  console.log('\nThe overview leads with status, then actions')
+
+  const html = pages['/admin']
+  const at = (needle) => html.indexOf(needle)
+
+  const summary = at('aria-label="Current status"')
+  const actions = at('Next actions')
+  const gates = at('Launch gates')
+  const explainer = at('How dashboard statuses work')
+
+  assert(summary > 0, 'the status summary is present')
+  assert(actions > 0, 'the next-actions list is present')
+  assert(summary < actions, 'status comes before actions')
+  assert(actions < gates, 'actions come before the full gate table')
+  assert(explainer > gates, 'the explanation is below the data, not above it')
+
+  // The five questions, each answerable from the summary strip.
+  for (const label of [
+    'Blocked gates',
+    'Not verified',
+    'Configuration health',
+    'Android internal build',
+    'iOS internal build',
+    'Clinical review',
+  ]) {
+    assert(html.includes(label), `the summary answers "${label}"`)
+  }
+
+  // Each action row is itself a link to where it is acted on.
+  for (const action of LAUNCH_ACTIONS) {
+    assert(
+      html.includes(action.title),
+      `the action list shows "${action.title}"`,
+    )
+  }
+  // Each title is wrapped in an anchor, so the row's target is the title's
+  // full width rather than a small cell at the end of the row.
+  for (const action of LAUNCH_ACTIONS) {
+    const escaped = action.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const linked = new RegExp(`<a[^>]*href="/admin[^"]*"[^>]*>${escaped}</a>`)
+    assert(linked.test(html), `"${action.title}" is itself the link`)
+  }
+
+  // The explanation is collapsed, not occupying the first screen.
+  assert(html.includes('<details'), 'the explanation is a disclosure')
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 12. Status is legible as text, and tables say they scroll
+ * ──────────────────────────────────────────────────────────────────────── */
+function checkTextualStatus(pages) {
+  console.log('\nStatus is carried by words, and scrolling is announced')
+
+  // Provenance words, not just colour.
+  for (const word of ['MEASURED', 'FROM SOURCE', 'RECORDED', 'NO VALUE']) {
+    assert(
+      pages['/admin'].toUpperCase().includes(word),
+      `the overview states provenance in text: ${word}`,
+    )
+  }
+
+  // Every page carrying a wide table announces that it scrolls.
+  for (const route of ['/admin', '/admin/launch-readiness', '/admin/signups']) {
+    assert(
+      pages[route].includes('scrolls sideways on a narrow screen'),
+      `${route} announces its scrollable table`,
+    )
+  }
+
+  // Gate and severity states are words.
+  for (const word of ['Blocked', 'Not verified', 'Waiting', 'Ready']) {
+    assert(pages['/admin'].includes(word), `gate state "${word}" appears as text`)
+  }
+
+  // The inactive sections answer all three questions.
+  for (const route of ['/admin/feedback', '/admin/support']) {
+    for (const heading of ['Current state', 'Why there is no data', 'Before this becomes active']) {
+      assert(pages[route].includes(heading), `${route} explains: ${heading}`)
+    }
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 13. No client JavaScript was added
+ * ──────────────────────────────────────────────────────────────────────── */
+async function checkNoClientJs() {
+  console.log('\nThe admin tree ships no client JavaScript of its own')
+
+  const { readFileSync, readdirSync, statSync } = await import('node:fs')
+  const walk = (dir) =>
+    readdirSync(dir).flatMap((name) => {
+      const p = `${dir}/${name}`
+      return statSync(p).isDirectory() ? walk(p) : [p]
+    })
+
+  const sources = [...walk('app/admin'), ...walk('content/admin'), 'components/admin.tsx'].filter(
+    (p) => p.endsWith('.ts') || p.endsWith('.tsx'),
+  )
+  for (const file of sources) {
+    const src = readFileSync(file, 'utf8')
+    assert(!src.includes("'use client'"), `${file} is a server component`)
+    assert(!src.includes('useState') && !src.includes('useEffect'), `${file} uses no client hooks`)
+  }
+}
+
 /* ──────────────────────────────────────────────────────────────────────── */
 
 async function main() {
@@ -550,6 +716,10 @@ async function main() {
   checkHonestSections(pages)
   await checkIsolation(pages)
   await checkNotIndexed()
+  checkShell(pages)
+  checkFirstViewport(pages)
+  checkTextualStatus(pages)
+  await checkNoClientJs()
 
   console.log(`\ncheck-admin: ${checks} checks, ${failures} failed`)
   if (failures > 0) process.exit(1)

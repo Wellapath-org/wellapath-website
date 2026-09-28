@@ -17,20 +17,20 @@ export const ADMIN_SECTIONS: readonly AdminSection[] = [
   { href: '/admin/signups', label: 'Waitlist', blurb: 'Launch signups. Personal data.' },
   {
     href: '/admin/launch-readiness',
-    label: 'Launch Readiness',
+    label: 'Launch readiness',
     blurb: 'The gates between here and a public launch.',
   },
   {
     href: '/admin/distribution',
-    label: 'App Distribution',
+    label: 'App distribution',
     blurb: 'Android and iOS builds, tracked separately.',
   },
   {
     href: '/admin/system-health',
-    label: 'System Health',
+    label: 'System health',
     blurb: 'Production configuration, measured.',
   },
-  { href: '/admin/data', label: 'Facilities / Data', blurb: 'Clinical artifacts and coverage.' },
+  { href: '/admin/data', label: 'Facilities and data', blurb: 'Clinical artifacts and coverage.' },
   { href: '/admin/feedback', label: 'Feedback', blurb: 'Not active.' },
   { href: '/admin/support', label: 'Support', blurb: 'Not active.' },
   {
@@ -40,7 +40,7 @@ export const ADMIN_SECTIONS: readonly AdminSection[] = [
   },
   {
     href: '/admin/product-insights',
-    label: 'Product Insights',
+    label: 'Product insights',
     blurb: 'Product analytics. Separate from crash diagnostics.',
   },
 ] as const

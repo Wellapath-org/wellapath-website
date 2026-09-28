@@ -11,7 +11,7 @@ import { LAUNCHED } from '@/content/launch'
 import { dbConfigured } from '@/content/db'
 import { getAllConditions } from '@/content/conditions'
 import { redFlagReviewStatus } from '@/content/red-flag-labels'
-import { EXPECTED_ARTIFACTS } from './config-health'
+import { EXPECTED_ARTIFACTS } from './config-probe'
 import type { Fact, LabelledFact } from './facts'
 
 /** Presence only. The value is never read, returned or rendered. */
@@ -98,10 +98,10 @@ export function adminAuth(): LabelledFact {
   return {
     label: 'Admin authentication',
     state: 'derived',
-    value: configured ? 'Basic auth, single shared credential' : 'Not configured, denying all',
+    value: configured ? 'Configured' : 'Not configured, denying all',
     source: 'middleware.ts. Credential values are never read here.',
     note: configured
-      ? 'Accepted for founder-operated use only. A second person needs individual accounts, roles and an audit trail first: today there is no way to tell who looked at what.'
+      ? 'Accepted for founder-operated use only. Individual accounts, roles and an audit trail are required before a second person is given access.'
       : 'Every admin request is denied, which is the safe failure.',
   }
 }

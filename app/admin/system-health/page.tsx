@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 
 import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
 import { FactPanel } from '@/components/admin'
-import { EXPECTED_ARTIFACTS, getConfigHealth } from '@/content/admin/config-health'
+import { getConfigHealth } from '@/content/admin/config-health'
+import { matchesExpected } from '@/content/admin/config-probe'
 import { expectedArtifacts } from '@/content/admin/derived'
 import { observedLabel, type LabelledFact } from '@/content/admin/facts'
 
@@ -49,9 +50,7 @@ export default async function SystemHealthPage() {
     const served = Object.entries(health.artifacts)
       .map(([name, version]) => `${name} ${version}`)
       .join(' · ')
-    const asExpected = Object.entries(EXPECTED_ARTIFACTS).every(
-      ([name, version]) => health.artifacts[name] === version,
-    )
+    const asExpected = matchesExpected(health.artifacts)
     facts.push({
       label: 'Artifact versions served',
       state: 'live',

@@ -184,7 +184,7 @@ export const LAUNCH_ACTIONS: readonly LaunchAction[] = [
     owner: 'Engineering',
     severity: 'high',
     reference: 'middleware.ts',
-    note: 'Basic auth with one shared credential is accepted for founder-operated Phase 1 only. A second person needs real per-user authentication, roles and an audit trail first.',
+    note: 'Shared-credential access is accepted for founder-operated Phase 1 only. A second person needs individual authentication, roles and an audit trail first. Detail of the current control is deliberately not recorded here: this repository is public.',
   },
   {
     id: 'SEARCH-CONSOLE',

@@ -116,7 +116,13 @@ export function middleware(req: NextRequest) {
   const passOk = safeEqual(givenPass, password)
   if (!(userOk && passOk)) return deny('Authentication required.')
 
-  const res = NextResponse.next()
+  // The admin layout reads this to mark the current nav item. It is derived
+  // from the request, never from anything the client can set: the value here
+  // overwrites any inbound header of the same name.
+  const forwarded = new Headers(req.headers)
+  forwarded.set('x-pathname', pathname)
+
+  const res = NextResponse.next({ request: { headers: forwarded } })
   adminSecurityHeaders(res.headers)
   return res
 }

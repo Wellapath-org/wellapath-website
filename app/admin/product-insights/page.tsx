@@ -115,12 +115,15 @@ export default function ProductInsightsPage() {
       <div>
         <h2 className="text-body font-semibold text-ink">Metric definitions</h2>
         <p className="text-small mt-2 max-w-[68ch] text-ink-soft">
-          Each of these reads <em>Not instrumented</em> and will keep reading it until an approved
-          pipeline supplies real data. The second column is the part worth agreeing early: what
-          each number is not, so nobody reads more into it later than it can carry.
+          <strong className="font-semibold text-ink">
+            Every metric below reads Not instrumented
+          </strong>{' '}
+          and will keep reading it until an approved pipeline supplies real data. None of them is
+          a zero, because nothing is measuring. The second column is the part worth agreeing
+          early: what each number is not, so nobody reads more into it later than it can carry.
         </p>
         <div className="mt-6 w-full min-w-0 overflow-x-auto">
-          <table className="text-small w-full min-w-[720px] border-collapse">
+          <table className="text-small w-full min-w-[620px] border-collapse">
             <caption className="sr-only">
               Proposed product metrics, their definitions, and what each one does not mean
             </caption>
@@ -132,11 +135,8 @@ export default function ProductInsightsPage() {
                 <th scope="col" className="pb-2 pr-4 font-semibold text-ink">
                   Definition
                 </th>
-                <th scope="col" className="pb-2 pr-4 font-semibold text-ink">
-                  Not
-                </th>
                 <th scope="col" className="pb-2 font-semibold text-ink">
-                  Value
+                  Not
                 </th>
               </tr>
             </thead>
@@ -145,10 +145,7 @@ export default function ProductInsightsPage() {
                 <tr key={metric.name} className="border-b border-rule align-top">
                   <td className="py-2.5 pr-4 font-semibold text-ink">{metric.name}</td>
                   <td className="py-2.5 pr-4 text-ink-soft">{metric.definition}</td>
-                  <td className="text-small py-2.5 pr-4 text-ink-mute">{metric.notWhat}</td>
-                  <td className="py-2.5 font-medium whitespace-nowrap text-ink-mute italic">
-                    Not instrumented
-                  </td>
+                  <td className="py-2.5 text-ink-mute">{metric.notWhat}</td>
                 </tr>
               ))}
             </tbody>

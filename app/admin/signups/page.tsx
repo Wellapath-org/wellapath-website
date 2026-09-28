@@ -22,6 +22,7 @@
 import type { Metadata } from 'next'
 import { Section, Eyebrow, TwoTone, Stat, StatRow, Button, Card } from '@/components/ui'
 import { getSignups } from '@/content/signups'
+import { csvDocument } from '@/content/csv'
 import { TriangleAlert, Download } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -87,19 +88,20 @@ export default async function SignupsPage() {
   const H = 150
   const seg = (n: number) => (r.peakDay === 0 || n === 0 ? 0 : Math.max(4, (n / r.peakDay) * H))
 
-  const csv = [
-    'email,whatsapp,received_at,unsubscribed,source,store',
-    ...r.signups.map((s) =>
-      [
-        s.email ?? '',
-        s.whatsapp ?? '',
-        s.createdAt.toISOString(),
-        s.unsubscribed,
-        s.source ?? '',
-        s.store,
-      ].join(','),
-    ),
-  ].join('\n')
+  // Properly quoted and escaped, and defused against spreadsheet formula
+  // injection. `source` is free text from a public form, so a comma, a quote,
+  // a newline or a leading `=` in it are all things a visitor can send.
+  const csv = csvDocument(
+    ['email', 'whatsapp', 'received_at', 'unsubscribed', 'source', 'store'],
+    r.signups.map((s) => [
+      s.email ?? '',
+      s.whatsapp ?? '',
+      s.createdAt,
+      s.unsubscribed,
+      s.source ?? '',
+      s.store,
+    ]),
+  )
 
   return (
     <>

@@ -268,9 +268,10 @@ project with a real chance of breaking the marketing pages.
 ### Screenshotting the admin panel
 
 **Never capture the waitlist page against production data.** It renders real
-signup email addresses, and a local run picks up whatever credentials are in
+contact details, and a local run picks up whatever credentials are in
 `.env.local`, so an ordinary screenshot of that page is a screenshot of
-personal data.
+personal data. This is not hypothetical: it has happened once during
+development and was caught before the image went anywhere.
 
 Capture it in one of two states instead:
 

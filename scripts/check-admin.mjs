@@ -595,6 +595,7 @@ function checkFirstViewport(pages) {
   console.log('\nThe overview leads with status, then actions')
 
   const html = pages['/admin']
+  const gatesHtml = pages['/admin'] + pages['/admin/launch-readiness']
   const at = (needle) => html.indexOf(needle)
 
   const summary = at('aria-label="Current status"')
@@ -627,6 +628,18 @@ function checkFirstViewport(pages) {
   for (const forbidden of ['Android internal build', 'iOS internal build']) {
     assert(!html.includes(forbidden), `no platform-agnostic "${forbidden}" label`)
   }
+
+  // The Android gate carries a build number because Android 211 IS confirmed
+  // available on that track: an unqualified "Android internal testing — Not
+  // verified" would read as though nothing had shipped at all.
+  assert(
+    !/>Android internal testing</.test(gatesHtml),
+    'the Android gate label is qualified by build',
+  )
+  assert(
+    gatesHtml.includes('Android 215 · internal testing'),
+    'the Android gate names the build it describes',
+  )
 
   // Each action row is itself a link to where it is acted on.
   for (const action of LAUNCH_ACTIONS) {

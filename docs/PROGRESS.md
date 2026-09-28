@@ -135,7 +135,7 @@ States below were last verified 3 August, except `LAUNCHED`.
 
 | Variable | State |
 |---|---|
-| `DATABASE_URL` | **Not set.** Until it is, WhatsApp-only signups fail honestly and email-only ones still reach Resend |
+| `DATABASE_URL` | **Set.** Verified present for Production and Preview on 2026-09-28, with the Neon integration attached and available. The admin panel's derived signup-storage fact is the source of truth for this, not this table |
 | `RESEND_API_KEY` | Held locally, needs setting in Vercel |
 | `RESEND_AUDIENCE_ID` | `c838d74a-bfca-47da-b936-ae3435c97292` |
 | `ADMIN_USER`, `ADMIN_PASSWORD` | Gate `/admin/signups`. Missing means the route denies everything, which is the safe failure |
@@ -264,6 +264,26 @@ protects.
 USB, alongside the existing `no-store` and `noindex, nofollow`. Scoped to
 `/admin` deliberately: a site-wide content security policy is a separate
 project with a real chance of breaking the marketing pages.
+
+### Screenshotting the admin panel
+
+**Never capture the waitlist page against production data.** It renders real
+signup email addresses, and a local run picks up whatever credentials are in
+`.env.local`, so an ordinary screenshot of that page is a screenshot of
+personal data.
+
+Capture it in one of two states instead:
+
+- the unreachable state, by starting the server with deliberately invalid
+  Resend credentials and no Postgres URL, which is also the more useful image
+  because it shows the honest-failure path; or
+- against fictional local fixtures.
+
+Inspect every image before attaching it anywhere, including in a pull request,
+a review comment or a document. This applies to any page that can reach the
+signups table, not only the waitlist page itself.
+
+Do not commit signup data, or examples derived from it, to this repository.
 
 ### Checks
 

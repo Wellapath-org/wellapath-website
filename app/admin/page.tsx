@@ -67,8 +67,14 @@ export default async function AdminOverviewPage() {
   const unverified = gates.filter((g) => g.state === 'not-verified')
   const health = await getConfigHealth()
 
-  const android = aged(MANUAL_FACTS.android211Live, now)
-  const ios = aged(MANUAL_FACTS.iosProcessing, now)
+  // Two builds, two platforms, four separate facts. 211 is the proven
+  // soft-launch candidate; 215 is a later internal build whose console outcome
+  // nobody has checked. Collapsing them into one headline is how a dashboard
+  // starts implying a release is further along than it is.
+  const android211 = aged(MANUAL_FACTS.android211Track, now)
+  const ios211 = aged(MANUAL_FACTS.ios211Track, now)
+  const android215 = aged(MANUAL_FACTS.android215Track, now)
+  const ios215 = aged(MANUAL_FACTS.ios215Track, now)
   const clinical = aged(MANUAL_FACTS.clinicalReview, now)
 
   // The questions the first screen has to answer, in the order they are asked.
@@ -96,19 +102,31 @@ export default async function AdminOverviewPage() {
       hint: health.ok ? observedLabel(health.observedAt) : 'The probe did not complete.',
     },
     {
-      label: 'Android internal build',
-      value: factText(android),
-      state: android.state,
+      label: 'Android · build 211',
+      value: factText(android211),
+      state: android211.state,
       hint:
-        android.state === 'manual'
-          ? `${android.observedBy}, ${android.observedAt.slice(0, 10)}`
+        android211.state === 'manual'
+          ? `Play Console, ${android211.observedBy}, ${android211.observedAt.slice(0, 10)}`
           : undefined,
     },
     {
-      label: 'iOS internal build',
-      value: factText(ios),
-      state: ios.state,
-      hint: 'Upload succeeded; the processing outcome is unobserved.',
+      label: 'iOS · build 211',
+      value: factText(ios211),
+      state: ios211.state,
+      hint: 'Uploaded 2026-09-21; availability never confirmed.',
+    },
+    {
+      label: 'Android · build 215',
+      value: factText(android215),
+      state: android215.state,
+      hint: 'A signed artifact exists; upload unconfirmed.',
+    },
+    {
+      label: 'iOS · build 215',
+      value: factText(ios215),
+      state: ios215.state,
+      hint: 'Upload returned success; processing unconfirmed.',
     },
     {
       label: 'Clinical review',
@@ -123,10 +141,10 @@ export default async function AdminOverviewPage() {
   )
 
   const build: LabelledFact[] = [
-    { label: 'Android 215 uploaded', ...aged(MANUAL_FACTS.android215Uploaded, now) },
-    { label: 'iOS visible in TestFlight', ...aged(MANUAL_FACTS.iosBuildVisible, now) },
-    { label: 'Android internal testers', ...aged(MANUAL_FACTS.androidTesters, now) },
-    { label: 'iOS internal testers', ...aged(MANUAL_FACTS.iosTesters, now) },
+    { label: 'Android 211 · internal testers', ...aged(MANUAL_FACTS.android211Testers, now) },
+    { label: 'Android 215 · internal testers', ...aged(MANUAL_FACTS.android215Testers, now) },
+    { label: 'iOS 215 · internal testers', ...aged(MANUAL_FACTS.ios215Testers, now) },
+    { label: 'Play App Signing prompt', ...aged(MANUAL_FACTS.playAppSigningPrompt, now) },
   ]
 
   const site: LabelledFact[] = [siteMode(), signupStorage(), redFlagLabels(), adminAuth()]

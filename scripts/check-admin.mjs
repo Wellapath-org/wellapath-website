@@ -608,16 +608,24 @@ function checkFirstViewport(pages) {
   assert(actions < gates, 'actions come before the full gate table')
   assert(explainer > gates, 'the explanation is below the data, not above it')
 
-  // The five questions, each answerable from the summary strip.
+  // The questions, each answerable from the summary strip.
   for (const label of [
     'Blocked gates',
     'Not verified',
     'Configuration health',
-    'Android internal build',
-    'iOS internal build',
+    'Android · build 211',
+    'iOS · build 211',
+    'Android · build 215',
+    'iOS · build 215',
     'Clinical review',
   ]) {
     assert(html.includes(label), `the summary answers "${label}"`)
+  }
+
+  // 211 and 215 mean different things and must not be collapsed into one
+  // headline, and neither platform may borrow the other's evidence.
+  for (const forbidden of ['Android internal build', 'iOS internal build']) {
+    assert(!html.includes(forbidden), `no platform-agnostic "${forbidden}" label`)
   }
 
   // Each action row is itself a link to where it is acted on.

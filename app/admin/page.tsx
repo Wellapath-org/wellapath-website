@@ -83,7 +83,7 @@ export default async function AdminOverviewPage() {
       label: 'Not verified',
       value: unverified.length === 0 ? 'None' : `${unverified.length} of ${gates.length}`,
       state: 'derived',
-      hint: unverified.length ? 'Nobody has checked these yet.' : undefined,
+      hint: unverified.length ? unverified.map((g) => g.name).join('; ') : undefined,
     },
     {
       label: 'Configuration health',
@@ -137,8 +137,8 @@ export default async function AdminOverviewPage() {
         title="Overview"
         summary={
           blocked.length > 0
-            ? `${blocked.length} gates blocked, ${unverified.length} unverified. The public site is closed and the app is in internal testing.`
-            : `No gates blocked, ${unverified.length} unverified.`
+            ? 'The public site is closed and the app is in internal testing.'
+            : 'The public site is closed. No gates are blocked.'
         }
         observed={`Generated ${observedLabel(now.toISOString())}`}
       />
@@ -146,7 +146,7 @@ export default async function AdminOverviewPage() {
       <StatusSummary items={summary} />
 
       {/* ── what to do next ─────────────────────────────────────────────── */}
-      <section className="mt-7">
+      <section className="mt-8 border-t border-rule pt-5">
         <h2 className="text-body font-semibold text-ink">Next actions</h2>
         <p className="text-small mt-1 text-ink-soft">
           Recorded by hand in <code className="rounded-xs bg-rail px-1 py-0.5">register.ts</code>.
@@ -197,7 +197,7 @@ export default async function AdminOverviewPage() {
       </section>
 
       {/* ── gates ───────────────────────────────────────────────────────── */}
-      <section className="mt-7">
+      <section className="mt-8 border-t border-rule pt-5">
         <h2 className="text-body font-semibold text-ink">Launch gates</h2>
         <ScrollableTable label="This table">
           <table className="text-small w-full min-w-[560px] border-collapse">

@@ -73,6 +73,17 @@ function deny(message: string) {
   return res
 }
 
+/**
+ * Every response carries the request path, so a server component can branch on
+ * it without becoming a client component. Set from the request, never trusted
+ * from it: whatever a caller sends under this name is overwritten here.
+ */
+function withPathname(req: NextRequest, pathname: string) {
+  const forwarded = new Headers(req.headers)
+  forwarded.set('x-pathname', pathname)
+  return { request: { headers: forwarded } }
+}
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
@@ -86,7 +97,9 @@ export function middleware(req: NextRequest) {
   }
 
   // The lock below is only for /admin. Everything else is done here.
-  if (!pathname.startsWith('/admin')) return NextResponse.next()
+  if (!pathname.startsWith('/admin')) {
+    return NextResponse.next(withPathname(req, pathname))
+  }
 
   const user = process.env.ADMIN_USER
   const password = process.env.ADMIN_PASSWORD
@@ -116,13 +129,7 @@ export function middleware(req: NextRequest) {
   const passOk = safeEqual(givenPass, password)
   if (!(userOk && passOk)) return deny('Authentication required.')
 
-  // The admin layout reads this to mark the current nav item. It is derived
-  // from the request, never from anything the client can set: the value here
-  // overwrites any inbound header of the same name.
-  const forwarded = new Headers(req.headers)
-  forwarded.set('x-pathname', pathname)
-
-  const res = NextResponse.next({ request: { headers: forwarded } })
+  const res = NextResponse.next(withPathname(req, pathname))
   adminSecurityHeaders(res.headers)
   return res
 }

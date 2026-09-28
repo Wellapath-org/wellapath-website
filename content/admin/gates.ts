@@ -56,7 +56,10 @@ export function launchGates(): Gate[] {
       source: 'Mobile repository, recorded by hand',
     },
     {
-      name: 'Android internal testing',
+      // Qualified by build on purpose: Android 211 IS confirmed available on
+      // this track, so an unqualified "Android internal testing — Not
+      // verified" reads as though nothing has shipped at all.
+      name: 'Android 215 · internal testing',
       state: 'not-verified',
       owner: 'Founder',
       detail:

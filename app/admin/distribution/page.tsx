@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
-import { FactPanel, PanelGrid } from '@/components/admin'
+import { AdminHeader, FactPanel, PanelGrid } from '@/components/admin'
 import { MANUAL_FACTS } from '@/content/admin/register'
 import { aged, type LabelledFact } from '@/content/admin/facts'
 import { MOBILE_BUILD_NOTE } from '@/content/admin/derived'
@@ -17,85 +16,63 @@ export default function DistributionPage() {
   const now = new Date()
 
   const android: LabelledFact[] = [
+    { label: '211 · track state', ...aged(MANUAL_FACTS.android211Track, now) },
+    { label: '211 · internal testers', ...aged(MANUAL_FACTS.android211Testers, now) },
     {
-      label: 'Version and build',
+      label: '215 · artifact',
       state: 'manual',
-      value: '0.3.0 (215)',
-      observedBy: 'Engineering',
-      observedAt: '2026-09-25',
-      source: 'Mobile repository build registry',
-      note: MOBILE_BUILD_NOTE,
-    },
-    {
-      label: 'Artifact verification',
-      state: 'manual',
-      value: 'Signed and verified, not uploaded',
+      value: '0.3.0 (215), signed and verified',
       observedBy: 'Engineering',
       observedAt: '2026-09-25',
       source: 'Mobile release record',
-      note: 'Signature verified, certificate matches the established upload key, bundle validation passed. Upload is a separate console action.',
+      note: `Signature verified, certificate matches the established upload key, bundle validation passed. ${MOBILE_BUILD_NOTE}`,
     },
-    { label: 'Uploaded to internal testing', ...aged(MANUAL_FACTS.android215Uploaded, now) },
-    { label: 'Internal testing availability', ...aged(MANUAL_FACTS.androidTesters, now) },
-    { label: 'Previous build on the track', ...aged(MANUAL_FACTS.android211Live, now) },
+    { label: '215 · track state', ...aged(MANUAL_FACTS.android215Track, now) },
+    { label: '215 · internal testers', ...aged(MANUAL_FACTS.android215Testers, now) },
     { label: 'App signing enrolment prompt', ...aged(MANUAL_FACTS.playAppSigningPrompt, now) },
   ]
 
   const ios: LabelledFact[] = [
+    { label: '211 · TestFlight availability', ...aged(MANUAL_FACTS.ios211Track, now) },
     {
-      label: 'Version and build',
+      label: '215 · artifact',
       state: 'manual',
-      value: '0.3.0 (215)',
-      observedBy: 'Engineering',
-      observedAt: '2026-09-25',
-      source: 'Mobile repository build registry',
-      note: MOBILE_BUILD_NOTE,
-    },
-    {
-      label: 'Artifact verification',
-      state: 'manual',
-      value: 'Signed, verified and uploaded',
+      value: '0.3.0 (215), signed and uploaded',
       observedBy: 'Engineering',
       observedAt: '2026-09-25',
       source: 'Mobile release record',
-      note: 'Exported as internal-testing-only, which bars external testing and beta review for this build by construction rather than by policy.',
+      note: `Exported internal-only, which bars external testing and beta review for this build by construction. The upload call returned success; that is not the same as availability. ${MOBILE_BUILD_NOTE}`,
     },
-    { label: 'Processing outcome', ...aged(MANUAL_FACTS.iosProcessing, now) },
-    { label: 'Visible in TestFlight', ...aged(MANUAL_FACTS.iosBuildVisible, now) },
-    { label: 'Internal testing availability', ...aged(MANUAL_FACTS.iosTesters, now) },
-    { label: 'Previous build still available', ...aged(MANUAL_FACTS.ios211Available, now) },
+    { label: '215 · processing outcome', ...aged(MANUAL_FACTS.ios215Track, now) },
+    { label: '215 · internal testers', ...aged(MANUAL_FACTS.ios215Testers, now) },
   ]
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="App distribution."
-          rest="Android and iOS tracked separately, because they fail separately."
-          className="mt-4"
+      <div>
+        <AdminHeader
+          title="App distribution"
+          summary="Android and iOS tracked separately, because they fail separately."
         />
-        <Card className="mt-8 p-6" edge="ring" tone="sunk">
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-small text-ink-soft">
             Every value on this page is recorded by hand. This site has no access to either store
             console and no access to the mobile repository, so nothing here is measured. Where a
             console fact has not been read by anyone, it says <em>Not verified</em> rather than
             showing a reassuring default.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
 
-      <Section tone="sunk" space="tight">
+      <div className="mt-5">
         <PanelGrid>
           <FactPanel title="Android" facts={android} />
           <FactPanel title="iOS" facts={ios} />
         </PanelGrid>
-      </Section>
+      </div>
 
-      <Section tone="ground" space="tight">
-        <Card className="p-6" edge="ring">
+      <div>
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-body font-semibold text-ink">No controls here, deliberately.</p>
           <p className="text-body mt-2 text-ink-soft">
             There is no button to promote a build, submit for review, or move a release to a wider
@@ -103,8 +80,8 @@ export default function DistributionPage() {
             console where they are attributable to a named account rather than to a shared admin
             password.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
     </>
   )
 }

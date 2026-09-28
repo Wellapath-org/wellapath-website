@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
-import { FactPanel } from '@/components/admin'
+import { AdminHeader, FactPanel } from '@/components/admin'
 import type { LabelledFact } from '@/content/admin/facts'
 
 export const dynamic = 'force-dynamic'
@@ -91,16 +90,12 @@ export default function ProductInsightsPage() {
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="Product insights."
-          rest="Definitions agreed now, so the numbers mean something when they arrive."
-          className="mt-4"
+      <div>
+        <AdminHeader
+          title="Product insights"
+          summary="Definitions agreed now, so the numbers mean something when they arrive."
         />
-        <Card className="mt-8 p-6" edge="ring" tone="sunk">
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-small text-ink-soft">
             Product analytics is a different subsystem from crash diagnostics under Reliability,
             with different data and a separate approval. Nothing on this page is measured, and no
@@ -108,61 +103,58 @@ export default function ProductInsightsPage() {
             person on this website; an app metric is an anonymous count from another system.
             Joining them would destroy the anonymity of the second and is not done anywhere.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
 
-      <Section tone="sunk" space="tight">
-        <div className="max-w-[720px]">
+      <div className="mt-5">
+        <div>
           <FactPanel title="Current state" facts={state} />
         </div>
-      </Section>
+      </div>
 
-      <Section tone="ground" space="tight">
-        <h2 className="text-h2 font-semibold text-ink">Metric definitions</h2>
+      <div>
+        <h2 className="text-body font-semibold text-ink">Metric definitions</h2>
         <p className="text-small mt-2 max-w-[68ch] text-ink-soft">
-          Each of these reads <em>Not instrumented</em> and will keep reading it until an approved
-          pipeline supplies real data. The second column is the part worth agreeing early: what
-          each number is not, so nobody reads more into it later than it can carry.
+          <strong className="font-semibold text-ink">
+            Every metric below reads Not instrumented
+          </strong>{' '}
+          and will keep reading it until an approved pipeline supplies real data. None of them is
+          a zero, because nothing is measuring. The second column is the part worth agreeing
+          early: what each number is not, so nobody reads more into it later than it can carry.
         </p>
         <div className="mt-6 w-full min-w-0 overflow-x-auto">
-          <table className="text-body w-full min-w-[720px] border-collapse">
+          <table className="text-small w-full min-w-[620px] border-collapse">
             <caption className="sr-only">
               Proposed product metrics, their definitions, and what each one does not mean
             </caption>
             <thead>
-              <tr className="border-b-2 border-ink text-left">
-                <th scope="col" className="pb-3 pr-4 font-semibold text-ink">
+              <tr className="border-b border-ink text-left">
+                <th scope="col" className="pb-2 pr-4 font-semibold text-ink">
                   Metric
                 </th>
-                <th scope="col" className="pb-3 pr-4 font-semibold text-ink">
+                <th scope="col" className="pb-2 pr-4 font-semibold text-ink">
                   Definition
                 </th>
-                <th scope="col" className="pb-3 pr-4 font-semibold text-ink">
+                <th scope="col" className="pb-2 font-semibold text-ink">
                   Not
-                </th>
-                <th scope="col" className="pb-3 font-semibold text-ink">
-                  Value
                 </th>
               </tr>
             </thead>
             <tbody>
               {METRICS.map((metric) => (
                 <tr key={metric.name} className="border-b border-rule align-top">
-                  <td className="py-3.5 pr-4 font-semibold text-ink">{metric.name}</td>
-                  <td className="py-3.5 pr-4 text-ink-soft">{metric.definition}</td>
-                  <td className="text-small py-3.5 pr-4 text-ink-mute">{metric.notWhat}</td>
-                  <td className="py-3.5 font-medium whitespace-nowrap text-ink-mute italic">
-                    Not instrumented
-                  </td>
+                  <td className="py-2.5 pr-4 font-semibold text-ink">{metric.name}</td>
+                  <td className="py-2.5 pr-4 text-ink-soft">{metric.definition}</td>
+                  <td className="py-2.5 text-ink-mute">{metric.notWhat}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </Section>
+      </div>
 
-      <Section tone="sunk" space="tight">
-        <Card className="p-6" edge="ring">
+      <div className="mt-5">
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-body font-semibold text-ink">What may never be collected.</p>
           <p className="text-body mt-2 text-ink-soft">
             Symptoms, answers, results, urgency categories or any medical guidance. Location of any
@@ -171,8 +163,8 @@ export default function ProductInsightsPage() {
             excluded by the design of the event contract rather than by policy, so a prohibited
             field cannot be expressed by a caller.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
     </>
   )
 }

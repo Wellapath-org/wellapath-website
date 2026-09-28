@@ -17,51 +17,60 @@ import type { Fact } from './facts'
 
 export const MANUAL_FACTS = {
   // ── App Store Connect ──────────────────────────────────────────────────
-  iosProcessing: {
+  ios215Track: {
     state: 'unavailable',
     reason: 'not-verified',
     source: 'App Store Connect, TestFlight, iOS builds',
-    note: 'Upload succeeded 2026-09-25T14:18:57Z (xcodebuild exit 0). The processing OUTCOME has not been observed by anyone yet.',
+    note: 'The 215 upload returned success on 2026-09-25. The processing outcome and whether it reached a tester have not been observed. An upload attempt is not availability.',
   },
-  iosBuildVisible: {
-    state: 'unavailable',
-    reason: 'not-verified',
-    source: 'App Store Connect, TestFlight, iOS builds',
-    note: 'Awaiting a console read.',
-  },
-  iosTesters: {
+  ios215Testers: {
     state: 'unavailable',
     reason: 'not-verified',
     source: 'App Store Connect, Internal Testing group',
-    note: 'Exported with testFlightInternalTestingOnly, so external testing and Beta App Review are barred for this build by construction. The number of internal testers who can install it has not been observed.',
-  },
-  ios211Available: {
-    state: 'unavailable',
-    reason: 'not-verified',
-    source: 'App Store Connect, TestFlight, iOS builds',
-    note: 'Build 211 remains the soft-launch candidate. Confirm it has not expired out of the 90-day TestFlight window.',
+    note: 'Build 215 was exported internal-only, so external testing and beta review are barred for it by construction. How many internal testers can install it has not been observed.',
   },
 
   // ── Google Play ────────────────────────────────────────────────────────
-  android215Uploaded: {
+  android215Track: {
     state: 'unavailable',
     reason: 'not-verified',
     source: 'Play Console, Testing, Internal testing',
-    note: 'The signed artifact is verified and on disk but was not uploaded by engineering. Upload is a founder console action.',
+    note: 'A signed artifact for 215 is verified and on disk. Nobody has confirmed whether it was uploaded, and a signed artifact is not evidence of store availability.',
   },
-  androidTesters: {
+  android215Testers: {
     state: 'unavailable',
     reason: 'not-verified',
     source: 'Play Console, Internal testing, Testers',
-    note: 'Five testers were confirmed on the track for build 211. Not re-observed for 215.',
+    note: 'No tester count has been observed for build 215. The count recorded for 211 is a different build and is not carried across.',
   },
-  android211Live: {
+  /**
+   * Build 211 and build 215 mean different things and must not be collapsed.
+   * 211 is the proven soft-launch candidate and the one confirmed available to
+   * testers. 215 is a later internal-testing build whose console outcome
+   * nobody has checked. Each platform is recorded separately, because they
+   * succeed and fail separately.
+   */
+  android211Track: {
     state: 'manual',
-    value: 'Live, 5 testers',
+    value: '0.3.0 (211), Internal testing, available',
     observedBy: 'Founder',
     observedAt: '2026-09-25',
     source: 'Play Console, Internal testing track',
-    note: 'Direct console confirmation. This superseded an earlier record that said the app had never been uploaded.',
+    note: 'Direct console confirmation of the track state for build 211. Says nothing about build 215.',
+  },
+  android211Testers: {
+    state: 'manual',
+    value: '5',
+    observedBy: 'Founder',
+    observedAt: '2026-09-25',
+    source: 'Play Console, Internal testing, Testers',
+    note: 'Counted for build 211 on that date. Not re-checked since, and not a count for 215.',
+  },
+  ios211Track: {
+    state: 'unavailable',
+    reason: 'not-verified',
+    source: 'App Store Connect, TestFlight',
+    note: 'Build 211 was uploaded on 2026-09-21 and the upload succeeded. Whether it is still available to testers, and to how many, has not been observed. An upload is not availability.',
   },
   playAppSigningPrompt: {
     state: 'unavailable',
@@ -153,14 +162,6 @@ export const LAUNCH_ACTIONS: readonly LaunchAction[] = [
     severity: 'blocker',
     reference: 'Mobile: docs/release/CB_211_DISPOSITION.md',
     note: 'The one open finding in the 239-case bank. Blocks every external cohort. Does not block internal testing.',
-  },
-  {
-    id: 'DATABASE-URL',
-    title: 'Provision Postgres and set the database URL',
-    owner: 'Founder',
-    severity: 'high',
-    reference: 'docs/PROGRESS.md, Vercel environment variables',
-    note: 'Until it is set, WhatsApp-only signups cannot be stored. The form fails honestly and writes to the server log rather than pretending to work.',
   },
   {
     id: 'PLAY-APP-SIGNING',

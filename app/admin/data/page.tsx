@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
-import { FactPanel, PanelGrid } from '@/components/admin'
+import { AdminHeader, FactPanel, PanelGrid } from '@/components/admin'
 import { conditionPages, expectedArtifacts, redFlagLabels } from '@/content/admin/derived'
 import { getConfigHealth } from '@/content/admin/config-health'
 import type { LabelledFact } from '@/content/admin/facts'
@@ -58,35 +57,31 @@ export default async function DataPage() {
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="Facilities and data."
-          rest="Which clinical artifacts are in use, and how far the facility coverage reaches."
-          className="mt-4"
+      <div>
+        <AdminHeader
+          title="Facilities and data"
+          summary="Which clinical artifacts are in use, and how far facility coverage reaches."
         />
-      </Section>
+      </div>
 
-      <Section tone="sunk" space="tight">
+      <div className="mt-5">
         <PanelGrid>
           <FactPanel title="Facility data" facts={facilities} />
           <FactPanel title="Clinical content" facts={clinical}>
             Versions and counts only. No clinical record or facility record is read by this panel.
           </FactPanel>
         </PanelGrid>
-      </Section>
+      </div>
 
-      <Section tone="ground" space="tight">
-        <Card className="p-6" edge="ring">
+      <div>
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-small text-ink-soft">
             Artifact contents are deliberately not shown. This page reports which versions are in
             play and whether they match what was reviewed. Reading the artifacts themselves belongs
             in the knowledge-base repository, where changes are reviewable as diffs.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
     </>
   )
 }

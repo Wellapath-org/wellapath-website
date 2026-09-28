@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { headers } from 'next/headers'
 
+import { Eyebrow } from '@/components/ui'
 import { ADMIN_SECTIONS } from '@/content/admin/sections'
 import { assertAdmin } from '@/content/admin/guard'
 
@@ -26,26 +28,55 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   await assertAdmin()
 
+  // Set by middleware.ts so the nav can mark the current section without a
+  // client component. Absent in any context where middleware did not run, in
+  // which case nothing is marked, which is the harmless outcome.
+  const pathname = (await headers()).get('x-pathname') ?? ''
+
   return (
     <div>
       <nav aria-label="Admin sections" className="border-b border-rule bg-sunk">
         <div className="mx-auto w-full max-w-[1120px] px-5 py-3 sm:px-6 md:px-10">
-          <p className="text-eyebrow font-semibold text-ink-mute">WellaPath admin</p>
-          <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5">
-            {ADMIN_SECTIONS.map((section) => (
-              <li key={section.href}>
-                <a
-                  href={section.href}
-                  className="text-small text-ink-soft underline decoration-rule underline-offset-4 hover:text-accent-ink hover:decoration-accent"
-                >
-                  {section.label}
-                </a>
-              </li>
-            ))}
+          <Eyebrow>WellaPath admin</Eyebrow>
+          {/* min-h-12 links: the 48px target is also the row spacing. */}
+          <ul className="mt-1 flex flex-wrap gap-x-5">
+            {ADMIN_SECTIONS.map((section) => {
+              const current =
+                pathname === section.href ||
+                (section.href !== '/admin' && pathname.startsWith(`${section.href}/`))
+              return (
+                <li key={section.href}>
+                  <a
+                    href={section.href}
+                    aria-current={current ? 'page' : undefined}
+                    className={
+                      // 48px is the documented floor and is enforced by
+                      // scripts/check-layout.mjs now that it covers /admin.
+                      'text-small inline-flex min-h-12 items-center underline-offset-4 ' +
+                      (current
+                        ? 'font-semibold text-ink underline decoration-accent decoration-2'
+                        : 'text-ink-soft underline decoration-ink-mute/40 hover:text-accent-ink hover:decoration-accent')
+                    }
+                  >
+                    {section.label}
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </nav>
-      {children}
+      {/* The root skip link lands before this nav, so give the content its own
+          target: ten links are exactly what a skip link exists to skip. */}
+      <a
+        href="#admin-content"
+        className="skip-link absolute left-4 -translate-y-20 focus:translate-y-2"
+      >
+        Skip to section content
+      </a>
+      <div id="admin-content" tabIndex={-1}>
+        {children}
+      </div>
     </div>
   )
 }

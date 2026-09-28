@@ -16,8 +16,18 @@ const BASE = process.argv[2] ?? 'http://localhost:3737'
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 import { reachable, announce, LAUNCHED } from './launch.mjs'
+import { ADMIN_ROUTES } from '../content/admin/sections.ts'
 
 const ROUTES = ['/', '/conditions', '/conditions/malaria', '/coverage', '/for/health-facilities', '/how-it-works', '/partners', '/support']
+
+// The admin panel is behind HTTP Basic, so it was invisible to this check and
+// to check-copy until now. That gap is exactly how three layout defects got as
+// far as review. Included when credentials are supplied; skipped, loudly, when
+// they are not, so a green run never implies the admin pages were measured.
+const ADMIN_USER = process.env.ADMIN_USER
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
+const ADMIN_ENABLED = Boolean(ADMIN_USER && ADMIN_PASSWORD)
+const isAdmin = (route) => route.startsWith('/admin')
 // 320 is the narrowest phone still in use; 360 is the commonest Android width
 // in Nigeria; 390 and 430 are current iPhone and iPhone Max; 768 and 820 are
 // iPad portrait, which used to fall through to the stacked phone layout and so
@@ -36,13 +46,21 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--force-color-profile=srgb'],
 })
 
-const LIVE = reachable(ROUTES)
+const LIVE = [...reachable(ROUTES), ...(ADMIN_ENABLED ? ADMIN_ROUTES : [])]
 
 console.log(`\nLayout checks at ${BASE}\n`)
-announce(LIVE, ROUTES)
+announce(reachable(ROUTES), ROUTES)
+console.log(
+  ADMIN_ENABLED
+    ? `  Including ${ADMIN_ROUTES.length} admin routes (credentials supplied).`
+    : '  Skipping the admin routes: set ADMIN_USER and ADMIN_PASSWORD to include them.',
+)
 
 for (const route of LIVE) {
   const page = await browser.newPage()
+  if (isAdmin(route)) {
+    await page.authenticate({ username: ADMIN_USER, password: ADMIN_PASSWORD })
+  }
   await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }])
 
   // ── horizontal overflow ───────────────────────────────────────────────────

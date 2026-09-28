@@ -245,13 +245,18 @@ anything shaped like a contact.
 
 ### Admin authentication is accepted for now, and only for now
 
-HTTP Basic with a single shared credential is adequate while one person
-operates this. It has no per-user identity, no audit trail, no rate limiting
-and no lockout, so there is no way to tell who looked at what.
+A single shared credential is adequate while one person operates this. It
+carries no per-user identity and no audit trail, so it cannot answer who looked
+at what.
 
 **Before a second person is given admin access, this needs individual
 authentication, roles and auditability.** That is recorded as a launch action
 rather than left as a reader's inference.
+
+This repository is public, so the specifics of the current control and its
+gaps are deliberately not written down here. They belong in the private
+engineering notes, not in a file anyone can read alongside the URL it
+protects.
 
 `/admin` responses now also carry `frame-ancestors 'none'` and
 `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` and a

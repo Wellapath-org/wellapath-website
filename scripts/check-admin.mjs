@@ -31,6 +31,14 @@
 import { ADMIN_SECTIONS } from '../content/admin/sections.ts'
 import { csvField, csvDocument, defuseFormula } from '../content/csv.ts'
 import { aged, factText, panelKind } from '../content/admin/facts.ts'
+import {
+  interpretResponse,
+  canonicalJson,
+  matchesExpected,
+  BASELINE_CANONICAL_SHA256,
+  TIMEOUT_MS,
+  TTL_MS,
+} from '../content/admin/config-probe.ts'
 import { MANUAL_FACTS, LAUNCH_ACTIONS } from '../content/admin/register.ts'
 
 const BASE = process.argv[2] ?? 'http://localhost:3737'
@@ -343,6 +351,81 @@ async function checkNotIndexed() {
 }
 
 /* ────────────────────────────────────────────────────────────────────────
+ * 8b. The health probe fails safely in every direction
+ * ──────────────────────────────────────────────────────────────────────── */
+async function checkProbe() {
+  console.log('\nThe health probe fails safely in every direction')
+
+  const at = '2026-09-28T00:00:00.000Z'
+  const good = JSON.stringify({ artifacts: { facilities: { version: '1.1' } } })
+
+  const nonOk = await interpretResponse(503, 'unavailable', at)
+  assert(nonOk.ok === false && nonOk.reason === 'status', 'a non-200 is a status failure')
+
+  const bad = await interpretResponse(200, '<html>not json</html>', at)
+  assert(bad.ok === false && bad.reason === 'malformed', 'invalid JSON is a malformed failure')
+
+  const empty = await interpretResponse(200, '{"a":1}', at)
+  assert(
+    empty.ok === false && empty.reason === 'malformed',
+    'a response with no artifact block is malformed, not an empty success',
+  )
+
+  const wrongHash = await interpretResponse(200, good, at)
+  assert(wrongHash.ok === true, 'a well-formed 200 succeeds')
+  assert(wrongHash.integrity === 'differs', 'a body that is not the baseline reports differs')
+  assert(wrongHash.artifacts.facilities === '1.1', 'versions are read from the body')
+
+  // The same body compared against its own hash must match, which proves the
+  // comparison is real rather than always reporting differs.
+  const ownHash = await (async () => {
+    const bytes = new TextEncoder().encode(canonicalJson(JSON.parse(good)))
+    const digest = await crypto.subtle.digest('SHA-256', bytes)
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  })()
+  const matching = await interpretResponse(200, good, at, ownHash)
+  assert(matching.ok === true && matching.integrity === 'match', 'a matching body reports match')
+
+  // Key order must not change the verdict.
+  const a = canonicalJson(JSON.parse('{"z":1,"a":2,"n":{"y":1,"x":2}}'))
+  const b = canonicalJson(JSON.parse('{"a":2,"z":1,"n":{"x":2,"y":1}}'))
+  assert(a === b, 'key order does not change the canonical form')
+
+  // No failure path carries data it did not read.
+  assert(!('artifacts' in nonOk), 'a failed probe carries no artifact data')
+  assert(!('integrity' in bad), 'a malformed probe carries no integrity verdict')
+
+  assert(
+    matchesExpected({
+      token_dictionary: '1.1',
+      knowledge_base: '2.4',
+      rules: '2.2',
+      facilities: '1.1',
+    }),
+    'the expected set matches itself',
+  )
+  assert(!matchesExpected({ facilities: '1.0' }), 'a wrong version does not match the expected set')
+
+  assert(TIMEOUT_MS === 2500, 'the probe timeout is 2.5 seconds', String(TIMEOUT_MS))
+  assert(TTL_MS === 300000, 'the probe is cached for five minutes', String(TTL_MS))
+  assert(BASELINE_CANONICAL_SHA256.length === 64, 'the baseline is a full sha256')
+
+  // The live module must stay server-only: importing it here must throw.
+  let serverOnly = false
+  try {
+    await import('../content/admin/config-health.ts')
+  } catch {
+    serverOnly = true
+  }
+  assert(
+    serverOnly,
+    'config-health.ts is server-only and cannot be imported outside a server context',
+  )
+}
+
+/* ────────────────────────────────────────────────────────────────────────
  * 9. Unit checks that need no server
  * ──────────────────────────────────────────────────────────────────────── */
 function checkCsv() {
@@ -373,6 +456,26 @@ function checkCsv() {
   const nasty = csvField('=SUM(1,2)')
   assert(nasty.startsWith('"\''), 'a formula with a comma is defused then quoted')
   assert(nasty.includes('=SUM(1,2)'), 'the original text survives defusing')
+
+  // Unicode passes through untouched. Nigerian names carry accents and the
+  // form accepts any language, so mangling here would be a real data loss.
+  assert(csvField('Adéwálé') === 'Adéwálé', 'accented text is unchanged')
+  assert(csvField('naïve, bold') === '"naïve, bold"', 'accented text with a comma is quoted')
+  assert(csvField('\u{1F1F3}\u{1F1EC}') === '\u{1F1F3}\u{1F1EC}', 'an emoji is unchanged')
+  assert(csvField('') === '', 'an empty string stays empty')
+  assert(csvField(0) === '0', 'a real zero is written, because it is a real value')
+  assert(csvField('a\r\nb') === '"a\r\nb"', 'a CRLF pair forces quoting')
+  assert(csvField('"') === '""""', 'a lone quote is escaped and quoted')
+  assert(csvField('=1+1') === "'=1+1", 'an equals formula is defused')
+  assert(csvField('@SUM(A1)') === "'@SUM(A1)", 'an at-sign formula is defused')
+  assert(csvField('+1+1') === "'+1+1", 'a plus formula is defused')
+  assert(csvField('-1-1') === "'-1-1", 'a minus formula is defused')
+  assert(csvField('\t=1') === "'\t=1", 'a tab-led formula is defused')
+  assert(csvField('+2348031234567') === "'+2348031234567", 'a phone number is defused, not lost')
+  assert(
+    csvField('=HYPERLINK("http://evil","click")').startsWith('"\''),
+    'a hyperlink formula containing a comma is defused and quoted',
+  )
 
   const doc = csvDocument(['a', 'b'], [['1', 'x,y']])
   assert(doc === 'a,b\r\n1,"x,y"', 'a document uses CRLF between rows', JSON.stringify(doc))
@@ -429,6 +532,7 @@ async function main() {
   // Server-free checks first, so a broken server does not hide them.
   checkCsv()
   checkFactModel()
+  await checkProbe()
   checkRegisterHygiene()
 
   try {

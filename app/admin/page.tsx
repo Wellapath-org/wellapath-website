@@ -14,18 +14,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 }
 
+// Not the triage palette: those colours mean clinical urgency everywhere else
+// on this site. The severity word carries the meaning; weight and tone rank it.
 const SEVERITY_CLASS: Record<Severity, string> = {
-  blocker: 'text-triage-crit',
-  high: 'text-triage-warn',
-  medium: 'text-triage-warn',
-  low: 'text-ink-mute',
+  blocker: 'font-bold text-ink',
+  high: 'font-semibold text-ink',
+  medium: 'font-medium text-ink-soft',
+  low: 'font-medium text-ink-mute',
 }
 
+// Same reasoning as severity: the word is the signal, not a clinical colour.
 const GATE_CLASS: Record<GateState, string> = {
-  ready: 'text-triage-safe',
-  waiting: 'text-triage-warn',
-  blocked: 'text-triage-crit',
-  'not-verified': 'text-ink-mute',
+  ready: 'font-medium text-ink-mute',
+  waiting: 'font-semibold text-ink-soft',
+  blocked: 'font-bold text-ink',
+  'not-verified': 'font-semibold text-ink-soft',
 }
 
 export default function AdminOverviewPage() {
@@ -75,7 +78,7 @@ export default function AdminOverviewPage() {
       <Section tone="sunk" space="tight">
         <h2 className="text-h2 font-semibold text-ink">Gates</h2>
         <div className="mt-6 w-full min-w-0 overflow-x-auto">
-          <table className="text-body w-full border-collapse">
+          <table className="text-body w-full min-w-[560px] border-collapse">
             <caption className="sr-only">Launch gates and their current state</caption>
             <thead>
               <tr className="border-b-2 border-ink text-left">
@@ -93,7 +96,7 @@ export default function AdminOverviewPage() {
             <tbody>
               {gates.map((gate) => (
                 <tr key={gate.name} className="border-b border-rule align-top">
-                  <td className={`py-3.5 pr-4 font-semibold whitespace-nowrap ${GATE_CLASS[gate.state]}`}>
+                  <td className={`py-3.5 pr-4 whitespace-nowrap ${GATE_CLASS[gate.state]}`}>
                     {GATE_LABEL[gate.state]}
                   </td>
                   <td className="py-3.5 pr-4">
@@ -124,11 +127,11 @@ export default function AdminOverviewPage() {
       <Section tone="sunk" space="tight">
         <h2 className="text-h2 font-semibold text-ink">Outstanding actions</h2>
         <p className="text-small mt-2 text-ink-soft">
-          Maintained by hand in <code className="rounded-xs bg-rail px-1.5 py-0.5">content/admin/register.ts</code>.
+          Maintained by hand in <code className="rounded-xs bg-ground px-1.5 py-0.5">content/admin/register.ts</code>.
           Owners are roles.
         </p>
         <div className="mt-6 w-full min-w-0 overflow-x-auto">
-          <table className="text-body w-full border-collapse">
+          <table className="text-body w-full min-w-[560px] border-collapse">
             <caption className="sr-only">Outstanding launch actions by severity</caption>
             <thead>
               <tr className="border-b-2 border-ink text-left">
@@ -147,7 +150,7 @@ export default function AdminOverviewPage() {
               {sorted.map((action) => (
                 <tr key={action.id} className="border-b border-rule align-top">
                   <td
-                    className={`py-3.5 pr-4 font-semibold whitespace-nowrap capitalize ${SEVERITY_CLASS[action.severity]}`}
+                    className={`py-3.5 pr-4 whitespace-nowrap capitalize ${SEVERITY_CLASS[action.severity]}`}
                   >
                     {action.severity}
                   </td>

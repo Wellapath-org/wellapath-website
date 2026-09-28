@@ -10,11 +10,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 }
 
+// Same reasoning as severity: the word is the signal, not a clinical colour.
 const GATE_CLASS: Record<GateState, string> = {
-  ready: 'text-triage-safe',
-  waiting: 'text-triage-warn',
-  blocked: 'text-triage-crit',
-  'not-verified': 'text-ink-mute',
+  ready: 'font-medium text-ink-mute',
+  waiting: 'font-semibold text-ink-soft',
+  blocked: 'font-bold text-ink',
+  'not-verified': 'font-semibold text-ink-soft',
 }
 
 const ORDER: GateState[] = ['blocked', 'not-verified', 'waiting', 'ready']
@@ -42,7 +43,7 @@ export default function LaunchReadinessPage() {
         <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2">
           {counts.map(({ state, n }) => (
             <p key={state} className="text-body">
-              <span className={`font-semibold ${GATE_CLASS[state]}`}>{GATE_LABEL[state]}</span>
+              <span className={GATE_CLASS[state]}>{GATE_LABEL[state]}</span>
               <span className="text-ink-soft"> · {n}</span>
             </p>
           ))}
@@ -51,7 +52,7 @@ export default function LaunchReadinessPage() {
 
       <Section tone="sunk" space="tight">
         <div className="w-full min-w-0 overflow-x-auto">
-          <table className="text-body w-full border-collapse">
+          <table className="text-body w-full min-w-[720px] border-collapse">
             <caption className="sr-only">Launch gates, most urgent first</caption>
             <thead>
               <tr className="border-b-2 border-ink text-left">
@@ -73,7 +74,7 @@ export default function LaunchReadinessPage() {
               {gates.map((gate) => (
                 <tr key={gate.name} className="border-b border-rule align-top">
                   <td
-                    className={`py-3.5 pr-4 font-semibold whitespace-nowrap ${GATE_CLASS[gate.state]}`}
+                    className={`py-3.5 pr-4 whitespace-nowrap ${GATE_CLASS[gate.state]}`}
                   >
                     {GATE_LABEL[gate.state]}
                   </td>

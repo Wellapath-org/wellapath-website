@@ -125,7 +125,7 @@ export default function ProductInsightsPage() {
           each number is not, so nobody reads more into it later than it can carry.
         </p>
         <div className="mt-6 w-full min-w-0 overflow-x-auto">
-          <table className="text-body w-full border-collapse">
+          <table className="text-body w-full min-w-[720px] border-collapse">
             <caption className="sr-only">
               Proposed product metrics, their definitions, and what each one does not mean
             </caption>

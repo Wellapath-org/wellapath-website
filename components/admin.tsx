@@ -23,10 +23,14 @@ import {
 
 /* ── panel heading ──────────────────────────────────────────────────────── */
 
+// Deliberately not the triage palette. Those three colours mean clinical
+// urgency everywhere else on this site, and DESIGN.md is right that spending
+// them on "this panel was measured" would leave them meaning nothing. The word
+// carries the state; weight and tone do the scanning.
 const KIND_CLASS: Record<PanelKind, string> = {
-  live: 'text-triage-safe',
-  derived: 'text-accent-ink',
-  manual: 'text-triage-warn',
+  live: 'text-accent-ink',
+  derived: 'text-ink-soft',
+  manual: 'text-ink-soft',
   incomplete: 'text-ink-mute',
 }
 
@@ -34,7 +38,7 @@ export function PanelKindTag({ facts }: { facts: readonly Fact[] }) {
   const kind = panelKind(facts)
   return (
     <span
-      className={`text-eyebrow rounded-xs border border-rule px-1.5 py-0.5 font-semibold ${KIND_CLASS[kind]}`}
+      className={`text-eyebrow rounded-xs border border-ink/15 px-1.5 py-0.5 font-semibold uppercase ${KIND_CLASS[kind]}`}
     >
       {PANEL_KIND_LABEL[kind]}
     </span>
@@ -55,7 +59,7 @@ export function FactRow({ fact }: { fact: LabelledFact }) {
       <div className="text-small flex flex-wrap items-center gap-2 text-ink-mute">
         {fact.label}
         {fact.state === 'manual' && (
-          <span className="text-eyebrow rounded-xs bg-accent-wash px-1.5 py-0.5 font-semibold text-accent-ink">
+          <span className="text-eyebrow rounded-xs bg-accent-wash px-1.5 py-0.5 font-semibold text-accent-ink uppercase">
             Manual
           </span>
         )}
@@ -113,7 +117,7 @@ export function FactPanel({
 
 /** Panels side by side, stacking to one column on a narrow screen. */
 export function PanelGrid({ children }: { children: ReactNode }) {
-  return <div className="mt-8 grid gap-5 md:grid-cols-2">{children}</div>
+  return <div className="mt-8 grid items-start gap-5 md:grid-cols-2">{children}</div>
 }
 
 /* ── an inactive section ────────────────────────────────────────────────── */
@@ -134,7 +138,7 @@ export function InactiveSection({
 }) {
   return (
     <Card className="p-6" edge="ring">
-      <p className="text-body font-semibold text-ink">{what} is not active.</p>
+      <h2 className="text-h3 font-semibold text-ink">{what} is not active.</h2>
       <p className="text-body mt-2 text-ink-soft">{why}</p>
       <p className="text-small mt-4 text-ink-mute">{whenActive}</p>
     </Card>
@@ -146,7 +150,7 @@ export function InactiveSection({
 export function ReadingKey() {
   return (
     <Card className="mt-8 p-6" edge="ring" tone="sunk">
-      <p className="text-small font-semibold text-ink">How to read this</p>
+      <h2 className="text-small font-semibold text-ink">How to read this</h2>
       <p className="text-small mt-2 text-ink-soft">
         Every value carries where it came from. <strong>Live</strong> means a system was measured
         just now. <strong>Derived</strong> means it reproduces from the repository.{' '}

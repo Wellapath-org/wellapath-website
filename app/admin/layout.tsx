@@ -2,60 +2,52 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { headers } from 'next/headers'
 
-import { Eyebrow } from '@/components/ui'
-import { ADMIN_SECTIONS } from '@/content/admin/sections'
+import { Wordmark } from '@/components/chrome'
+import { ADMIN_GROUPS, currentSection, sectionsIn } from '@/content/admin/sections'
 import { assertAdmin } from '@/content/admin/guard'
 
 /**
- * The admin panel shell: shared navigation, and a second assertion of the
- * lock.
+ * The admin shell.
+ *
+ * Deliberately not the website. The root layout drops the marketing header and
+ * footer for /admin, so this is the whole chrome: a quiet sidebar on a desktop,
+ * a collapsed disclosure on a phone, and nothing else. No avatar, no bell, no
+ * search box, no settings cog — every one of those would be a control that
+ * does nothing, and a dashboard that lies about what it can do is worse than a
+ * plain one.
  *
  * `middleware.ts` is the gate that matters and runs at the edge before this
- * renders. `assertAdmin()` runs again here so that a regression in the
- * middleware matcher fails the render rather than serving the page. Belt and
- * braces, on the one part of the site that shows personal data.
+ * renders. `assertAdmin()` runs again here so a regression in the middleware
+ * matcher fails the render rather than serving the page.
  *
- * This layout nests inside the root layout, so admin pages still carry the
- * marketing header and footer. That is existing behaviour for /admin/signups
- * and is left alone: removing it would mean a route-group restructure, which
- * would move the waitlist page's URL.
+ * No client JavaScript: the mobile navigation is a native <details>.
  */
 export const metadata: Metadata = {
   title: 'Admin',
   robots: { index: false, follow: false, nocache: true },
 }
 
-export default async function AdminLayout({ children }: { children: ReactNode }) {
-  await assertAdmin()
-
-  // Set by middleware.ts so the nav can mark the current section without a
-  // client component. Absent in any context where middleware did not run, in
-  // which case nothing is marked, which is the harmless outcome.
-  const pathname = (await headers()).get('x-pathname') ?? ''
-
+function NavList({ pathname }: { pathname: string }) {
   return (
-    <div>
-      <nav aria-label="Admin sections" className="border-b border-rule bg-sunk">
-        <div className="mx-auto w-full max-w-[1120px] px-5 py-3 sm:px-6 md:px-10">
-          <Eyebrow>WellaPath admin</Eyebrow>
-          {/* min-h-12 links: the 48px target is also the row spacing. */}
-          <ul className="mt-1 flex flex-wrap gap-x-5">
-            {ADMIN_SECTIONS.map((section) => {
-              const current =
+    <>
+      {ADMIN_GROUPS.map((group) => (
+        <div key={group} className="mb-5 last:mb-0">
+          <p className="text-eyebrow px-3 font-semibold text-ink-mute uppercase">{group}</p>
+          <ul className="mt-1">
+            {sectionsIn(group).map((section) => {
+              const active =
                 pathname === section.href ||
                 (section.href !== '/admin' && pathname.startsWith(`${section.href}/`))
               return (
                 <li key={section.href}>
                   <a
                     href={section.href}
-                    aria-current={current ? 'page' : undefined}
+                    aria-current={active ? 'page' : undefined}
                     className={
-                      // 48px is the documented floor and is enforced by
-                      // scripts/check-layout.mjs now that it covers /admin.
-                      'text-small inline-flex min-h-12 items-center underline-offset-4 ' +
-                      (current
-                        ? 'font-semibold text-ink underline decoration-accent decoration-2'
-                        : 'text-ink-soft underline decoration-ink-mute/40 hover:text-accent-ink hover:decoration-accent')
+                      'text-small flex min-h-12 items-center rounded-sm px-3 ' +
+                      (active
+                        ? 'bg-accent-wash font-semibold text-accent-ink'
+                        : 'text-ink-soft hover:bg-rail hover:text-ink')
                     }
                   >
                     {section.label}
@@ -65,17 +57,56 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             })}
           </ul>
         </div>
-      </nav>
-      {/* The root skip link lands before this nav, so give the content its own
-          target: ten links are exactly what a skip link exists to skip. */}
-      <a
-        href="#admin-content"
-        className="skip-link absolute left-4 -translate-y-20 focus:translate-y-2"
-      >
-        Skip to section content
-      </a>
-      <div id="admin-content" tabIndex={-1}>
-        {children}
+      ))}
+    </>
+  )
+}
+
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  await assertAdmin()
+
+  const pathname = (await headers()).get('x-pathname') ?? ''
+  const section = currentSection(pathname)
+
+  return (
+    <div className="min-h-screen bg-sunk lg:flex">
+      {/* ── phone and tablet: a collapsed disclosure, no JavaScript ───────── */}
+      <details className="border-b border-rule bg-ground lg:hidden">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-5 py-2 sm:px-6">
+          <span className="flex items-center gap-2.5">
+            <span className="block w-[104px] text-ink">
+              <Wordmark />
+            </span>
+            <span className="text-eyebrow font-semibold text-ink-mute uppercase">Admin</span>
+          </span>
+          <span className="text-small text-ink-soft">
+            {section ? section.label : 'Menu'}
+            <span aria-hidden="true"> ▾</span>
+          </span>
+        </summary>
+        <nav aria-label="Admin sections" className="border-t border-rule px-2 pt-3 pb-4">
+          <NavList pathname={pathname} />
+        </nav>
+      </details>
+
+      {/* ── desktop: a restrained sidebar ─────────────────────────────────── */}
+      <div className="hidden w-[240px] shrink-0 border-r border-rule bg-ground lg:block">
+        <div className="sticky top-0 max-h-screen overflow-y-auto px-2 py-5">
+          <div className="mb-6 flex items-center gap-2.5 px-3">
+            <span className="block w-[104px] text-ink">
+              <Wordmark />
+            </span>
+            <span className="text-eyebrow font-semibold text-ink-mute uppercase">Admin</span>
+          </div>
+          <nav aria-label="Admin sections">
+            <NavList pathname={pathname} />
+          </nav>
+        </div>
+      </div>
+
+      {/* ── content ───────────────────────────────────────────────────────── */}
+      <div className="min-w-0 flex-1">
+        <div className="mx-auto w-full max-w-[1000px] px-5 py-7 sm:px-6 lg:px-10">{children}</div>
       </div>
     </div>
   )

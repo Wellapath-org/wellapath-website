@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
-import { FactPanel } from '@/components/admin'
+import { AdminHeader, FactPanel } from '@/components/admin'
 import { getConfigHealth } from '@/content/admin/config-health'
 import { matchesExpected } from '@/content/admin/config-probe'
 import { expectedArtifacts } from '@/content/admin/derived'
@@ -87,16 +86,12 @@ export default async function SystemHealthPage() {
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="System health."
-          rest="The one thing on this panel that is actually measured."
-          className="mt-4"
+      <div>
+        <AdminHeader
+          title="System health"
+          summary="The one thing on this panel that is actually measured."
         />
-        <Card className="mt-8 p-6" edge="ring" tone="sunk">
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-small text-ink-soft">
             The app pins no artifact versions. It loads whatever the configuration endpoint names,
             so this response, and not anything in a repository, is what decides which clinical
@@ -108,21 +103,21 @@ export default async function SystemHealthPage() {
             is a public endpoint read exactly as an app reads it. The response is hashed and its
             version fields taken. Nothing else from it is stored or shown.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
 
-      <Section tone="sunk" space="tight">
-        <div className="max-w-[640px]">
+      <div className="mt-5">
+        <div>
           <FactPanel title="Production configuration" facts={facts} />
         </div>
-      </Section>
+      </div>
 
-      <Section tone="ground" space="tight">
-        <div className="max-w-[640px]">
+      <div>
+        <div>
           <FactPanel title="Expected" facts={[expectedArtifacts()]} />
         </div>
         {!health.ok && (
-          <Card className="mt-6 p-6" edge="ring">
+          <div className="mt-5 rounded-md border border-rule bg-ground p-5">
             <p className="text-body font-semibold text-ink">
               A failed probe is not the same as an outage.
             </p>
@@ -132,9 +127,9 @@ export default async function SystemHealthPage() {
               <em>Not verified</em> rather than reporting production as down. Confirm from a second
               vantage point before treating it as an incident.
             </p>
-          </Card>
+          </div>
         )}
-      </Section>
+      </div>
     </>
   )
 }

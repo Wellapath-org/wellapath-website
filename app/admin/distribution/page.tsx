@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Card, Eyebrow, Section, TwoTone } from '@/components/ui'
-import { FactPanel, PanelGrid } from '@/components/admin'
+import { AdminHeader, FactPanel, PanelGrid } from '@/components/admin'
 import { MANUAL_FACTS } from '@/content/admin/register'
 import { aged, type LabelledFact } from '@/content/admin/facts'
 import { MOBILE_BUILD_NOTE } from '@/content/admin/derived'
@@ -68,34 +67,30 @@ export default function DistributionPage() {
 
   return (
     <>
-      <Section tone="ground" space="tight">
-        <Eyebrow>Internal · not indexed</Eyebrow>
-        <TwoTone
-          as="h1"
-          size="display"
-          lead="App distribution."
-          rest="Android and iOS tracked separately, because they fail separately."
-          className="mt-4"
+      <div>
+        <AdminHeader
+          title="App distribution"
+          summary="Android and iOS tracked separately, because they fail separately."
         />
-        <Card className="mt-8 p-6" edge="ring" tone="sunk">
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-small text-ink-soft">
             Every value on this page is recorded by hand. This site has no access to either store
             console and no access to the mobile repository, so nothing here is measured. Where a
             console fact has not been read by anyone, it says <em>Not verified</em> rather than
             showing a reassuring default.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
 
-      <Section tone="sunk" space="tight">
+      <div className="mt-5">
         <PanelGrid>
           <FactPanel title="Android" facts={android} />
           <FactPanel title="iOS" facts={ios} />
         </PanelGrid>
-      </Section>
+      </div>
 
-      <Section tone="ground" space="tight">
-        <Card className="p-6" edge="ring">
+      <div>
+        <div className="mt-5 rounded-md border border-rule bg-ground p-5">
           <p className="text-body font-semibold text-ink">No controls here, deliberately.</p>
           <p className="text-body mt-2 text-ink-soft">
             There is no button to promote a build, submit for review, or move a release to a wider
@@ -103,8 +98,8 @@ export default function DistributionPage() {
             console where they are attributable to a named account rather than to a shared admin
             password.
           </p>
-        </Card>
-      </Section>
+        </div>
+      </div>
     </>
   )
 }

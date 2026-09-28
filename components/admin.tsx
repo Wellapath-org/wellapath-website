@@ -46,7 +46,7 @@ const PROVENANCE_CLASS: Record<Fact['state'], string> = {
 
 export function Provenance({ fact }: { fact: Fact }) {
   return (
-    <span className={`text-eyebrow font-semibold uppercase ${PROVENANCE_CLASS[fact.state]}`}>
+    <span className={`text-[12px] tracking-[0.06em] uppercase ${PROVENANCE_CLASS[fact.state]}`}>
       {PROVENANCE[fact.state]}
     </span>
   )
@@ -70,7 +70,7 @@ export function FactRow({ fact }: { fact: LabelledFact }) {
       <p
         className={
           missing
-            ? 'text-body mt-0.5 font-medium text-ink-mute italic'
+            ? 'text-body mt-0.5 font-medium text-ink-soft italic'
             : 'text-body mt-0.5 font-semibold text-ink'
         }
       >
@@ -173,7 +173,7 @@ export function StatusSummary({ items }: { items: readonly SummaryItem[] }) {
           <div className="flex items-baseline justify-between gap-2">
             <span className="text-small text-ink-soft">{item.label}</span>
             <span
-              className={`text-eyebrow font-semibold uppercase ${PROVENANCE_CLASS[item.state]}`}
+              className={`text-[12px] tracking-[0.06em] uppercase ${PROVENANCE_CLASS[item.state]}`}
             >
               {PROVENANCE[item.state]}
             </span>
@@ -181,7 +181,7 @@ export function StatusSummary({ items }: { items: readonly SummaryItem[] }) {
           <p
             className={
               item.state === 'unavailable'
-                ? 'text-body mt-1 font-medium text-ink-mute italic'
+                ? 'text-body mt-1 font-medium text-ink-soft italic'
                 : 'text-body mt-1 font-semibold text-ink'
             }
           >

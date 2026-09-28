@@ -172,6 +172,23 @@ function checkWaitlistPreserved(pages) {
     'neither the list heading nor the honest-failure heading was found',
   )
 
+  // The two WhatsApp figures are the trap: with no Postgres a WhatsApp-only
+  // signup cannot be stored, so a zero there would report an absence as a
+  // measurement. It must read as an absence instead.
+  if (listed && html.includes('No Postgres URL is set')) {
+    assert(
+      html.includes('Not stored'),
+      'the waitlist reports unstorable WhatsApp figures as absent, not as zero',
+    )
+    assert(
+      !/Gave a WhatsApp number<\/span>[\s\S]{0,200}?>0</.test(html),
+      'the WhatsApp count is not rendered as a zero while storage is unavailable',
+    )
+  }
+
+  // The waitlist must not reintroduce the clinical palette.
+  assert(!html.includes('text-triage-'), 'the waitlist uses no clinical triage colour')
+
   // When the store is unreachable it must say so rather than report zero.
   if (cannotReach) {
     assert(

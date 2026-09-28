@@ -20,8 +20,13 @@
  *  - The table below is the accessible view of the same data, not an extra.
  */
 import type { Metadata } from 'next'
-import { Stat, StatRow, Button, Card } from '@/components/ui'
-import { AdminHeader, ScrollableTable } from '@/components/admin'
+import { Button, Card } from '@/components/ui'
+import {
+  AdminHeader,
+  ScrollableTable,
+  StatusSummary,
+  type SummaryItem,
+} from '@/components/admin'
 import { getSignups } from '@/content/signups'
 import { csvDocument } from '@/content/csv'
 import { TriangleAlert, Download } from 'lucide-react'
@@ -58,7 +63,7 @@ export default async function SignupsPage() {
         />
         <Card className="mt-5 p-5">
           <p className="text-body flex items-start gap-3 text-ink">
-            <TriangleAlert className="mt-1 size-5 shrink-0 text-triage-warn" aria-hidden="true" />
+            <TriangleAlert className="mt-1 size-5 shrink-0 text-ink" aria-hidden="true" />
             <span>{r.error}</span>
           </p>
           {r.warnings.length > 0 && (
@@ -100,6 +105,29 @@ export default async function SignupsPage() {
     ]),
   )
 
+  // A WhatsApp-only signup cannot be stored while Postgres is unconfigured, so
+  // those two figures would be zeros that can never be anything else. A zero
+  // read as "nobody gave a number" when the truth is "we could not have kept
+  // one" is the same mistake this panel exists to refuse, so they report the
+  // absence instead.
+  const whatsappStorable = !r.warnings.some((w) => w.includes('Postgres'))
+  const whatsappItem = (label: string, value: number): SummaryItem =>
+    whatsappStorable
+      ? { label, value: `${value}`, state: 'live' }
+      : {
+          label,
+          value: 'Not stored',
+          state: 'unavailable',
+          hint: 'No Postgres URL, so a WhatsApp number cannot be kept.',
+        }
+
+  const summaryItems: readonly SummaryItem[] = [
+    { label: 'Total signups', value: `${r.total}`, state: 'live' },
+    whatsappItem('Gave a WhatsApp number', r.withWhatsapp),
+    whatsappItem('WhatsApp only, no email', r.whatsappOnly),
+    { label: 'In the last 7 days', value: `${r.last7d}`, state: 'live' },
+  ]
+
   return (
     <>
       <div>
@@ -115,7 +143,7 @@ export default async function SignupsPage() {
         {r.warnings.length > 0 && (
           <Card className="mt-5 p-5">
             <p className="text-body flex items-start gap-3 font-semibold text-ink">
-              <TriangleAlert className="mt-0.5 size-5 shrink-0 text-triage-warn" aria-hidden="true" />
+              <TriangleAlert className="mt-0.5 size-5 shrink-0 text-ink" aria-hidden="true" />
               <span>The numbers below are real, but one part of the setup is incomplete.</span>
             </p>
             <ul className="text-small mt-3 space-y-2 pl-8 text-ink-soft">
@@ -126,19 +154,12 @@ export default async function SignupsPage() {
           </Card>
         )}
 
-        <div className="mt-10">
-          <StatRow>
-            <Stat value={r.total} label="Total signups" emphasis />
-            <Stat value={r.withWhatsapp} label="Gave a WhatsApp number" />
-            <Stat value={r.whatsappOnly} label="WhatsApp only, no email" />
-            <Stat value={r.last7d} label="In the last 7 days" />
-          </StatRow>
-        </div>
+        <StatusSummary items={summaryItems} />
       </div>
 
       {/* ── Signups per day ─────────────────────────────────────────────── */}
       <div className="mt-6">
-        <h2 className="text-h2 font-bold text-ink">Signups per day, by channel</h2>
+        <h2 className="text-body font-semibold text-ink">Signups per day, by channel</h2>
         <p className="text-small mt-2 text-ink-mute">
           Last 30 days. Days with no signups are shown as gaps, not skipped. Anyone who gave a
           number counts under WhatsApp, even if they also gave an address.
@@ -209,7 +230,7 @@ export default async function SignupsPage() {
       <div>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-h2 font-bold text-ink">Every signup</h2>
+            <h2 className="text-body font-semibold text-ink">Every signup</h2>
             <p className="text-small mt-2 text-ink-mute">
               Newest first. This is personal data: do not paste it anywhere, and do not export it
               except to run the launch message.
@@ -259,7 +280,7 @@ export default async function SignupsPage() {
                     <td className="py-3.5 text-right">
                       <span
                         className={`text-small font-medium ${
-                          s.unsubscribed ? 'text-ink-mute' : 'text-triage-safe'
+                          s.unsubscribed ? 'text-ink-mute' : 'text-ink-soft'
                         }`}
                       >
                         {s.unsubscribed ? 'Unsubscribed' : 'Subscribed'}

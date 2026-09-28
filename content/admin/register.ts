@@ -57,7 +57,7 @@ export const MANUAL_FACTS = {
   },
   android211Live: {
     state: 'manual',
-    value: 'Live, 5 testers',
+    value: 'Build 211 live, 5 testers',
     observedBy: 'Founder',
     observedAt: '2026-09-25',
     source: 'Play Console, Internal testing track',

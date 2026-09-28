@@ -44,7 +44,7 @@ function NavList({ pathname }: { pathname: string }) {
                     href={section.href}
                     aria-current={active ? 'page' : undefined}
                     className={
-                      'text-small flex min-h-12 items-center rounded-sm px-3 ' +
+                      'text-small flex min-h-12 items-center rounded-sm px-3 lg:min-h-9 ' +
                       (active
                         ? 'bg-accent-wash font-semibold text-accent-ink'
                         : 'text-ink-soft hover:bg-rail hover:text-ink')
@@ -106,7 +106,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
       {/* ── content ───────────────────────────────────────────────────────── */}
       <div className="min-w-0 flex-1">
-        <div className="mx-auto w-full max-w-[1000px] px-5 py-7 sm:px-6 lg:px-10">{children}</div>
+        <div className="w-full max-w-[1060px] px-5 py-7 sm:px-6 lg:px-8">{children}</div>
       </div>
     </div>
   )

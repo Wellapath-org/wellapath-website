@@ -196,6 +196,97 @@ Carried from `PLAN.md` §7, with what has since been settled.
 
 ---
 
+## The admin panel
+
+`/admin` is now a small panel rather than a single page: Overview, Waitlist,
+Launch Readiness, App Distribution, System Health, Facilities/Data, Feedback,
+Support, Reliability, Product Insights. All ten are read-only. There is no
+control anywhere in it that promotes, submits, distributes, edits or deletes
+anything, because every one of those actions belongs in the console that owns
+it, where it is attributable to a named person rather than to a shared
+password.
+
+**The waitlist page is unchanged.** Same URL, same query, same behaviour. The
+only edit to it is the CSV export fix recorded below.
+
+**Every displayed value carries where it came from.** Four states and no
+fifth: `live` (measured this request), `derived` (reproduces from the
+repository), `manual` (a person typed it in, and it shows their name and the
+date), `unavailable` (no value exists). The union in `content/admin/facts.ts`
+gives the unavailable branch no `value` field at all, so a switched-off
+subsystem cannot be given a number even by mistake; the compiler refuses it.
+That is the whole reason the boundary exists. "0 crashes" and "crash reporting
+is off" are opposite facts, and a launch decision made on the first while the
+second is true is made on evidence that does not exist.
+
+Manual entries expire after 14 days into "Not verified", keeping the original
+observer and date in the note, so a sign-off from six weeks ago cannot read as
+a current one.
+
+**System Health is the one live panel.** It reads the production configuration
+endpoint server-side, with a 2.5 second timeout, cached five minutes, no
+credentials and no custom headers. It compares a canonical hash (keys sorted,
+compact separators) against the reviewed baseline, so a harmless
+re-serialisation does not raise a false alarm while a real content change
+does. Every failure renders "Not verified" with the reason. A failed probe is
+never described as a production outage: the check runs from one server and the
+fault may be at this end.
+
+**Reliability and Product Insights are deliberately separate.** Crash
+diagnostics and product analytics have different data, different switches and
+different approvals, and are never shown on one page or summed. Both are off,
+and both say so in words.
+
+**Waitlist records are read by nothing else.** No new tables, no new queries,
+no joins. `content/admin/derived.ts` imports `dbConfigured` only, which is a
+boolean about configuration and reads no row. `scripts/check-admin.mjs`
+asserts both the static isolation and that no other admin page renders
+anything shaped like a contact.
+
+### Admin authentication is accepted for now, and only for now
+
+HTTP Basic with a single shared credential is adequate while one person
+operates this. It has no per-user identity, no audit trail, no rate limiting
+and no lockout, so there is no way to tell who looked at what.
+
+**Before a second person is given admin access, this needs individual
+authentication, roles and auditability.** That is recorded as a launch action
+rather than left as a reader's inference.
+
+`/admin` responses now also carry `frame-ancestors 'none'` and
+`X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` and a
+`Permissions-Policy` turning off camera, microphone, geolocation, payment and
+USB, alongside the existing `no-store` and `noindex, nofollow`. Scoped to
+`/admin` deliberately: a site-wide content security policy is a separate
+project with a real chance of breaking the marketing pages.
+
+### Checks
+
+`npm run check:admin` is a sixth check, in the same plain-Node style as the
+others and needing no test framework. It exists because the five existing
+checks all skip `/admin` and have to, since it is behind Basic auth, which
+left the one part of the site holding personal data as the one part with no
+automated verification.
+
+It runs 322 assertions: every route 401s without credentials and 200s with
+them, every response carries the cache, robots and security headers, the
+waitlist page still renders a genuine state, unavailable facts never render a
+figure, the inactive sections say they are inactive, no admin page other than
+the waitlist reads or renders an identity, and the sitemap and robots still
+exclude `/admin`.
+
+It needs its own throwaway credentials and never reads the live password:
+
+```bash
+ADMIN_USER=check ADMIN_PASSWORD="$(openssl rand -base64 24)" npm run check:admin
+```
+
+It is not in the aggregate `npm run check` for that reason: the other five run
+against any server, and this one needs a server started with credentials it
+knows.
+
+---
+
 ## Known, accepted, not bugs
 
 - **The hero screenshot contains a real typo.** The app's urgent result screen reads

@@ -35,15 +35,42 @@ function safeEqual(a: string, b: string) {
   return diff === 0
 }
 
+/**
+ * Applied to every /admin response, allowed and denied alike.
+ *
+ * Scoped to /admin on purpose. A site-wide content security policy is a real
+ * project with a real chance of breaking the marketing pages, and this is not
+ * that; these four are the ones that cost nothing here and matter on a page
+ * showing personal data.
+ */
+function adminSecurityHeaders(headers: Headers) {
+  // Personal data: never cached by a proxy, never indexed.
+  headers.set('Cache-Control', 'no-store, max-age=0')
+  headers.set('X-Robots-Tag', 'noindex, nofollow')
+  // No framing at all. Both forms, because the CSP directive is the one modern
+  // browsers honour and the header is what older ones understand.
+  headers.set('Content-Security-Policy', "frame-ancestors 'none'")
+  headers.set('X-Frame-Options', 'DENY')
+  // An admin URL should not travel to another origin in a Referer header.
+  headers.set('Referrer-Policy', 'no-referrer')
+  // Nothing here needs a device. Turn the common ones off rather than rely on
+  // never adding a feature that asks.
+  headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+  )
+  return headers
+}
+
 function deny(message: string) {
-  return new NextResponse(message, {
+  const res = new NextResponse(message, {
     status: 401,
     headers: {
       'WWW-Authenticate': 'Basic realm="WellaPath admin", charset="UTF-8"',
-      'Cache-Control': 'no-store',
-      'X-Robots-Tag': 'noindex, nofollow',
     },
   })
+  adminSecurityHeaders(res.headers)
+  return res
 }
 
 export function middleware(req: NextRequest) {
@@ -82,13 +109,14 @@ export function middleware(req: NextRequest) {
   const givenUser = i === -1 ? decoded : decoded.slice(0, i)
   const givenPass = i === -1 ? '' : decoded.slice(i + 1)
 
-  // Both compared every time — no short-circuit on the username.
-  const ok = safeEqual(givenUser, user) && safeEqual(givenPass, password)
-  if (!ok) return deny('Authentication required.')
+  // Both compared every time. Assigning each result before combining them is
+  // what makes that true: `a() && b()` would skip the password comparison
+  // whenever the username is wrong, and the difference is measurable.
+  const userOk = safeEqual(givenUser, user)
+  const passOk = safeEqual(givenPass, password)
+  if (!(userOk && passOk)) return deny('Authentication required.')
 
   const res = NextResponse.next()
-  // Personal data: never cached by a proxy, never indexed.
-  res.headers.set('Cache-Control', 'no-store, max-age=0')
-  res.headers.set('X-Robots-Tag', 'noindex, nofollow')
+  adminSecurityHeaders(res.headers)
   return res
 }

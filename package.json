@@ -14,7 +14,8 @@
     "check:resend": "node scripts/check-resend.mjs",
     "check:phone": "tsx scripts/check-phone.mjs",
     "check:seo": "node scripts/check-seo.mjs",
-    "check:analytics": "node scripts/check-analytics.mjs"
+    "check:analytics": "node scripts/check-analytics.mjs",
+    "check:admin": "tsx scripts/check-admin.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

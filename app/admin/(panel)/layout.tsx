@@ -3,8 +3,11 @@ import type { ReactNode } from 'react'
 import { headers } from 'next/headers'
 
 import { Wordmark } from '@/components/chrome'
-import { ADMIN_GROUPS, currentSection, sectionsIn } from '@/content/admin/sections'
+import { ActingAs } from '@/components/admin-auth'
+import { ADMIN_GROUPS, MODERATION_SECTIONS, currentSection, sectionsIn, type AdminSection } from '@/content/admin/sections'
 import { assertAdmin } from '@/content/admin/guard'
+import { adminAuthMode } from '@/content/admin/auth/mode'
+import { csrfToken, requireViewer, type Viewer } from '@/content/admin/auth/viewer'
 
 /**
  * The admin shell.
@@ -18,7 +21,13 @@ import { assertAdmin } from '@/content/admin/guard'
  *
  * `middleware.ts` is the gate that matters and runs at the edge before this
  * renders. `assertAdmin()` runs again here so a regression in the middleware
- * matcher fails the render rather than serving the page.
+ * matcher fails the render rather than serving the page. In individual mode
+ * the same second assertion is `requireViewer()`: a moderator or admin, asked
+ * of the backend, with a TOTP step-up the backend confirms.
+ *
+ * Basic mode renders exactly what it always did. The acting-as bar and the
+ * Moderation group exist only in individual mode, because the shared
+ * credential identifies nobody and must never moderate.
  *
  * No client JavaScript: the mobile navigation is a native <details>.
  */
@@ -27,14 +36,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 }
 
-function NavList({ pathname }: { pathname: string }) {
+function NavList({ pathname, viewer }: { pathname: string; viewer: Viewer | null }) {
+  const groups: { group: string; sections: readonly AdminSection[] }[] = ADMIN_GROUPS.map((group) => ({
+    group,
+    sections: sectionsIn(group).filter((s) => !viewer || !s.minRole || s.minRole === viewer.role),
+  }))
+  if (viewer) groups.push({ group: 'Moderation', sections: MODERATION_SECTIONS })
   return (
     <>
-      {ADMIN_GROUPS.map((group) => (
+      {groups.map(({ group, sections }) => (
         <div key={group} className="mb-5 last:mb-0">
           <p className="text-eyebrow px-3 font-semibold text-ink-mute uppercase">{group}</p>
           <ul className="mt-1">
-            {sectionsIn(group).map((section) => {
+            {sections.map((section) => {
               const active =
                 pathname === section.href ||
                 (section.href !== '/admin' && pathname.startsWith(`${section.href}/`))
@@ -63,10 +77,13 @@ function NavList({ pathname }: { pathname: string }) {
 }
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  await assertAdmin()
+  let viewer: Viewer | null = null
+  if (adminAuthMode() === 'individual') viewer = await requireViewer(true)
+  else await assertAdmin()
 
   const pathname = (await headers()).get('x-pathname') ?? ''
   const section = currentSection(pathname)
+  const csrf = viewer ? await csrfToken() : ''
 
   return (
     <div className="min-h-screen bg-sunk lg:flex">
@@ -85,7 +102,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           </span>
         </summary>
         <nav aria-label="Admin sections" className="border-t border-rule px-2 pt-3 pb-4">
-          <NavList pathname={pathname} />
+          <NavList pathname={pathname} viewer={viewer} />
         </nav>
       </details>
 
@@ -99,13 +116,23 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <span className="text-eyebrow font-semibold text-ink-mute uppercase">Admin</span>
           </div>
           <nav aria-label="Admin sections">
-            <NavList pathname={pathname} />
+            <NavList pathname={pathname} viewer={viewer} />
           </nav>
         </div>
       </div>
 
       {/* ── content ───────────────────────────────────────────────────────── */}
       <div className="min-w-0 flex-1">
+        {viewer && (
+          <ActingAs
+            displayName={viewer.displayName}
+            accountId={viewer.me.account_id}
+            role={viewer.role}
+            meta={viewer.meta}
+            csrf={csrf}
+            now={Date.now()}
+          />
+        )}
         <div className="w-full max-w-[1060px] px-5 py-7 sm:px-6 lg:px-8">{children}</div>
       </div>
     </div>

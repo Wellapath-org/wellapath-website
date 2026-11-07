@@ -72,6 +72,9 @@ npm run check:resend           # tells you exactly what is missing or wrong
 | `RESEND_API_KEY` | [resend.com/api-keys](https://resend.com/api-keys) — "Sending access" is enough; this code only creates contacts, it never sends |
 | `RESEND_AUDIENCE_ID` | [resend.com/audiences](https://resend.com/audiences) — create an audience, copy its **ID**, not its name |
 | `ADMIN_USER`, `ADMIN_PASSWORD` | Chosen by you. They gate `/admin/signups`, which lists real names and numbers |
+| `ADMIN_AUTH_MODE` | Unset or `basic` (the default, and production today): the shared Basic credential above, read-only pages, no moderation. `individual`: per-person sign-in for moderator and admin accounts against the Community auth service, with mandatory TOTP, and the moderation section. Anything else is `basic` |
+| `ADMIN_BASIC_OUTER_GATE` | `individual` mode only. `true` keeps the shared Basic credential in front of the individual sign-in during the transition; it grants nothing on its own |
+| `COMMUNITY_API_BASE_URL` | `individual` mode only. The Community API origin (HTTPS; `http://127.0.0.1` allowed for local work). Unset means nobody can sign in |
 | `ADMIN_REVEAL_CONTACTS` | Local only, normally unset. Outside production (`next dev`) `/admin/signups` masks every email and number and drops the CSV export; `true` shows them. Production ignores it |
 
 Set the same values in **Vercel → Settings → Environment Variables**. Vercel only

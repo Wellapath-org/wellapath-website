@@ -31,6 +31,8 @@ import { getSignups } from '@/content/signups'
 import { csvDocument } from '@/content/csv'
 import { maskEmail, maskPhone, revealContacts } from '@/content/admin/reveal'
 import { TriangleAlert, Download } from 'lucide-react'
+import { adminAuthMode } from '@/content/admin/auth/mode'
+import { requireRole } from '@/content/admin/auth/viewer'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
@@ -53,6 +55,8 @@ const SERIES = [
 ]
 
 export default async function SignupsPage() {
+  // Individual mode: contact details are for admins, not every moderator.
+  if (adminAuthMode() === 'individual') await requireRole('admin')
   const r = await getSignups(30)
 
   if (!r.ok) {

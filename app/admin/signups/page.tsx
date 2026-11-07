@@ -29,6 +29,7 @@ import {
 } from '@/components/admin'
 import { getSignups } from '@/content/signups'
 import { csvDocument } from '@/content/csv'
+import { maskEmail, maskPhone, revealContacts } from '@/content/admin/reveal'
 import { TriangleAlert, Download } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -75,8 +76,9 @@ export default async function SignupsPage() {
           )}
           <p className="text-small mt-4 text-ink-mute">
             Run <code className="rounded-xs bg-sunk px-1.5 py-0.5">npm run check:resend</code>{' '}
-            locally to see which part is wrong. Signups are still written to the server log
-            meanwhile, so nothing is being lost.
+            locally to see which part is wrong. Contact details are never written to the server
+            log, so a signup that no store could keep is reported to the visitor as an error
+            rather than silently lost.
           </p>
         </Card>
       </div>
@@ -93,7 +95,14 @@ export default async function SignupsPage() {
   // Properly quoted and escaped, and defused against spreadsheet formula
   // injection. `source` is free text from a public form, so a comma, a quote,
   // a newline or a leading `=` in it are all things a visitor can send.
-  const csv = csvDocument(
+  //
+  // Outside production the list is masked and there is no export unless
+  // ADMIN_REVEAL_CONTACTS=true (see content/admin/reveal.ts). Production is
+  // unchanged.
+  const reveal = revealContacts()
+  const emailShown = (e: string) => (reveal ? e : maskEmail(e))
+  const phoneShown = (p: string) => (reveal ? p : maskPhone(p))
+  const csv = reveal && csvDocument(
     ['email', 'whatsapp', 'received_at', 'unsubscribed', 'source', 'store'],
     r.signups.map((s) => [
       s.email ?? '',
@@ -235,8 +244,14 @@ export default async function SignupsPage() {
               Newest first. This is personal data: do not paste it anywhere, and do not export it
               except to run the launch message.
             </p>
+            {!reveal && (
+              <p className="text-small mt-2 text-ink-mute">
+                Contact details are masked and the CSV export is off because this is not a
+                production server. Set ADMIN_REVEAL_CONTACTS=true to show them.
+              </p>
+            )}
           </div>
-          {r.total > 0 && (
+          {csv && r.total > 0 && (
             <Button
               href={`data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`}
               variant="secondary"
@@ -271,10 +286,14 @@ export default async function SignupsPage() {
                 r.signups.map((s) => (
                   <tr key={s.id} className="border-b border-rule">
                     <td className="py-3.5 text-ink">
-                      {s.email ?? <span className="text-ink-mute">not given</span>}
+                      {s.email ? emailShown(s.email) : <span className="text-ink-mute">not given</span>}
                     </td>
                     <td className="tnum py-3.5 text-ink">
-                      {s.whatsappDisplay ?? <span className="text-ink-mute">not given</span>}
+                      {s.whatsappDisplay ? (
+                        phoneShown(s.whatsappDisplay)
+                      ) : (
+                        <span className="text-ink-mute">not given</span>
+                      )}
                     </td>
                     <td className="tnum py-3.5 text-ink-soft">{fmtFull.format(s.createdAt)}</td>
                     <td className="py-3.5 text-right">

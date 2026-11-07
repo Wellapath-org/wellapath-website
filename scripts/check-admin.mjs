@@ -40,6 +40,7 @@ import {
   TTL_MS,
 } from '../content/admin/config-probe.ts'
 import { MANUAL_FACTS, LAUNCH_ACTIONS } from '../content/admin/register.ts'
+import { maskEmail, maskPhone, revealContacts } from '../content/admin/reveal.ts'
 
 const BASE = process.argv[2] ?? 'http://localhost:3737'
 const USER = process.env.ADMIN_USER
@@ -444,6 +445,54 @@ async function checkProbe() {
 /* ────────────────────────────────────────────────────────────────────────
  * 9. Unit checks that need no server
  * ──────────────────────────────────────────────────────────────────────── */
+
+/** Contacts are masked off production, and never reach a server log. */
+async function checkContactExposure() {
+  console.log('\nContact details stay out of logs and local screenshots')
+
+  // Synthetic values only.
+  const email = 'jane.doe@example.com'
+  assert(maskEmail(email) === 'j•••@•••.com', 'an email masks to its shape', maskEmail(email))
+  assert(!maskEmail(email).includes('example'), 'a masked email keeps no domain name')
+  assert(maskPhone('0803 123 4567') === '••• ••• ••67', 'a number keeps its last two digits only')
+  assert(!maskPhone('+234 803 123 4567').includes('803'), 'a masked number hides the prefix and body')
+
+  const saved = { node: process.env.NODE_ENV, flag: process.env.ADMIN_REVEAL_CONTACTS }
+  const env = (node, flag) => {
+    process.env.NODE_ENV = node
+    if (flag === undefined) delete process.env.ADMIN_REVEAL_CONTACTS
+    else process.env.ADMIN_REVEAL_CONTACTS = flag
+    return revealContacts()
+  }
+  assert(env('production', undefined) === true, 'production reveals, as before')
+  assert(env('production', 'false') === true, 'production ignores ADMIN_REVEAL_CONTACTS')
+  assert(env('development', undefined) === false, 'a dev server masks by default')
+  assert(env('development', '1') === false, 'only the exact value "true" reveals')
+  assert(env('development', 'true') === true, 'ADMIN_REVEAL_CONTACTS=true reveals off production')
+  if (saved.node === undefined) delete process.env.NODE_ENV
+  else process.env.NODE_ENV = saved.node
+  if (saved.flag === undefined) delete process.env.ADMIN_REVEAL_CONTACTS
+  else process.env.ADMIN_REVEAL_CONTACTS = saved.flag
+
+  const { readFileSync } = await import('node:fs')
+  const page = readFileSync('app/admin/signups/page.tsx', 'utf8')
+  assert(/const csv = reveal &&/.test(page), 'the CSV export is built only when contacts are revealed')
+
+  // Every console call in the signup route and the store it calls: the only
+  // values a template may interpolate are the event, the channel and the code,
+  // and no call may pass a second argument (a raw error can quote the address).
+  const allowed = new Set(['event', 'channel', 'code', "code ? ` code=${code}` : ''"])
+  for (const file of ['app/api/notify/route.ts', 'content/db.ts']) {
+    const src = readFileSync(file, 'utf8')
+    const calls = src.match(/console\.\w+\(`[^`]*(?:`[^`]*`[^`]*)*`[^)]*\)/g) ?? []
+    const bare = (src.match(/console\.\w+\(/g) ?? []).length
+    assert(calls.length === bare, `${file}: every console call is a single template string`)
+    const used = calls.flatMap((c) => [...c.matchAll(/\$\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]))
+    const bad = used.filter((u) => !allowed.has(u) && u !== 'code')
+    assert(bad.length === 0, `${file}: no console call interpolates a contact detail`, bad.join(', '))
+  }
+}
+
 function checkCsv() {
   console.log('\nCSV export quotes, escapes and defuses')
 
@@ -735,6 +784,7 @@ async function main() {
 
   // Server-free checks first, so a broken server does not hide them.
   checkCsv()
+  await checkContactExposure()
   checkFactModel()
   await checkProbe()
   checkRegisterHygiene()

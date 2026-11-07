@@ -25,7 +25,7 @@ if (!existsSync(KB)) {
 
 const FILES = {
   'rules.json': 'rules.ng.v2.2.json',
-  'facilities.json': 'facilities.ng.v1.1.json',
+  'facilities.json': 'facilities.ng.v1.2.json',
   'tokens.json': 'token_dictionary.ng.v1.1.json',
   'red-flag-display.json': 'mobile_handoff/red_flag_display_map.json',
 }

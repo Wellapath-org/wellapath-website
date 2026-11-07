@@ -1,10 +1,10 @@
 {
   "_metadata": {
     "artifact_id": "facilities",
-    "version": "1.1",
+    "version": "1.2",
     "schema_version": "1.0",
     "country": "ng",
-    "release_date": "2026-07-26",
+    "release_date": "2026-09-29",
     "total_facilities": 5344,
     "states_covered": [
       "Lagos",
@@ -25,13 +25,6 @@
         "last_updated": "2025-02",
         "license": "ODbL",
         "reliability": 4
-      },
-      {
-        "name": "HFR manual enrichment \u2014 45 Lagos facilities with verified phone numbers",
-        "url": null,
-        "last_updated": "2026-07-26",
-        "license": null,
-        "reliability": 5
       }
     ],
     "coordinate_bounds": {
@@ -53,7 +46,36 @@
       "pharmacy",
       "health_centre",
       "maternity"
-    ]
+    ],
+    "licence": {
+      "database_licence": "ODbL-1.0",
+      "database_licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "database_licence_statement": "This facility database is offered under the Open Database License 1.0. It is a Derivative Database under ODbL 1.0 section 1.0: OpenStreetMap records are modified and merged into it rather than included unaltered. The complete machine-readable database is this file, published at no charge.",
+      "scope": "This licence covers the facility database only. It does not place the WellaPath application source code, the clinical engine or any other product code under ODbL.",
+      "attribution": [
+        "© OpenStreetMap contributors",
+        "Center for Integrated Earth System Information (CIESIN), Columbia University (2024). GRID3 NGA Health Facilities v2.0. Licensed CC BY 4.0.",
+        "Produced with the Humanitarian OpenStreetMap Team's HOT Export Tool, via the Humanitarian Data Exchange."
+      ],
+      "attribution_urls": {
+        "openstreetmap_copyright": "https://www.openstreetmap.org/copyright",
+        "odbl": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "cc_by_4_0": "https://creativecommons.org/licenses/by/4.0/",
+        "grid3_dataset": "https://data.grid3.org/datasets/GRID3::grid3-nga-health-facilities-/explore",
+        "hotosm_dataset": "https://data.humdata.org/dataset/hotosm_nga_health_facilities"
+      },
+      "modifications": "WellaPath restricted the sources to Lagos, the FCT and Kano; normalised state names; mapped source facility types onto a five-value enumeration, excluding 746 unmappable records; validated coordinates against Nigeria's bounding box and rounded them to seven decimal places; title-cased names and collapsed internal whitespace; discarded 456 OpenStreetMap records as duplicates of GRID3 records; merged the remainder into one table with WellaPath identifiers; and derived emergency_capable from facility type. The data is modified from the originals.",
+      "no_endorsement": "GRID3, CIESIN, Columbia University, the Humanitarian OpenStreetMap Team, OpenStreetMap contributors, the Government of Nigeria and the Federal Ministry of Health do not endorse WellaPath or this derived work."
+    },
+    "supersession": {
+      "supersedes": "1.1",
+      "reason": "Version 1.1 carried 45 telephone numbers imported directly from a Nigeria Health Facility Registry export. NHFR publishes no licence and no terms of use, and its only public rights statement reserves all rights, so written redistribution permission for those values was never captured. They are removed here.",
+      "not_a_privacy_incident": "No personal-data breach was established. The removed values carry no named individual, and the source export's officer-contact columns are empty on every row. The final classification is a public-source facility-data licensing and attribution gap.",
+      "records_changed": 0,
+      "identities_preserved": true,
+      "coordinates_preserved": true,
+      "rollback": "docs/FACILITIES_V1_2_ROLLBACK.md"
+    }
   },
   "facilities": [
     {
@@ -556,7 +578,7 @@
       "city_area": "Ajeromi/Ifelodun",
       "latitude": 6.46945,
       "longitude": 3.34373,
-      "phone": "+2347030308631",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -592,7 +614,7 @@
       "city_area": "Alimosho",
       "latitude": 6.5258483,
       "longitude": 3.2163917,
-      "phone": "+2348060835555",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -832,7 +854,7 @@
       "city_area": "Agege",
       "latitude": 6.62489,
       "longitude": 3.31736,
-      "phone": "+2348023199846",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -1648,7 +1670,7 @@
       "city_area": "Agege",
       "latitude": 6.6171267,
       "longitude": 3.3308767,
-      "phone": "+2347062411832",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -2164,7 +2186,7 @@
       "city_area": "Ajeromi/Ifelodun",
       "latitude": 6.46131,
       "longitude": 3.34164,
-      "phone": "+2348055363625",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -3208,7 +3230,7 @@
       "city_area": "Alimosho",
       "latitude": 6.64871,
       "longitude": 3.29462,
-      "phone": "+2348053134810",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -3928,7 +3950,7 @@
       "city_area": "Alimosho",
       "latitude": 6.6007983,
       "longitude": 3.2461033,
-      "phone": "+2348029794506",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -4324,7 +4346,7 @@
       "city_area": "Agege",
       "latitude": 6.626665,
       "longitude": 3.3085983,
-      "phone": "+2349123775261",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -4564,7 +4586,7 @@
       "city_area": "Agege",
       "latitude": 6.6206417,
       "longitude": 3.3049933,
-      "phone": "+2348023332993",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -7756,7 +7778,7 @@
       "city_area": "Agege",
       "latitude": 6.6363167,
       "longitude": 3.31268,
-      "phone": "+2348033013282",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -9580,7 +9602,7 @@
       "city_area": "Alimosho",
       "latitude": 6.653086,
       "longitude": 3.29754,
-      "phone": "+2349043345125",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -9856,7 +9878,7 @@
       "city_area": "Alimosho",
       "latitude": 6.644325,
       "longitude": 3.2617667,
-      "phone": "+2348150741167",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -11152,7 +11174,7 @@
       "city_area": "Agege",
       "latitude": 6.6343,
       "longitude": 3.30455,
-      "phone": "+2348033047306",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -11248,7 +11270,7 @@
       "city_area": "Agege",
       "latitude": 6.61014,
       "longitude": 3.31067,
-      "phone": "+2348072694981",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -12220,7 +12242,7 @@
       "city_area": "Alimosho",
       "latitude": 6.55263,
       "longitude": 3.22461,
-      "phone": "+2347032603830",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -14164,7 +14186,7 @@
       "city_area": "Ikorodu",
       "latitude": 6.62124,
       "longitude": 3.51899,
-      "phone": "+2348023181957",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -14920,7 +14942,7 @@
       "city_area": "Agege",
       "latitude": 6.61194,
       "longitude": 3.31236,
-      "phone": "+2347030370167",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -15388,7 +15410,7 @@
       "city_area": "Ajeromi/Ifelodun",
       "latitude": 6.47115,
       "longitude": 3.34986,
-      "phone": "+2348033296600",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -15400,7 +15422,7 @@
       "city_area": "Alimosho",
       "latitude": 6.6216283,
       "longitude": 3.274495,
-      "phone": "+2348023211358",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -16348,7 +16370,7 @@
       "city_area": "Alimosho",
       "latitude": 6.5916883,
       "longitude": 3.2996683,
-      "phone": "+2348163964672",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -16600,7 +16622,7 @@
       "city_area": "Alimosho",
       "latitude": 6.64952,
       "longitude": 3.28179,
-      "phone": "+2348036660448",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -16924,7 +16946,7 @@
       "city_area": "Agege",
       "latitude": 6.6313567,
       "longitude": 3.319685,
-      "phone": "+2348056530891",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -17596,7 +17618,7 @@
       "city_area": "Alimosho",
       "latitude": 6.61235,
       "longitude": 3.30345,
-      "phone": "+2348056867574",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -18064,7 +18086,7 @@
       "city_area": "Ibeju/Lekki",
       "latitude": 6.4601092,
       "longitude": 3.710085,
-      "phone": "+2349129207229",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -18088,7 +18110,7 @@
       "city_area": "Alimosho",
       "latitude": 6.6414167,
       "longitude": 3.31608,
-      "phone": "+2348037360366",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -19084,7 +19106,7 @@
       "city_area": "Alimosho",
       "latitude": 6.6109267,
       "longitude": 3.2974,
-      "phone": "+2348033030368",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -19444,7 +19466,7 @@
       "city_area": "Agege",
       "latitude": 6.6088867,
       "longitude": 3.3120728,
-      "phone": "+2348033447126",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -19540,7 +19562,7 @@
       "city_area": "Agege",
       "latitude": 6.640105,
       "longitude": 3.3128167,
-      "phone": "+2348023154774",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -19720,7 +19742,7 @@
       "city_area": "Agege",
       "latitude": 6.62267,
       "longitude": 3.3092,
-      "phone": "+2348033579246",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -20260,7 +20282,7 @@
       "city_area": "Agege",
       "latitude": 6.634495,
       "longitude": 3.303395,
-      "phone": "+2348023054074",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": true
     },
@@ -20908,7 +20930,7 @@
       "city_area": "Agege",
       "latitude": 6.622185,
       "longitude": 3.308495,
-      "phone": "+2348030471727",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -21400,7 +21422,7 @@
       "city_area": "Agege",
       "latitude": 6.6219533,
       "longitude": 3.30327,
-      "phone": "+2348033677444",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -21592,7 +21614,7 @@
       "city_area": "Alimosho",
       "latitude": 6.60497,
       "longitude": 3.2860917,
-      "phone": "+2348093932162",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -21880,7 +21902,7 @@
       "city_area": "Agege",
       "latitude": 6.6343117,
       "longitude": 3.3161283,
-      "phone": "+2348038195704",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -23152,7 +23174,7 @@
       "city_area": "Agege",
       "latitude": 6.6189333,
       "longitude": 3.3149667,
-      "phone": "+2348034256587",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -24628,7 +24650,7 @@
       "city_area": "Agege",
       "latitude": 6.610635,
       "longitude": 3.3291888,
-      "phone": "+2347025514546",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -25948,7 +25970,7 @@
       "city_area": "Agege",
       "latitude": 6.63063,
       "longitude": 3.31303,
-      "phone": "+2348034740169",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -26716,7 +26738,7 @@
       "city_area": "Agege",
       "latitude": 6.6146617,
       "longitude": 3.3046667,
-      "phone": "+2349079055273",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -26800,7 +26822,7 @@
       "city_area": "Alimosho",
       "latitude": 6.54301,
       "longitude": 3.26132,
-      "phone": "+2348029915892",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -27340,7 +27362,7 @@
       "city_area": "Alimosho",
       "latitude": 6.55336,
       "longitude": 3.26832,
-      "phone": "+2348033765204",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": false
     },
@@ -27424,7 +27446,7 @@
       "city_area": "Ajeromi-Ifelodun",
       "latitude": 6.4474488,
       "longitude": 3.3369879,
-      "phone": "+2348023566489",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": true
     },
@@ -27868,7 +27890,7 @@
       "city_area": "Alimosho",
       "latitude": 6.6064245,
       "longitude": 3.2349466,
-      "phone": "+2348074568456",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": true
     },
@@ -29872,7 +29894,7 @@
       "city_area": "Alimosho",
       "latitude": 6.551744,
       "longitude": 3.2188976,
-      "phone": "+2348165474936",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": true
     },
@@ -30820,7 +30842,7 @@
       "city_area": "Alimosho",
       "latitude": 6.6240372,
       "longitude": 3.2914647,
-      "phone": "+2348141665471",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": true
     },
@@ -32014,7 +32036,7 @@
     },
     {
       "facility_id": "ng_lag_2664",
-      "name": "St. Luke\u00e3\u00a2\u00c2\u20ac\u00c2\u02dcS Medical Center",
+      "name": "St. Lukeã¢Â€Â˜S Medical Center",
       "type": "hospital",
       "state": "Lagos",
       "city_area": "Surulere",
@@ -32272,7 +32294,7 @@
       "city_area": "Alimosho",
       "latitude": 6.5856125,
       "longitude": 3.2456017,
-      "phone": "+2348029318672",
+      "phone": null,
       "opening_hours": null,
       "emergency_capable": true
     },

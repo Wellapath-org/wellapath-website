@@ -464,7 +464,12 @@ export class MockBackend {
       target.status = to
       let revoked = 0
       if (verb === 'suspend') {
-        for (const s of this.sessions.values()) if (s.accountId === target.id && !s.revoked) (s.revoked = true), revoked++
+        for (const s of this.sessions.values()) {
+          if (s.accountId === target.id && !s.revoked) {
+            s.revoked = true
+            revoked++
+          }
+        }
       }
       const action = { restrict: 'restrict_account', suspend: 'suspend_account', reinstate: 'reinstate_account' }[verb]!
       const row = { ...this.record(actor, action, 'account', id, reason), target_status: to }

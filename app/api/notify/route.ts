@@ -15,10 +15,15 @@
  *    §9 requires every page to work without JS; a signup that silently fails
  *    for those visitors would be worse than not offering one.
  *
- * 3. A missing or broken API key must never swallow the address. If Resend is
- *    unreachable the visitor is told plainly and the address is logged to the
- *    server so it can be recovered, rather than disappearing into a success
+ * 3. A missing or broken API key must never swallow the address. If no store
+ *    keeps it the visitor is told plainly, rather than landing on a success
  *    page that lied.
+ *
+ *    NO CONTACT DETAIL IS EVER LOGGED. Server logs are retained, forwarded and
+ *    screenshotted far more freely than the signups table, and nothing in them
+ *    is covered by /privacy's 30-day deletion promise. Failure logs carry the
+ *    channel and an error code only (see `logFailure`), never the address, the
+ *    number, a hash of either, or a raw error object that might quote them.
  *
  * 4. NDPR: the lawful basis is consent, given by submitting this form. The
  *    signups table records the timestamp, which is the consent evidence, and is
@@ -38,6 +43,27 @@ export const runtime = 'nodejs'
 
 /** Deliberately permissive: the only job is to reject obvious rubbish. */
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+type Channel = 'email' | 'whatsapp' | 'email+whatsapp'
+
+/**
+ * A short, PII-free code for an error. Postgres errors carry a SQLSTATE in
+ * `code` (and quote the offending value in `detail`, which is why the object
+ * itself is never logged); Resend errors carry a `name`. Anything else falls
+ * back to the error class.
+ */
+function errorCode(e: unknown): string {
+  if (e && typeof e === 'object') {
+    const { code, name } = e as { code?: unknown; name?: unknown }
+    if (typeof code === 'string' && /^[0-9A-Z]{5}$/.test(code)) return `sqlstate_${code}`
+    if (typeof name === 'string' && /^[A-Za-z_]{1,64}$/.test(name)) return name
+  }
+  return 'unknown'
+}
+
+function logFailure(event: string, channel: Channel, code?: string) {
+  console.error(`[notify] ${event} channel=${channel}${code ? ` code=${code}` : ''}`)
+}
 
 function back(req: NextRequest, params: Record<string, string>) {
   const url = new URL('/notify/thanks', req.nextUrl.origin)
@@ -83,7 +109,7 @@ export async function POST(req: NextRequest) {
     whatsapp = parsed.e164
   }
 
-  const who = [emailGiven ? email : null, whatsapp].filter(Boolean).join(' / ')
+  const channel: Channel = emailGiven && whatsapp ? 'email+whatsapp' : whatsapp ? 'whatsapp' : 'email'
 
   // ── Postgres is the source of truth ────────────────────────────────────
   // It is allowed to be absent. The database and the deployment that uses it
@@ -98,12 +124,10 @@ export async function POST(req: NextRequest) {
       await saveSignup({ email: emailGiven ? email : null, whatsapp, source: source || null })
       stored = true
     } catch (e) {
-      console.error(`[notify] Could not save ${who} to Postgres:`, e)
+      logFailure('postgres_save_failed', channel, errorCode(e))
     }
   } else if (whatsapp) {
-    console.error(
-      `[notify] No Postgres URL (DATABASE_URL or POSTGRES_URL). Unsaved WhatsApp signup: ${who}`,
-    )
+    logFailure('postgres_not_configured', channel)
   }
 
   // ── Resend, for the email broadcast ────────────────────────────────────
@@ -114,7 +138,7 @@ export async function POST(req: NextRequest) {
     const key = process.env.RESEND_API_KEY
     const audienceId = process.env.RESEND_AUDIENCE_ID
     if (!key || !audienceId) {
-      console.error(`[notify] Resend is not configured, so ${email} is not on the launch list.`)
+      logFailure('resend_not_configured', channel)
     } else {
       try {
         const { error } = await new Resend(key).contacts.create({
@@ -124,9 +148,9 @@ export async function POST(req: NextRequest) {
         })
         // Already-subscribed is a success from the visitor's side.
         if (!error || String(error.message ?? '').toLowerCase().includes('already')) mailed = true
-        else console.error(`[notify] Resend rejected ${email}: ${error.message}`)
+        else logFailure('resend_rejected', channel, errorCode(error))
       } catch (e) {
-        console.error(`[notify] Resend threw for ${email}:`, e)
+        logFailure('resend_threw', channel, errorCode(e))
       }
     }
   }
@@ -137,7 +161,7 @@ export async function POST(req: NextRequest) {
   const numberLost = Boolean(whatsapp) && !stored
 
   if (!kept || numberLost) {
-    console.error(`[notify] Unsaved signup: ${who}`)
+    logFailure('signup_not_kept', channel)
     return back(req, { status: 'error' })
   }
 

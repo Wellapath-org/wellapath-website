@@ -46,6 +46,9 @@ To build a preview anyway:
 ALLOW_UNREVIEWED_RED_FLAGS=true npm run build
 ```
 
+Pass it on the command line like this, for a local preview only. `.env.example`
+ships it as `false` on purpose: a copied `.env.local` must never carry the bypass.
+
 ## Launch signup
 
 The "Notify me at launch" form posts to `/api/notify`. It takes **an email
@@ -69,13 +72,16 @@ npm run check:resend           # tells you exactly what is missing or wrong
 | `RESEND_API_KEY` | [resend.com/api-keys](https://resend.com/api-keys) — "Sending access" is enough; this code only creates contacts, it never sends |
 | `RESEND_AUDIENCE_ID` | [resend.com/audiences](https://resend.com/audiences) — create an audience, copy its **ID**, not its name |
 | `ADMIN_USER`, `ADMIN_PASSWORD` | Chosen by you. They gate `/admin/signups`, which lists real names and numbers |
+| `ADMIN_REVEAL_CONTACTS` | Local only, normally unset. Outside production (`next dev`) `/admin/signups` masks every email and number and drops the CSV export; `true` shows them. Production ignores it |
 
 Set the same values in **Vercel → Settings → Environment Variables**. Vercel only
 applies environment variables to deployments created *after* they are added, so
 redeploy once you have set them.
 
-Until `DATABASE_URL` is set every signup returns an honest error and the details
-are written to the server log, so nothing is lost — but nothing is stored either.
+Until `DATABASE_URL` is set a WhatsApp signup returns an honest error, because
+nothing can store it. Contact details are never written to the server log: a
+failure logs only the channel (`email`, `whatsapp` or `email+whatsapp`) and an
+error code.
 `/admin/signups` says so on the page rather than quietly reporting zero.
 
 Numbers are normalised to E.164 (`+234XXXXXXXXXX`) on the way in, so the same

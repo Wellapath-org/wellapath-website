@@ -338,6 +338,8 @@ export class MockBackend {
       const { a, s } = r
       if (a.role === 'member') return send(403, err('forbidden'))
       const confirm = path.endsWith('/confirm')
+      // A8: already enrolled is already_in_state (C2, founder-approved 2026-11-08); nothing started is not_enrolled.
+      if (confirm && a.enrolled) return send(422, err('invalid_state', { reason: 'already_in_state' }))
       if (confirm && !a.pendingSecret) return send(422, err('invalid_state', { reason: 'not_enrolled' }))
       if (!confirm && !a.enrolled) return send(403, err('mfa_enrollment_required'))
       if (a.lockedUntil > Date.now()) {

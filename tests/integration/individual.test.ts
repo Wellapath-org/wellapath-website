@@ -317,6 +317,25 @@ describe('moderation', () => {
     expect((await bad.json()).error.details).toEqual({ reason: 'refresh_invalid' })
   })
 
+  it('the mock backend answers A8 confirm on an enrolled account with already_in_state (C2)', async () => {
+    const api = (path: string, body: unknown, token?: string) =>
+      fetch(`http://127.0.0.1:${mock.port}${path}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify(body),
+      })
+    await api('/v1/auth/otp/request', { email: 'mod@test.invalid' })
+    const pair = await (
+      await api('/v1/auth/otp/verify', { email: 'mod@test.invalid', code: OTP_CODE, device_id: crypto.randomUUID() })
+    ).json()
+    expect(pair.expires_in).toBeGreaterThanOrEqual(60)
+    expect(pair.expires_in).toBeLessThanOrEqual(900)
+    expect(pair.refresh_token).toMatch(/^wprt_[A-Za-z0-9_-]{43,}$/)
+    const confirm = await api('/v1/auth/totp/enrol/confirm', { code: TOTP_CODE }, pair.access_token)
+    expect(confirm.status).toBe(422)
+    expect((await confirm.json()).error).toMatchObject({ code: 'invalid_state', details: { reason: 'already_in_state' } })
+  })
+
   it('restricting an already restricted account shows already_in_state and records nothing (C3)', async () => {
     const b = await signInStepped()
     const page = await b.get(`/admin/moderation/accounts/${AUTHOR_ID}`)

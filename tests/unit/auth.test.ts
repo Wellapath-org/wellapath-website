@@ -224,9 +224,12 @@ describe('session clock against the contract mock', () => {
     if (s.kind !== 'ok') return
     expect(s.refresh).not.toBe(pair.refresh_token)
     expect(s.meta.abs).toBeLessThanOrEqual(now + 12 * 3600 * 1000 + 1000)
-    // Replaying the old refresh token is reuse: the family dies.
-    const replay = await resumeSession({ get: (n) => (n === COOKIE.access ? undefined : jar.get(n)) })
-    expect(replay).toMatchObject({ kind: 'ended', reason: 'session_ended' })
+    const replayOld = () => resumeSession({ get: (n) => (n === COOKIE.access ? undefined : jar.get(n)) })
+    // D-019: within 10 s, same device, replacement unused: a race, not reuse.
+    expect(await replayOld()).toEqual({ kind: 'race' })
+    // Outside the window the same replay is reuse: the family dies.
+    mock.refresh.get(pair.refresh_token)!.usedAt = Date.now() - 11_000
+    expect(await replayOld()).toMatchObject({ kind: 'ended', reason: 'session_ended' })
   })
 
   it('idle for an hour ends the session and revokes it at the backend', async () => {

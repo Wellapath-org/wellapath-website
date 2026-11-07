@@ -291,6 +291,48 @@ describe('moderation', () => {
     }
   })
 
+  it('the mock backend models the tightened D-019 refresh race and C6', async () => {
+    const api = (path: string, body: unknown) =>
+      fetch(`http://127.0.0.1:${mock.port}${path}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    const device = crypto.randomUUID()
+    await api('/v1/auth/otp/request', { email: 'mod@test.invalid' })
+    const first = await (await api('/v1/auth/otp/verify', { email: 'mod@test.invalid', code: OTP_CODE, device_id: device })).json()
+    const rotated = await (await api('/v1/auth/refresh', { refresh_token: first.refresh_token, device_id: device })).json()
+    // Same device, within 10 s, replacement unused: tolerated.
+    const race = await api('/v1/auth/refresh', { refresh_token: first.refresh_token, device_id: device })
+    expect(race.status).toBe(409)
+    expect((await race.json()).error.details).toEqual({ reason: 'refresh_race' })
+    // Once the replacement is used, the same repeat is reuse and revokes.
+    const third = await (await api('/v1/auth/refresh', { refresh_token: rotated.refresh_token, device_id: device })).json()
+    const reuse = await api('/v1/auth/refresh', { refresh_token: first.refresh_token, device_id: device })
+    expect(reuse.status).toBe(401)
+    expect((await reuse.json()).error.details).toEqual({ reason: 'refresh_reused' })
+    expect((await api('/v1/auth/refresh', { refresh_token: third.refresh_token, device_id: device })).status).toBe(401)
+    const bad = await api('/v1/auth/refresh', { refresh_token: 'nope', device_id: device })
+    expect(bad.status).toBe(401)
+    expect((await bad.json()).error.details).toEqual({ reason: 'refresh_invalid' })
+  })
+
+  it('restricting an already restricted account shows already_in_state and records nothing (C3)', async () => {
+    const b = await signInStepped()
+    const page = await b.get(`/admin/moderation/accounts/${AUTHOR_ID}`)
+    const f = { csrf: Browser.csrf(page.body), op: 'restrict', target_type: 'account', target_id: AUTHOR_ID, reason: REASON, return_to: '/admin/moderation' }
+    expect((await b.post('/admin/moderation/act', f)).location).toBe('/admin/moderation/result')
+    const auditHits = async () =>
+      ((await b.get(`/admin/moderation/audit?target_id=${AUTHOR_ID}`)).body.match(/restrict_account/g) ?? []).length
+    const before = mock.actions.length
+    const pageBefore = await auditHits()
+    const again = await b.post('/admin/moderation/act', f)
+    expect(again.location).toBe('/admin/moderation?error=invalid_state.already_in_state')
+    expect(mock.actions.length).toBe(before)
+    expect(mock.actions.filter((a) => a.action === 'restrict_account')).toHaveLength(1)
+    expect(await auditHits()).toBe(pageBefore)
+  })
+
   it('restore after hide works and is audited; acting on an already-hidden post shows the server state error', async () => {
     const b = await signInStepped()
     const page = await b.get(`/admin/moderation/reports/${REPORT_ID}`)

@@ -12,6 +12,11 @@
  * input values (§1.3).
  *
  * Edge-safe: fetch, AbortController and nothing from Node.
+ *
+ * CORS (contract C8, approved 2026-11-08): because these calls are
+ * server-to-server, /admin needs no browser CORS grant from the API. It uses
+ * GET and POST only, sends authorization, content-type, idempotency-key and
+ * accept, and never sends credentials (cookies stay on the website).
  */
 import { communityApiBase } from './mode'
 

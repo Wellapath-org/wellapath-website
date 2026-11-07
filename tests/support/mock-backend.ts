@@ -48,9 +48,11 @@ export class MockBackend {
   accounts = new Map<string, Account>()
   sessions = new Map<string, Session>()
   access = new Map<string, { sid: string; exp: number }>()
-  refresh = new Map<string, { sid: string; used: boolean }>()
+  /** usedAt and next model the D-019 race window (contract §3.2). */
+  refresh = new Map<string, { sid: string; used: boolean; usedAt?: number; next?: string }>()
   otpIssued = new Set<string>()
   actions: Record<string, unknown>[] = []
+  private lastIssuedRefresh = ''
   contentStatus = new Map<string, string>()
   reportStatus = new Map<string, string>()
   nextActionId = 1000
@@ -159,6 +161,7 @@ export class MockBackend {
     const exp = Date.now() + ACCESS_TTL_S * 1000
     this.access.set(at, { sid, exp })
     this.refresh.set(rt, { sid, used: false })
+    this.lastIssuedRefresh = rt
     return {
       token_type: 'Bearer',
       access_token: at,
@@ -284,14 +287,28 @@ export class MockBackend {
       const r = this.refresh.get(String(body.refresh_token ?? ''))
       if (!r) return send(401, err('unauthenticated', { reason: 'refresh_invalid' }))
       const s = this.sessions.get(r.sid)!
+      if (s.revoked) return send(401, err('unauthenticated', { reason: 'session_revoked' }))
+      // D-019 (founder, 2026-11-08): a repeat is tolerated only within 10 s,
+      // from the same device, with the replacement (same family) unused.
+      const next = r.next ? this.refresh.get(r.next) : undefined
+      const tolerated =
+        r.used &&
+        s.deviceId === body.device_id &&
+        Date.now() - (r.usedAt ?? 0) < 10_000 &&
+        next !== undefined &&
+        next.sid === r.sid &&
+        !next.used
+      if (tolerated) return send(409, err('conflict', { reason: 'refresh_race' }))
       if (r.used || s.deviceId !== body.device_id) {
         this.revokeSession(r.sid)
         return send(401, err('unauthenticated', { reason: 'refresh_reused' }))
       }
-      if (s.revoked) return send(401, err('unauthenticated', { reason: 'session_revoked' }))
       if (s.absUntil < Date.now()) return send(401, err('unauthenticated', { reason: 'refresh_expired' }))
       r.used = true
-      return send(200, this.issue(r.sid, this.byId(s.accountId)!, false))
+      r.usedAt = Date.now()
+      const pair = this.issue(r.sid, this.byId(s.accountId)!, false)
+      r.next = this.lastIssuedRefresh
+      return send(200, pair)
     }
     // A4
     if (method === 'POST' && path === '/v1/auth/logout') {
@@ -436,6 +453,10 @@ export class MockBackend {
       if (target.role !== 'member' && actor.role !== 'admin') return send(403, err('forbidden'))
       if (verb === 'reinstate' && target.status === 'active') {
         return send(422, err('invalid_state', { reason: 'not_restricted_or_suspended' }))
+      }
+      // C3 (founder, 2026-11-08): no-op restrict/suspend, and no audit row.
+      if ((verb === 'restrict' && target.status === 'restricted') || (verb === 'suspend' && target.status === 'suspended')) {
+        return send(422, err('invalid_state', { reason: 'already_in_state' }))
       }
       const to = { restrict: 'restricted', suspend: 'suspended', reinstate: 'active' }[verb] as Account['status']
       target.status = to

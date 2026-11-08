@@ -475,7 +475,7 @@ async function checkContactExposure() {
   else process.env.ADMIN_REVEAL_CONTACTS = saved.flag
 
   const { readFileSync } = await import('node:fs')
-  const page = readFileSync('app/admin/signups/page.tsx', 'utf8')
+  const page = readFileSync('app/admin/(panel)/signups/page.tsx', 'utf8')
   assert(/const csv = reveal &&/.test(page), 'the CSV export is built only when contacts are revealed')
 
   // Every console call in the signup route and the store it calls: the only

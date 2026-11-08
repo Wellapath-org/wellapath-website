@@ -17,6 +17,9 @@ export type AdminSection = {
   group: AdminGroup
   /** One line describing what the section answers. */
   blurb: string
+  /** Individual mode only: the lowest role that may open it. Unset means any
+   *  moderator or admin. Ignored in basic mode, which has no roles. */
+  minRole?: 'admin'
 }
 
 export const ADMIN_GROUPS: readonly AdminGroup[] = ['Operations', 'Audience', 'Measurement']
@@ -58,6 +61,7 @@ export const ADMIN_SECTIONS: readonly AdminSection[] = [
     label: 'Waitlist',
     group: 'Audience',
     blurb: 'Launch signups. Personal data.',
+    minRole: 'admin',
   },
   { href: '/admin/feedback', label: 'Feedback', group: 'Audience', blurb: 'Not active.' },
   { href: '/admin/support', label: 'Support', group: 'Audience', blurb: 'Not active.' },
@@ -76,6 +80,26 @@ export const ADMIN_SECTIONS: readonly AdminSection[] = [
   },
 ] as const
 
+/**
+ * Individual mode only, and deliberately not in ADMIN_SECTIONS: those are the
+ * read-only pages every mode serves, and the access check walks them with the
+ * shared credential. Moderation does not exist for the shared credential.
+ */
+export const MODERATION_SECTIONS: readonly AdminSection[] = [
+  {
+    href: '/admin/moderation',
+    label: 'Reports queue',
+    group: 'Operations',
+    blurb: 'Open Community reports, most urgent first.',
+  },
+  {
+    href: '/admin/moderation/audit',
+    label: 'Audit log',
+    group: 'Operations',
+    blurb: 'Every moderation action, newest first.',
+  },
+]
+
 export const ADMIN_ROUTES: readonly string[] = ADMIN_SECTIONS.map((s) => s.href)
 
 export function sectionsIn(group: AdminGroup): readonly AdminSection[] {
@@ -84,7 +108,7 @@ export function sectionsIn(group: AdminGroup): readonly AdminSection[] {
 
 /** The section a pathname belongs to, for the active marker and page titles. */
 export function currentSection(pathname: string): AdminSection | undefined {
-  return ADMIN_SECTIONS.find(
+  return [...ADMIN_SECTIONS, ...MODERATION_SECTIONS].find(
     (s) => pathname === s.href || (s.href !== '/admin' && pathname.startsWith(`${s.href}/`)),
   )
 }
